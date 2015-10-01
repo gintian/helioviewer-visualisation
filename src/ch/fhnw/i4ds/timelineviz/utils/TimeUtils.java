@@ -76,7 +76,6 @@ public class TimeUtils {
   public static Date fromString(String dateString, String format) throws ParseException {
 
     DateFormat dateFormat = new SimpleDateFormat(format);
-    System.out.println(dateString + " to: " + dateFormat.parse(dateString));
     return dateFormat.parse(dateString);
   }
 

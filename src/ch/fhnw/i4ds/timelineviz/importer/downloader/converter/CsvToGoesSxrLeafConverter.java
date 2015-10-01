@@ -39,11 +39,6 @@ public class CsvToGoesSxrLeafConverter {
 
         if (isValid(goesSxrLeaf) && TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp)) {
           goesSxrLeafs.add(goesSxrLeaf);
-        } else {
-//          System.out.println(startTimestamp);
-//          System.out.println(endTimestamp);
-//          System.out.println(goesSxrLeaf.getTimestamp());
-//          System.out.println();
         }
       }
     } finally {

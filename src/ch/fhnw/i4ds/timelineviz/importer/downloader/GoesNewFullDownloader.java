@@ -30,7 +30,6 @@ public class GoesNewFullDownloader extends AbstractGoesNewDownloader {
 
     try {
       goesNewFullStartDateMidnight = TimeUtils.setMidnight(TimeUtils.fromString("2009-12-01", "yyyy-MM-dd"));
-      System.out.println("blablup " + goesNewFullStartDateMidnight);
     } catch (ParseException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -76,7 +75,7 @@ public class GoesNewFullDownloader extends AbstractGoesNewDownloader {
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
-    System.out.println(url);
+    System.out.println(url); // TODO
     return url;
   }
 

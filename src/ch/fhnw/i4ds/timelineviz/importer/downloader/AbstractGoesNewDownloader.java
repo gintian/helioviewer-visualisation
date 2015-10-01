@@ -112,7 +112,6 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
 
     while ((currentLine = reader.readLine()) != null) {
       if (currentLine.startsWith("data:")) {
-        System.out.println(currentLine);
         return;
       }
     }
