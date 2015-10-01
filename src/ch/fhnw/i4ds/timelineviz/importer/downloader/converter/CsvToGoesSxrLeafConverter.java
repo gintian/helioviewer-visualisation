@@ -2,13 +2,10 @@ package ch.fhnw.i4ds.timelineviz.importer.downloader.converter;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.io.IOUtils;
-import org.joda.time.Instant;
-import org.joda.time.ReadableInstant;
-import org.joda.time.format.DateTimeFormatter;
 
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
@@ -22,16 +19,16 @@ public class CsvToGoesSxrLeafConverter {
   private final int timestampColumn;
   private final int lowChannelColumn;
   private final int highChannelColumn;
-  private final DateTimeFormatter dateTimeFormatter;
+  private final SimpleDateFormat dateTimeFormatter;
 
-  public CsvToGoesSxrLeafConverter(int timestampColumn, int lowChannelColumn, int highChannelColumn, DateTimeFormatter dateTimeFormatter) {
+  public CsvToGoesSxrLeafConverter(int timestampColumn, int lowChannelColumn, int highChannelColumn, SimpleDateFormat dateTimeFormatter) {
     this.timestampColumn = timestampColumn;
     this.lowChannelColumn = lowChannelColumn;
     this.highChannelColumn = highChannelColumn;
     this.dateTimeFormatter = dateTimeFormatter;
   }
 
-  public Set<GoesSxrLeaf> parseFile(ReadableInstant startTimestamp, ReadableInstant endTimestamp, Reader fileReader) throws IOException {
+  public Set<GoesSxrLeaf> parseFile(Date startTimestamp, Date endTimestamp, Reader fileReader) throws IOException {
     Set<GoesSxrLeaf> goesSxrLeafs = new HashSet<GoesSxrLeaf>();
     String[] nextLine;
     CSVReader csvReader = new CSVReader(fileReader, CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
@@ -42,10 +39,16 @@ public class CsvToGoesSxrLeafConverter {
 
         if (isValid(goesSxrLeaf) && TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp)) {
           goesSxrLeafs.add(goesSxrLeaf);
+        } else {
+//          System.out.println(startTimestamp);
+//          System.out.println(endTimestamp);
+//          System.out.println(goesSxrLeaf.getTimestamp());
+//          System.out.println();
         }
       }
     } finally {
-      IOUtils.closeQuietly(csvReader);
+      csvReader.close();
+//      IOUtils.closeQuietly(csvReader);
     }
 
     return goesSxrLeafs;
@@ -55,7 +58,8 @@ public class CsvToGoesSxrLeafConverter {
     try {
       GoesSxrLeaf goesSxrLeaf = new GoesSxrLeaf();
 
-      Instant timestamp = Instant.parse(line[timestampColumn], dateTimeFormatter);
+      Date timestamp = dateTimeFormatter.parse(line[timestampColumn]);
+//      Date timestamp = Date. (line[timestampColumn], dateTimeFormatter);
       float lowChannel = Float.parseFloat(line[lowChannelColumn]);
       float highChannel = Float.parseFloat(line[highChannelColumn]);
 
@@ -89,8 +93,6 @@ public class CsvToGoesSxrLeafConverter {
     if (goesSxrLeaf == null) {
       return false;
     } else if (goesSxrLeaf.getTimestamp() == null) {
-      return false;
-    } else if (goesSxrLeaf.getParentNode() != null) {
       return false;
     } else if (goesSxrLeaf.getLowChannel() < 1E-10 || goesSxrLeaf.getLowChannel() > 1E-2) {
       return false;

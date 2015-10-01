@@ -2,14 +2,10 @@ package ch.fhnw.i4ds.timelineviz.importer.downloader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Date;
 import java.util.Set;
-
-import org.apache.commons.io.IOUtils;
-import org.joda.time.DateMidnight;
-import org.joda.time.Instant;
-import org.joda.time.ReadableInstant;
 
 import ch.fhnw.i4ds.timelineviz.domain.GoesSxrLeaf;
 import ch.fhnw.i4ds.timelineviz.importer.downloader.converter.CsvToGoesSxrLeafConverter;
@@ -34,14 +30,14 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
   }
 
   @Override
-  public Set<GoesSxrLeaf> getGoesSxrLeafs(Instant startTimestamp, DateMidnight currentDateMidnight) {
+  public Set<GoesSxrLeaf> getGoesSxrLeafs(Date startTimestamp, Date currentDateMidnight) {
     int downloadTrials = 0;
 
     while (downloadTrials < MAX_GOESNR) {
       try {
         URL url = createUrl(currentDateMidnight, currentGoesNr);
-        final ReadableInstant maxStartTimestamp = TimeUtils.getMaxReadableInstant(startTimestamp, getStartDateMidnight());
-        final DateMidnight endTimestamp = getEndDateMidnight();
+        final Date maxStartTimestamp = TimeUtils.getMaxReadableInstant(startTimestamp, getStartDateMidnight());
+        final Date endTimestamp = getEndDateMidnight();
 
         Set<GoesSxrLeaf> goesSxrLeafs = downloadGoesSxrLeafs(url, maxStartTimestamp, endTimestamp);
         return goesSxrLeafs;
@@ -69,7 +65,7 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
    * @param goesNr
    * @return download URL
    */
-  protected abstract URL createUrl(DateMidnight currentDateMidnight, Integer goesNr);
+  protected abstract URL createUrl(Date currentDateMidnight, Integer goesNr);
 
   /**
    * Downloads the CSV-File from the given URL and parses it to GoesSxrLeafs.
@@ -82,19 +78,25 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
    * @return parsed GoesSxrLeafs.
    * @throws IOException
    */
-  private Set<GoesSxrLeaf> downloadGoesSxrLeafs(URL url, ReadableInstant startTimestamp, ReadableInstant endTimestamp) throws IOException {
+  private Set<GoesSxrLeaf> downloadGoesSxrLeafs(URL url, Date startTimestamp, Date endTimestamp) throws IOException {
     //		logger.info(DateTime.now().toString() + " - Importing data from: " + url);
 
-    String data = IOUtils.toString(url);
-    final StringReader stringReader = new StringReader(data);
-    BufferedReader dataReader = IOUtils.toBufferedReader(stringReader);
+    String data = url.toString(); // IOUtils.toString(url);
+//    final StringReader stringReader = new StringReader(data);
+    BufferedReader dataReader = new BufferedReader(new InputStreamReader(url.openStream())); // IOUtils.toBufferedReader(stringReader);
 
     Set<GoesSxrLeaf> parsedLeafs = null;
     try {
       skipToData(dataReader);
       parsedLeafs = csvParser.parseFile(startTimestamp, endTimestamp, dataReader);
+
+    } catch (IOException e) {
+      // TODO: handle exception
+      e.printStackTrace();
+
     } finally {
-      IOUtils.closeQuietly(dataReader);
+      dataReader.close();
+//      IOUtils.closeQuietly(dataReader);
     }
     return parsedLeafs;
   }
@@ -110,6 +112,7 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
 
     while ((currentLine = reader.readLine()) != null) {
       if (currentLine.startsWith("data:")) {
+        System.out.println(currentLine);
         return;
       }
     }

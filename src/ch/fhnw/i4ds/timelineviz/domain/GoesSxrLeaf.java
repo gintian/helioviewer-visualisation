@@ -1,40 +1,23 @@
 package ch.fhnw.i4ds.timelineviz.domain;
 
-import org.joda.time.Instant;
+import java.util.Date;
 
 public class GoesSxrLeaf implements Comparable<GoesSxrLeaf> {
 
-  private Long id;
 
-  private GoesTreeNode parentNode;
-
-  private Instant timestamp;
+  private Date timestamp;
 
   private float lowChannel;
 
   private float highChannel;
 
-  public Long getId() {
-    return id;
-  }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
 
-  public GoesTreeNode getParentNode() {
-    return parentNode;
-  }
-
-  public void setParentNode(GoesTreeNode parentNode) {
-    this.parentNode = parentNode;
-  }
-
-  public Instant getTimestamp() {
+  public Date getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(Instant timestamp) {
+  public void setTimestamp(Date timestamp) {
     this.timestamp = timestamp;
   }
 
@@ -78,7 +61,7 @@ public class GoesSxrLeaf implements Comparable<GoesSxrLeaf> {
       if (other.timestamp != null) {
         return false;
       }
-    } else if (!timestamp.isEqual(other.timestamp)) {
+    } else if (!timestamp.equals(other.timestamp)) {
       return false;
     }
     return true;
@@ -86,14 +69,14 @@ public class GoesSxrLeaf implements Comparable<GoesSxrLeaf> {
 
   @Override
   public String toString() {
-    return "GoesSxrLeaf [id=" + id + ", parentNodeId=" + (parentNode != null ? parentNode.getId() : null) + ", timestamp=" + timestamp + ", lowChannel=" + lowChannel + ", highChannel=" + highChannel + "]";
+    return "GoesSxrLeaf [timestamp=" + timestamp + ", lowChannel=" + lowChannel + ", highChannel=" + highChannel + "]";
   }
 
   @Override
   public int compareTo(GoesSxrLeaf o) {
-    if ((getTimestamp() != null && o.getTimestamp() == null) || (getTimestamp() != null) && getTimestamp().isBefore(o.getTimestamp())) {
+    if ((getTimestamp() != null && o.getTimestamp() == null) || (getTimestamp() != null) && getTimestamp().before(o.getTimestamp())) {
       return -1;
-    } else if ((getTimestamp() == null && o.getTimestamp() == null) || (getTimestamp() != null) && getTimestamp().isEqual(o.getTimestamp())) {
+    } else if ((getTimestamp() == null && o.getTimestamp() == null) || (getTimestamp() != null) && getTimestamp().equals(o.getTimestamp())) {
       return 0;
     } else {
       return 1;

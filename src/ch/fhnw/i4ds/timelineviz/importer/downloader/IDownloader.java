@@ -1,9 +1,7 @@
 package ch.fhnw.i4ds.timelineviz.importer.downloader;
 
+import java.util.Date;
 import java.util.Set;
-
-import org.joda.time.DateMidnight;
-import org.joda.time.Instant;
 
 import ch.fhnw.i4ds.timelineviz.domain.GoesSxrLeaf;
 
@@ -17,7 +15,7 @@ public interface IDownloader {
    * @param currentDateMidnight download leafs at this date.
    * @return downloader GoesSxrLeafs.
    */
-  public Set<GoesSxrLeaf> getGoesSxrLeafs(Instant startTimestamp, DateMidnight currentDateMidnight);
+  public Set<GoesSxrLeaf> getGoesSxrLeafs(Date startTimestamp, Date currentDateMidnight);
 
   /**
    * Compares the two DateMidnight and checks if it would use another download
@@ -27,20 +25,20 @@ public interface IDownloader {
    * @param otherDateMidnight
    * @return uses same download url
    */
-  public boolean isSameDownloadSite(DateMidnight thisDateMidnight, DateMidnight otherDateMidnight);
+  public boolean isSameDownloadSite(Date thisDateMidnight, Date otherDateMidnight);
 
   /**
    * Get start of the data.
    *
    * @return start of data
    */
-  public DateMidnight getStartDateMidnight();
+  public Date getStartDateMidnight();
 
   /**
    * Get end of the data.
    *
    * @return end of data
    */
-  public DateMidnight getEndDateMidnight();
+  public Date getEndDateMidnight();
 
 }
