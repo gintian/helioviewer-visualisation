@@ -81,7 +81,7 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
   private Set<GoesSxrLeaf> downloadGoesSxrLeafs(URL url, Date startTimestamp, Date endTimestamp) throws IOException {
     //		logger.info(DateTime.now().toString() + " - Importing data from: " + url);
 
-    String data = url.toString(); // IOUtils.toString(url);
+    //String data = url.toString(); // IOUtils.toString(url);
 //    final StringReader stringReader = new StringReader(data);
     BufferedReader dataReader = new BufferedReader(new InputStreamReader(url.openStream())); // IOUtils.toBufferedReader(stringReader);
 
