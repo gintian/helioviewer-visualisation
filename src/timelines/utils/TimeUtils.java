@@ -1,4 +1,4 @@
-package ch.fhnw.i4ds.timelineviz.utils;
+package timelines.utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -8,6 +8,11 @@ import java.util.Date;
 
 
 public class TimeUtils {
+
+  /**
+   * Calendar instance for date manipulations
+   */
+  private static Calendar calendar = Calendar.getInstance();
 
   /**
    * Does this time interval (defined with startReadableInstant and
@@ -61,16 +66,15 @@ public class TimeUtils {
 
   public static Date setMidnight(Date date) {
 
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(date);
+    calendar.setTime(date);
 
     // reset hour, minutes, seconds and millis
-    cal.set(Calendar.HOUR_OF_DAY, 0);
-    cal.set(Calendar.MINUTE, 0);
-    cal.set(Calendar.SECOND, 0);
-    cal.set(Calendar.MILLISECOND, 0);
+    calendar.set(Calendar.HOUR_OF_DAY, 0);
+    calendar.set(Calendar.MINUTE, 0);
+    calendar.set(Calendar.SECOND, 0);
+    calendar.set(Calendar.MILLISECOND, 0);
 
-    return cal.getTime();
+    return calendar.getTime();
   }
 
   public static Date fromString(String dateString, String format) throws ParseException {
@@ -85,35 +89,30 @@ public class TimeUtils {
   }
 
   public static int getYear(Date date) {
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(date);
-    return cal.get(Calendar.YEAR);
+    calendar.setTime(date);
+    return calendar.get(Calendar.YEAR);
   }
 
   public static int getMonth(Date date) {
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(date);
-    return cal.get(Calendar.MONTH) + 1; // For some horrendous reason, the month is 0 based...
+    calendar.setTime(date);
+    return calendar.get(Calendar.MONTH) + 1; // For some horrendous reason, the month is 0 based...
   }
 
   public static int getDayOfMonth(Date date) {
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(date);
-    return cal.get(Calendar.DAY_OF_MONTH);
+    calendar.setTime(date);
+    return calendar.get(Calendar.DAY_OF_MONTH);
   }
 
   public static Date firstDayOfMonth(Date date) {
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(date);
-    cal.getActualMinimum(Calendar.DAY_OF_MONTH);
-    return cal.getTime();
+    calendar.setTime(date);
+    calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+    return calendar.getTime();
   }
 
   public static Date lastDayOfMonth(Date date) {
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(date);
-    cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-    return cal.getTime();
+    calendar.setTime(date);
+    calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+    return calendar.getTime();
   }
 
 

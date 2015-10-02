@@ -1,4 +1,4 @@
-package ch.fhnw.i4ds.timelineviz.importer.downloader;
+package timelines.importer.downloader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -8,9 +8,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.fhnw.i4ds.timelineviz.importer.downloader.converter.CsvToGoesSxrLeafConverter;
-import ch.fhnw.i4ds.timelineviz.utils.StringUtils;
-import ch.fhnw.i4ds.timelineviz.utils.TimeUtils;
+import timelines.importer.csv.CsvToGoesSxrLeafConverter;
+import timelines.utils.StringUtils;
+import timelines.utils.TimeUtils;
 
 public class GoesNewAvgDownloader extends AbstractGoesNewDownloader  {
 

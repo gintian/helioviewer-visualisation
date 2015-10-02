@@ -1,4 +1,4 @@
-package ch.fhnw.i4ds.timelineviz.utils;
+package timelines.utils;
 
 import java.util.Map;
 

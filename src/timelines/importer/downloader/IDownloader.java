@@ -1,9 +1,9 @@
-package ch.fhnw.i4ds.timelineviz.importer.downloader;
+package timelines.importer.downloader;
 
 import java.util.Date;
 import java.util.Set;
 
-import ch.fhnw.i4ds.timelineviz.domain.GoesSxrLeaf;
+import timelines.importer.csv.GoesSxrLeaf;
 
 public interface IDownloader {
 

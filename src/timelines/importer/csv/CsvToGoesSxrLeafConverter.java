@@ -1,4 +1,4 @@
-package ch.fhnw.i4ds.timelineviz.importer.downloader.converter;
+package timelines.importer.csv;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -7,10 +7,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import timelines.utils.TimeUtils;
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
-import ch.fhnw.i4ds.timelineviz.domain.GoesSxrLeaf;
-import ch.fhnw.i4ds.timelineviz.utils.TimeUtils;
 
 public class CsvToGoesSxrLeafConverter {
 

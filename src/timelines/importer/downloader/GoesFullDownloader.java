@@ -1,4 +1,4 @@
-package ch.fhnw.i4ds.timelineviz.importer.downloader;
+package timelines.importer.downloader;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import ch.fhnw.i4ds.timelineviz.domain.GoesSxrLeaf;
-import ch.fhnw.i4ds.timelineviz.importer.downloader.converter.CsvToGoesSxrLeafConverter;
-import ch.fhnw.i4ds.timelineviz.utils.StringUtils;
-import ch.fhnw.i4ds.timelineviz.utils.TimeUtils;
+import timelines.importer.csv.CsvToGoesSxrLeafConverter;
+import timelines.importer.csv.GoesSxrLeaf;
+import timelines.utils.StringUtils;
+import timelines.utils.TimeUtils;
 
 public class GoesFullDownloader implements IDownloader {
 

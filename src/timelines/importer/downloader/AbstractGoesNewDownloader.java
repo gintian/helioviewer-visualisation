@@ -1,4 +1,4 @@
-package ch.fhnw.i4ds.timelineviz.importer.downloader;
+package timelines.importer.downloader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,9 +7,9 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Set;
 
-import ch.fhnw.i4ds.timelineviz.domain.GoesSxrLeaf;
-import ch.fhnw.i4ds.timelineviz.importer.downloader.converter.CsvToGoesSxrLeafConverter;
-import ch.fhnw.i4ds.timelineviz.utils.TimeUtils;
+import timelines.importer.csv.CsvToGoesSxrLeafConverter;
+import timelines.importer.csv.GoesSxrLeaf;
+import timelines.utils.TimeUtils;
 
 abstract class AbstractGoesNewDownloader implements IDownloader {
   //	protected final Logger logger = LoggerFactory.getLogger(getClass());

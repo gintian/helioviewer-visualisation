@@ -1,4 +1,4 @@
-package ch.fhnw.i4ds.timelineviz.domain;
+package timelines.importer.csv;
 
 import java.util.Date;
 
