@@ -2,9 +2,12 @@ package timelines.database;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Date;
 
 import timelines.importer.csv.GoesSxrLeaf;
 
@@ -59,8 +62,18 @@ public class MemoryMappedFile {
     MappedByteBuffer buffer = getBufferForIndex(index);
     byte[] result = new byte[length];
 
+    int originalPosition = buffer.position();
     buffer.position((int) (index % Integer.MAX_VALUE));
-    buffer.get(result);
+
+    try {
+      buffer.get(result);
+    } catch (BufferUnderflowException e) {
+      // TODO: increase buffer size.
+      // Should the buffer reach its maximum capacity,
+      // create a new buffer for the remaining bytes that have to be read
+    }
+
+    buffer.position(originalPosition);
 
     return result;
   }
@@ -81,29 +94,37 @@ public class MemoryMappedFile {
   }
 
 
+  // TODO
+  // make sure, that we "hop" to the next buffer
+  // once the end of the current one is reached.
+  // Should we reach the end of the last buffer,
+  // then this buffers size has to be increased.
+  // If its size reaches INTEGER.MAX_VALUE,
+  // create and add a new buffer
 
   /**
-   * Writes the given bytes to the end of the file
-   * @param value the bytes to write
-   */
-  public void write(byte[] value) {
-    // TODO
-    // make sure, that we "hop" to the next buffer
-    // once the end of the current one is reached.
-    // Should we reach the end of the last buffer,
-    // then this buffers size has to be increased.
-    // If its size reaches INTEGER.MAX_VALUE,
-    // create and add a new buffer
-  }
-
-  /**
-   * Needed?
-   * Writes the given value to the file, starting at index
+   * Writes the given byte array to the file, starting at index
    * @param value the value to write
    * @param index the index to write from
+   * @throws IOException
    */
-  public void write(byte[] value, long index) {
-    // TODO
+  public void write(byte[] value, long index) throws IOException {
+    MappedByteBuffer buffer = getBufferForIndex(index);
+
+    try {
+      int p0 = buffer.position();
+      buffer.position((int) (index % Integer.MAX_VALUE));
+      buffer.put(value);
+      buffer.position(p0);
+    } catch (BufferOverflowException e) {
+
+      //TODO: increase buffer size as far as necessary
+      // If doing so extends over the maximum capacity,
+      // increase the size to max capacity and create
+      // a new buffer for the remaining content
+
+
+    }
   }
 
   public void writeFloat(Float f, long index) throws IOException {
@@ -127,6 +148,8 @@ public class MemoryMappedFile {
   }
 
 
+  private static byte[] blup;
+
   /**
    * Used for testing purposes only
    * @param args
@@ -137,9 +160,29 @@ public class MemoryMappedFile {
 
     MemoryMappedFile meMoMaFi = new MemoryMappedFile("res/db");
 
-    meMoMaFi.writeFloat(123f, 123);
+//    meMoMaFi.writeFloat(123f, 123);
+    Date date = new Date();
 
-    System.out.println(meMoMaFi.readFloat(123));
+//    System.out.println(meMoMaFi.readFloat(123));
+//    for (long i = 0; i < 16000000; i++) {
+
+      blup =  meMoMaFi.read(0, 16000000 * 3);
+
+      System.out.println(blup[500000]);
+      System.out.println(blup.length);
+
+      System.out.println("\nReading completed");
+      Date timePassed = new Date(new Date().getTime() - date.getTime());
+      System.out.println("time passed: " + timePassed.getTime() + "ms");
+
+
+
+//      System.out.println(Arrays.toString(a));
+//    }
+
+//    System.out.println("\nwriting completed");
+//    timePassed = new Date(new Date().getTime() - date.getTime());
+//    System.out.println("time passed: " + timePassed.getTime() + "ms");
 
 
 
