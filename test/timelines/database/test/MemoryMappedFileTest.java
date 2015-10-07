@@ -1,8 +1,10 @@
 package timelines.database.test;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.junit.Test;
 
@@ -41,6 +43,18 @@ public class MemoryMappedFileTest {
     byte[] result = file.read(Integer.MAX_VALUE - 3, data.length);
 
     assertArrayEquals(data, result);
+  }
+
+  @Test
+  public void testReadSpeed() throws IOException {
+    MemoryMappedFile file = new MemoryMappedFile("res/db");
+
+    Date date = new Date();
+
+    byte[] data =  file.read(0, 16000000 * 3);
+
+    Date timePassed = new Date(new Date().getTime() - date.getTime());
+    assertTrue(5000l > timePassed.getTime());
   }
 
 }

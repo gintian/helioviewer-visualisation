@@ -2,12 +2,9 @@ package timelines.database;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.BufferOverflowException;
-import java.nio.BufferUnderflowException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Date;
 
 import timelines.importer.csv.GoesSxrLeaf;
 
@@ -36,8 +33,6 @@ public class MemoryMappedFile {
     long length = memoryMappedFile.length();
 
     while (length >= Integer.MAX_VALUE) {
-//      System.out.println("buffers size: " + buffers.size());
-//      System.out.println((long) buffers.size() * (long) Integer.MAX_VALUE);
       MappedByteBuffer out = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, (long) buffers.size() * (long) Integer.MAX_VALUE, Integer.MAX_VALUE);
       buffers.add(out);
       length -= Integer.MAX_VALUE;
@@ -58,24 +53,33 @@ public class MemoryMappedFile {
    * @throws IOException
    */
   public byte[] read(long index, int length) throws IOException {
+    byte[] result = new byte[length];
+    read(index, result, 0, length);
+    return result;
+  }
+
+  private void read(long index, byte[] result, int offset, int length) throws IOException {
 
     MappedByteBuffer buffer = getBufferForIndex(index);
-    byte[] result = new byte[length];
+
+    // return once we reached an index outside of the files length
+    if (buffer == null) {
+      return;
+    }
 
     int originalPosition = buffer.position();
     buffer.position((int) (index % Integer.MAX_VALUE));
 
-    try {
-      buffer.get(result);
-    } catch (BufferUnderflowException e) {
-      // TODO: increase buffer size.
-      // Should the buffer reach its maximum capacity,
-      // create a new buffer for the remaining bytes that have to be read
+    // check whether we need to access multiple buffers
+    if (length > buffer.remaining()) {
+      read(index + buffer.remaining(), result, buffer.remaining(), result.length - buffer.remaining());
+      buffer.get(result, 0, buffer.remaining());
+
+    } else {
+      buffer.get(result, offset, length);
     }
 
     buffer.position(originalPosition);
-
-    return result;
   }
 
   public GoesSxrLeaf readLeaf(long index) throws IOException {
@@ -109,22 +113,30 @@ public class MemoryMappedFile {
    * @throws IOException
    */
   public void write(byte[] value, long index) throws IOException {
+
     MappedByteBuffer buffer = getBufferForIndex(index);
 
-    try {
-      int p0 = buffer.position();
-      buffer.position((int) (index % Integer.MAX_VALUE));
-      buffer.put(value);
-      buffer.position(p0);
-    } catch (BufferOverflowException e) {
-
-      //TODO: increase buffer size as far as necessary
-      // If doing so extends over the maximum capacity,
-      // increase the size to max capacity and create
-      // a new buffer for the remaining content
-
-
+    // increase file size if needed
+    if (buffer == null) {
+      buffer = buffers.get(buffers.size() -1);
+      buffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, (long) buffers.size() * (long) Integer.MAX_VALUE, Integer.MAX_VALUE);
+      buffers.add(buffer);
     }
+
+    int p0 = buffer.position();
+    buffer.position((int) (index % Integer.MAX_VALUE));
+
+    if (value.length > buffer.remaining()) {
+      byte[] newValue = new byte[value.length - buffer.remaining()];
+      System.arraycopy(value, buffer.remaining(), newValue, 0, newValue.length);
+      write(newValue, index + buffer.remaining());
+      buffer.put(value, 0, buffer.remaining());
+    } else {
+      buffer.put(value);
+    }
+
+    buffer.position(p0);
+
   }
 
   public void writeFloat(Float f, long index) throws IOException {
@@ -146,95 +158,5 @@ public class MemoryMappedFile {
     }
     return buffers.get(bufferIndex);
   }
-
-
-  private static byte[] blup;
-
-  /**
-   * Used for testing purposes only
-   * @param args
-   * @throws Exception
-   */
-  public static void main(String[] args) throws Exception {
-
-
-    MemoryMappedFile meMoMaFi = new MemoryMappedFile("res/db");
-
-//    meMoMaFi.writeFloat(123f, 123);
-    Date date = new Date();
-
-//    System.out.println(meMoMaFi.readFloat(123));
-//    for (long i = 0; i < 16000000; i++) {
-
-      blup =  meMoMaFi.read(0, 16000000 * 3);
-
-      System.out.println(blup[500000]);
-      System.out.println(blup.length);
-
-      System.out.println("\nReading completed");
-      Date timePassed = new Date(new Date().getTime() - date.getTime());
-      System.out.println("time passed: " + timePassed.getTime() + "ms");
-
-
-
-//      System.out.println(Arrays.toString(a));
-//    }
-
-//    System.out.println("\nwriting completed");
-//    timePassed = new Date(new Date().getTime() - date.getTime());
-//    System.out.println("time passed: " + timePassed.getTime() + "ms");
-
-
-
-//    long count = 7L * 1024L * 1024L * 1024L; // 7GB
-//
-//    Date date = new Date();
-//
-//    System.out.println(Long.toUnsignedString(count));
-//
-//    RandomAccessFile memoryMappedFile = new RandomAccessFile("res/db", "rw");
-//
-//    // Mapping a file into memory
-//    MappedByteBuffer out1 = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, Integer.MAX_VALUE);
-//    MappedByteBuffer out2 = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 2147483647L, Integer.MAX_VALUE);
-//    MappedByteBuffer out3 = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 4294967294L, Integer.MAX_VALUE);
-//    MappedByteBuffer out4 = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 6442450941L, Integer.MAX_VALUE);
-//
-//    MappedByteBuffer[] buffer = {out1, out2, out3, out4};
-//
-//    // Writing to Memory Mapped File
-//
-//
-//      for (long i = 0; i < count; i++) {
-//
-//        int bufferIndex = (int) (i / Integer.MAX_VALUE);
-//        try {
-//
-//    //      System.out.println("i: " + i + " bufferIndex: " + bufferIndex);
-//          buffer[bufferIndex].put((byte) 'A');
-//
-//        } catch (BufferOverflowException e) {
-//          System.out.println(bufferIndex);
-//          System.out.println(i);
-//          e.printStackTrace();
-//        }
-//      }
-//
-//
-//    System.out.println("Writing completed");
-//
-//    // reading from memory file
-//    for (int i = 1024; i < 1034; i++) {
-//      int bufferIndex = i / Integer.MAX_VALUE;
-//      System.out.print((char) buffer[bufferIndex].get(i));
-//    }
-//
-//    System.out.println("\nReading completed");
-//    Date timePassed = new Date(new Date().getTime() - date.getTime());
-//    System.out.println("time passed: " + timePassed.getTime() + "ms");
-
-  }
-
-
 
 }
