@@ -45,6 +45,8 @@ public class MemoryMappedFile {
 
 
   // TODO figure out, what sort of read methods we really need and make sure they have high performance
+  // So far it looks like it's far more efficient to read an array instead of reading value by value
+
   /**
    * Read length bytes from the file starting at index
    * @param index from where to read
@@ -82,6 +84,10 @@ public class MemoryMappedFile {
     buffer.position(originalPosition);
   }
 
+  //
+  // potentially rather inefficient reading methods, not suited for a large amount of calls
+  //
+
   public GoesSxrLeaf readLeaf(long index) throws IOException {
     // TODO
     return null;
@@ -90,6 +96,11 @@ public class MemoryMappedFile {
   public float readFloat(long index) throws IOException {
     MappedByteBuffer buffer = getBufferForIndex(index);
     return buffer.getFloat((int) (index % Integer.MAX_VALUE));
+  }
+
+  public long readLong(long index) throws IOException {
+    MappedByteBuffer buffer = getBufferForIndex(index);
+    return buffer.getLong((int) (index % Integer.MAX_VALUE));
   }
 
   public int readInt(long index) throws IOException {
@@ -114,29 +125,64 @@ public class MemoryMappedFile {
    */
   public void write(byte[] value, long index) throws IOException {
 
-    MappedByteBuffer buffer = getBufferForIndex(index);
-
-    // increase file size if needed
-    if (buffer == null) {
-      buffer = buffers.get(buffers.size() -1);
-      buffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, (long) buffers.size() * (long) Integer.MAX_VALUE, Integer.MAX_VALUE);
+    // case 1: empty file. Create a new buffer with math.min(value.length, int.max_val) capacity, recursive write call
+    if (getFileSize() == 0) {
+      MappedByteBuffer buffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, Math.min(value.length + index, Integer.MAX_VALUE));
       buffers.add(buffer);
+      write(value, index);
     }
 
-    int p0 = buffer.position();
-    buffer.position((int) (index % Integer.MAX_VALUE));
+    // case 2: file too small. Increase last buffers size, add new buffer if necessary. Recursive write call
+    else if (getFileSize() < (index + value.length)) {
+      MappedByteBuffer buffer = buffers.get(buffers.size() - 1);
+      if (buffer.capacity() < Integer.MAX_VALUE) {
+        // increase last buffers size
+        long newIndex = (long)(buffers.size() - 1) * (long)Integer.MAX_VALUE;
+        int newCapacity = (int) Math.min(index + value.length - newIndex, Integer.MAX_VALUE);
 
-    if (value.length > buffer.remaining()) {
-      byte[] newValue = new byte[value.length - buffer.remaining()];
-      System.arraycopy(value, buffer.remaining(), newValue, 0, newValue.length);
-      write(newValue, index + buffer.remaining());
-      buffer.put(value, 0, buffer.remaining());
-    } else {
-      buffer.put(value);
+        MappedByteBuffer newBuffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, newIndex , newCapacity);
+        buffers.remove(buffers.size() - 1);
+        buffers.add(newBuffer);
+
+
+      } else {
+        // add new buffer
+        long newIndex = (long)buffers.size() * (long)Integer.MAX_VALUE;
+        int newCapacity = (int) Math.min(index + value.length - newIndex, Integer.MAX_VALUE);
+        MappedByteBuffer newBuffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, newIndex, newCapacity);
+        buffers.add(newBuffer);
+      }
+
+      // recursive write call
+      write(value, index);
     }
 
-    buffer.position(p0);
+    // default: write from index to buffers capacity, recursive call with new index and remaining data if any
+    else {
+      MappedByteBuffer buffer = getBufferForIndex(index);
+      int p0 = buffer.position();
+      buffer.position((int) (index % Integer.MAX_VALUE));
 
+      // check whether we have to write more than there's space remaining
+      // If so, write to the remaining space, then call write again recursively
+      // with the remaining values and an index right after the buffers end
+      if (value.length > buffer.remaining()) {
+
+        byte[] newValue = new byte[value.length - buffer.remaining()];
+        System.arraycopy(value, buffer.remaining(), newValue, 0, newValue.length);
+
+
+        buffer.put(value, 0, buffer.remaining());
+        long newIndex = index + value.length - newValue.length;
+        buffer.position(p0);
+
+        write(newValue, newIndex);
+
+      } else {
+        buffer.put(value);
+        buffer.position(p0);
+      }
+    }
   }
 
   public void writeFloat(Float f, long index) throws IOException {
@@ -157,6 +203,10 @@ public class MemoryMappedFile {
       return null;
     }
     return buffers.get(bufferIndex);
+  }
+
+  public long getFileSize() throws IOException {
+    return memoryMappedFile.length();
   }
 
 }

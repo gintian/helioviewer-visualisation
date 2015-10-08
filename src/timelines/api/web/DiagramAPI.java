@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class DiagramAPI
  */
-@WebServlet("/DiagramAPI")
+@WebServlet("/api")
 public class DiagramAPI extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
