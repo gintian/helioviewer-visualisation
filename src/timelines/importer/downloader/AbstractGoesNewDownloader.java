@@ -58,6 +58,38 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
     return null;
   }
 
+
+  public byte[] getGoesSxrData(Date startTimestamp, Date currentDateMidnight) {
+    int downloadTrials = 0;
+
+    while (downloadTrials < MAX_GOESNR) {
+      try {
+        URL url = createUrl(currentDateMidnight, currentGoesNr);
+        final Date maxStartTimestamp = TimeUtils.getMaxReadableInstant(startTimestamp, getStartDateMidnight());
+        final Date endTimestamp = getEndDateMidnight();
+
+        // TODO
+        // byte[] goesSxrData = downloadGoesSxrLeafs(url, maxStartTimestamp, endTimestamp);
+        // return goesSxrData;
+        throw new IOException(); // TODO
+      } catch (IOException e) {
+        //        logger.warn(e.toString());
+
+        downloadTrials++;
+        currentGoesNr++;
+        if (currentGoesNr > MAX_GOESNR) {
+          currentGoesNr = MIN_GOESNR;
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+        //        logger.warn(e.toString());
+      }
+    }
+
+    return null;
+  }
+
+
   /**
    * Creates the appropriate URL with the given parameters.
    *
@@ -79,10 +111,7 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
    * @throws IOException
    */
   private Set<GoesSxrLeaf> downloadGoesSxrLeafs(URL url, Date startTimestamp, Date endTimestamp) throws IOException {
-    //		logger.info(DateTime.now().toString() + " - Importing data from: " + url);
 
-    //String data = url.toString(); // IOUtils.toString(url);
-//    final StringReader stringReader = new StringReader(data);
     BufferedReader dataReader = new BufferedReader(new InputStreamReader(url.openStream())); // IOUtils.toBufferedReader(stringReader);
 
     Set<GoesSxrLeaf> parsedLeafs = null;
@@ -99,6 +128,26 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
 //      IOUtils.closeQuietly(dataReader);
     }
     return parsedLeafs;
+  }
+
+  private byte[] downloadGoesSxrData(URL url, Date startTimestamp, Date endTimestamp) throws IOException {
+
+    BufferedReader dataReader = new BufferedReader(new InputStreamReader(url.openStream())); // IOUtils.toBufferedReader(stringReader);
+
+    byte[] parsedData = null;
+    try {
+      skipToData(dataReader);
+      //parsedData = csvParser.parseFile(startTimestamp, endTimestamp, dataReader); TODO
+
+    } catch (IOException e) {
+      // TODO: handle exception
+      e.printStackTrace();
+
+    } finally {
+      dataReader.close();
+//      IOUtils.closeQuietly(dataReader);
+    }
+    return parsedData;
   }
 
   /**

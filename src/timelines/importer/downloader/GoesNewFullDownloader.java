@@ -2,7 +2,6 @@ package timelines.importer.downloader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,8 +15,7 @@ public class GoesNewFullDownloader extends AbstractGoesNewDownloader {
 
   private String templateUrl = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_full/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_2s_{date}_{date}.csv";
 
-  private Date goesNewFullStartDateMidnight;
-
+  public static final Date START_DATE = new Date(1262300400000L); // TimeUtils.setMidnight(TimeUtils.fromString("2009-12-01", "yyyy-MM-dd"));
 
   static class Columns {
     public static final int TIME_TAG = 0;
@@ -28,12 +26,12 @@ public class GoesNewFullDownloader extends AbstractGoesNewDownloader {
   public GoesNewFullDownloader(int minGoesNr, int maxGoesNr) {
     super(minGoesNr, maxGoesNr, createCsvToGoesSxrLeafConverter());
 
-    try {
-      goesNewFullStartDateMidnight = TimeUtils.setMidnight(TimeUtils.fromString("2009-12-01", "yyyy-MM-dd"));
-    } catch (ParseException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+//    try {
+//      goesNewFullStartDateMidnight = TimeUtils.setMidnight(TimeUtils.fromString("2009-12-01", "yyyy-MM-dd"));
+//    } catch (ParseException e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
 
 
   }
@@ -51,7 +49,7 @@ public class GoesNewFullDownloader extends AbstractGoesNewDownloader {
   @Override
   public Date getStartDateMidnight() {
 //    System.out.println("start date: " + goesNewFullStartDateMidnight);
-    return goesNewFullStartDateMidnight;
+    return START_DATE;
   }
 
   @Override

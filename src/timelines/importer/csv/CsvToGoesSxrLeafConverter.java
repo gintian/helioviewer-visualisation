@@ -7,9 +7,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import timelines.utils.TimeUtils;
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
+import timelines.utils.TimeUtils;
 
 public class CsvToGoesSxrLeafConverter {
 
@@ -46,6 +46,28 @@ public class CsvToGoesSxrLeafConverter {
     }
 
     return goesSxrLeafs;
+  }
+
+  public byte[] parseData(Date startTimestamp, Date endTimestamp, Reader fileReader) throws IOException {
+    byte[] goesSxrData;
+    String[] nextLine;
+    CSVReader csvReader = new CSVReader(fileReader, CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
+
+    try {
+      while ((nextLine = csvReader.readNext()) != null) {
+        GoesSxrLeaf goesSxrLeaf = parseDataRow(nextLine);
+
+        if (isValid(goesSxrLeaf) && TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp)) {
+          //goesSxrData.add(goesSxrLeaf); // TODO
+        }
+      }
+    } finally {
+      csvReader.close();
+//      IOUtils.closeQuietly(csvReader);
+    }
+
+    //return goesSxrData;
+    return null; // TODO
   }
 
   private GoesSxrLeaf parseDataRow(String[] line) {
