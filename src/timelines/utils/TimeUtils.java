@@ -49,7 +49,7 @@ public class TimeUtils {
    * @param readableInstantB
    * @return max ReadableInstant
    */
-  public static Date getMaxReadableInstant(Date readableInstantA, Date readableInstantB) {
+  public static Date getLaterDate(Date readableInstantA, Date readableInstantB) {
     if (readableInstantA == null) {
       return readableInstantB;
     }
@@ -105,13 +105,13 @@ public class TimeUtils {
 
   public static Date firstDayOfMonth(Date date) {
     calendar.setTime(date);
-    calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+    calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
     return calendar.getTime();
   }
 
   public static Date lastDayOfMonth(Date date) {
     calendar.setTime(date);
-    calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+    calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
     return calendar.getTime();
   }
 

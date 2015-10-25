@@ -1,21 +1,20 @@
 package timelines.importer.downloader;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import timelines.importer.csv.GoesSxrLeaf;
 
 public interface IDownloader {
 
   /**
-   * Download and parse GoesSxrLeafs.
+   * Download and parse one GoesSxrLeafs CSV.
    *
-   * @param startTimestamp only return leafs which timestamp is after
-   *          startTimestamp
-   * @param currentDateMidnight download leafs at this date.
-   * @return downloader GoesSxrLeafs.
+   * @param minTimestamp only get leafs with a timestamp that's after minTimestamp
+   * @param csvFileDate download file for this date.
+   * @return the GoesSxrLeafs from the file specified by csvFileDate with a timestamp >= minTimestamp.
    */
-  public Set<GoesSxrLeaf> getGoesSxrLeafs(Date startTimestamp, Date currentDateMidnight);
+  public List<GoesSxrLeaf> getGoesSxrLeafs(Date minTimestamp, Date csvFileDate);
 
   /**
    * Compares the two DateMidnight and checks if it would use another download

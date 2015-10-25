@@ -7,7 +7,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import timelines.database.MemoryMappedFile;
 import timelines.importer.csv.GoesSxrLeaf;
@@ -48,6 +48,7 @@ public class Importer {
     // get timestamp of last entry available in the database
     Date lastAvailableDate = downloader.getStartDateMidnight();
     if (memMappeFile.getFileSize() != 0) {
+      // TODO 2 files, one high one low channel with only floats
       long lastEntry = memMappeFile.readLong(memMappeFile.getFileSize() - (2 * 4 + 8));
       System.out.println(new Date(lastEntry));
       // TODO set lastAvailableDate to the date read
@@ -65,7 +66,7 @@ public class Importer {
       //getDownloaderForDate(currentDay);
 
       // TODO write into 2 seperate files
-      Set<GoesSxrLeaf> data = downloader.getGoesSxrLeafs(lastAvailableDate, currentDay);
+      List<GoesSxrLeaf> data = downloader.getGoesSxrLeafs(lastAvailableDate, currentDay);
       buffer = ByteBuffer.allocate(data.size() * Float.BYTES * 2);
       byte[] byteData; // = new byte[data.size() * 3 * 4];
 
@@ -90,32 +91,64 @@ public class Importer {
   /**
    * Used to initialize the database.
    * Downloads all available data from the older services
-   * @throws ParseException
+   * @throws Exception
    */
-  public void initializeDatabase() throws ParseException {
+  public void initializeDatabase() throws Exception {
 
     // TODO get data from old services
 
-    long lastTime = GoesNewAvgDownloader.START_DATE.getTime() / 1000; // TODO get last date in DB
+    long lastTime = GoesNewAvgDownloader.START_DATE.getTime(); // TODO get last date in DB
 
     GoesNewAvgDownloader averageDownloader = new GoesNewAvgDownloader(0, 20);
 
-    // TODO: we probably have to call for every day separately
-    Set<GoesSxrLeaf> leafs = averageDownloader.getGoesSxrLeafs(GoesNewAvgDownloader.START_DATE, GoesNewAvgDownloader.END_DATE);
+    // TODO: we have to call for every month separately
+    Date lastWrittenDate = GoesNewAvgDownloader.START_DATE;
+    System.out.println(lastWrittenDate);
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(lastWrittenDate);
 
     ArrayList<Float> highChannel = new ArrayList<>();
     ArrayList<Float> lowChannel = new ArrayList<>();
-    for (GoesSxrLeaf leaf : leafs) {
-      long currentTime = leaf.getTimestamp().getTime() / 1000;
-      while (currentTime - lastTime > 2) {
-        // add empty entry
-        highChannel.add(Float.NaN);
-        lowChannel.add(Float.NaN);
-        currentTime += 2;
+
+    while (lastWrittenDate.before(GoesNewAvgDownloader.END_DATE)) {
+
+      List<GoesSxrLeaf> leafs = averageDownloader.getGoesSxrLeafs(cal.getTime(), cal.getTime());
+      System.out.println("got data");
+
+      if (leafs == null) {
+        throw new Exception("Data could not be retrieved");
       }
-      highChannel.add(leaf.getHighChannel());
-      lowChannel.add(leaf.getLowChannel());
+
+      for (GoesSxrLeaf leaf : leafs) {
+        long currentTime = leaf.getTimestamp().getTime();
+//        System.out.println(leaf.getTimestamp());
+//        System.out.println(GoesNewAvgDownloader.START_DATE);
+//        System.out.println();
+        int empty = 0;
+        while (currentTime - lastTime > 2000) {
+//          System.out.println(currentTime);
+//          System.out.println(lastTime);
+//          System.out.println(currentTime - lastTime + "\n");
+          // add empty entry
+          highChannel.add(Float.NaN);
+          lowChannel.add(Float.NaN);
+          lastTime += 2000;
+          empty ++;
+        }
+        System.out.println("adding value " + leaf + " empty values before: " + empty);
+        highChannel.add(leaf.getHighChannel());
+        lowChannel.add(leaf.getLowChannel());
+        lastTime = leaf.getTimestamp().getTime();
+        // maybe write here already and empty the lists?
+      }
+      cal.add(Calendar.MONTH, 1);
+      System.out.println(highChannel);
     }
+
+
+//    System.out.println(highChannel);
+
+
 
     // TODO write to DB
 
@@ -139,14 +172,15 @@ public class Importer {
 
 //    Date date = TimeUtils.setMidnight(TimeUtils.fromString("2009-11-30", "yyyy-MM-dd"));
 //    System.out.println("avg end date" + date.getTime());
-
+    System.out.println(GoesNewAvgDownloader.START_DATE);
+//    Date date = TimeUtils.setMidnight(TimeUtils.fromString("2009-11-30", "yyyy-MM-dd"));
     Importer importer = new Importer();
 
     try {
       importer.initializeDatabase();
-      importer.importNewData();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
+//      importer.importNewData();
+     } catch (Exception e) {
+//      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }

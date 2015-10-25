@@ -1,5 +1,5 @@
 import java.util.Calendar;
-import java.util.Set;
+import java.util.List;
 
 import timelines.importer.csv.GoesSxrLeaf;
 import timelines.importer.downloader.GoesNewFullDownloader;
@@ -21,7 +21,7 @@ public class Test {
     cal.set(Calendar.MONTH, Calendar.SEPTEMBER);
     cal.set(Calendar.DAY_OF_MONTH, 27);
 
-    Set<GoesSxrLeaf> asd = loader.getGoesSxrLeafs(cal.getTime(), cal.getTime());
+    List<GoesSxrLeaf> asd = loader.getGoesSxrLeafs(cal.getTime(), cal.getTime());
     System.out.println(asd);
 
 

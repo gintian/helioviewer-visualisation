@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import timelines.importer.csv.CsvToGoesSxrLeafConverter;
 import timelines.importer.csv.GoesSxrLeaf;
@@ -30,16 +30,16 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
   }
 
   @Override
-  public Set<GoesSxrLeaf> getGoesSxrLeafs(Date startTimestamp, Date currentDateMidnight) {
+  public List<GoesSxrLeaf> getGoesSxrLeafs(Date minTimestamp, Date csvFileDate) {
     int downloadTrials = 0;
 
     while (downloadTrials < MAX_GOESNR) {
       try {
-        URL url = createUrl(currentDateMidnight, currentGoesNr);
-        final Date maxStartTimestamp = TimeUtils.getMaxReadableInstant(startTimestamp, getStartDateMidnight());
+        URL url = createUrl(csvFileDate, currentGoesNr);
+        final Date maxStartTimestamp = TimeUtils.getLaterDate(minTimestamp, getStartDateMidnight());
         final Date endTimestamp = getEndDateMidnight();
 
-        Set<GoesSxrLeaf> goesSxrLeafs = downloadGoesSxrLeafs(url, maxStartTimestamp, endTimestamp);
+        List<GoesSxrLeaf> goesSxrLeafs = downloadGoesSxrLeafs(url, maxStartTimestamp, endTimestamp);
         return goesSxrLeafs;
       } catch (IOException e) {
         //				logger.warn(e.toString());
@@ -57,38 +57,6 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
 
     return null;
   }
-
-
-  public byte[] getGoesSxrData(Date startTimestamp, Date currentDateMidnight) {
-    int downloadTrials = 0;
-
-    while (downloadTrials < MAX_GOESNR) {
-      try {
-        URL url = createUrl(currentDateMidnight, currentGoesNr);
-        final Date maxStartTimestamp = TimeUtils.getMaxReadableInstant(startTimestamp, getStartDateMidnight());
-        final Date endTimestamp = getEndDateMidnight();
-
-        // TODO
-        // byte[] goesSxrData = downloadGoesSxrLeafs(url, maxStartTimestamp, endTimestamp);
-        // return goesSxrData;
-        throw new IOException(); // TODO
-      } catch (IOException e) {
-        //        logger.warn(e.toString());
-
-        downloadTrials++;
-        currentGoesNr++;
-        if (currentGoesNr > MAX_GOESNR) {
-          currentGoesNr = MIN_GOESNR;
-        }
-      } catch (Exception e) {
-        e.printStackTrace();
-        //        logger.warn(e.toString());
-      }
-    }
-
-    return null;
-  }
-
 
   /**
    * Creates the appropriate URL with the given parameters.
@@ -110,11 +78,11 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
    * @return parsed GoesSxrLeafs.
    * @throws IOException
    */
-  private Set<GoesSxrLeaf> downloadGoesSxrLeafs(URL url, Date startTimestamp, Date endTimestamp) throws IOException {
+  private List<GoesSxrLeaf> downloadGoesSxrLeafs(URL url, Date startTimestamp, Date endTimestamp) throws IOException {
 
     BufferedReader dataReader = new BufferedReader(new InputStreamReader(url.openStream())); // IOUtils.toBufferedReader(stringReader);
 
-    Set<GoesSxrLeaf> parsedLeafs = null;
+    List<GoesSxrLeaf> parsedLeafs = null;
     try {
       skipToData(dataReader);
       parsedLeafs = csvParser.parseFile(startTimestamp, endTimestamp, dataReader);

@@ -17,7 +17,7 @@ public class GoesNewAvgDownloader extends AbstractGoesNewDownloader  {
   private String urlTemplate = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_avg/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_1m_{startdate}_{enddate}.csv";
 
   public static final Date START_DATE= new Date(842565600000L);
-  public static final Date END_DATE= new Date(1259535600000L);
+  public static final Date END_DATE= new Date(1259535600000L); // the full downloader starts after this
 
 //  private Date goesNewAvgEndDateMidnight;
 
@@ -62,6 +62,7 @@ public class GoesNewAvgDownloader extends AbstractGoesNewDownloader  {
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
+    System.out.println(url);
     return url;
   }
 

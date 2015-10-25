@@ -3,9 +3,9 @@ package timelines.importer.csv;
 import java.io.IOException;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
@@ -27,17 +27,26 @@ public class CsvToGoesSxrLeafConverter {
     this.dateTimeFormatter = dateTimeFormatter;
   }
 
-  public Set<GoesSxrLeaf> parseFile(Date startTimestamp, Date endTimestamp, Reader fileReader) throws IOException {
-    Set<GoesSxrLeaf> goesSxrLeafs = new HashSet<GoesSxrLeaf>();
+  public List<GoesSxrLeaf> parseFile(Date startTimestamp, Date endTimestamp, Reader fileReader) throws IOException {
+    List<GoesSxrLeaf> goesSxrLeafs = new ArrayList<GoesSxrLeaf>();
     String[] nextLine;
     CSVReader csvReader = new CSVReader(fileReader, CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
 
     try {
+      boolean foundValid = false;
       while ((nextLine = csvReader.readNext()) != null) {
         GoesSxrLeaf goesSxrLeaf = parseDataRow(nextLine);
 
         if (isValid(goesSxrLeaf) && TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp)) {
           goesSxrLeafs.add(goesSxrLeaf);
+          if(!foundValid) {
+            foundValid = true;
+            System.out.println(goesSxrLeaf);
+            // TODO remove debugging stuff
+          }
+        } else {
+//          System.out.println(goesSxrLeaf.getTimestamp() + " " + startTimestamp + " " + endTimestamp);
+//          System.out.println(TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp));
         }
       }
     } finally {
