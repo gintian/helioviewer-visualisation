@@ -1,4 +1,4 @@
-package timelines.gui;
+package timelines.gui.variant2;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
@@ -6,30 +6,29 @@ package timelines.gui;
  */
 
 import javax.swing.*;
-import java.awt.*;
 
 public class Window extends JFrame {
-  public Window(){
+/*  public Window(){
     super("i4ds05 - Time Lines Viewer");
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(400, 200);
     setLocation(100, 100);
 
-    JPanel hRulerPanel = new Ruler(Orientation.HORIZONTAL);
-    JPanel vRulerPanel = new Ruler(Orientation.VERTICAL);
-    Image imagePanel = new Image();
+    timelines.gui.Image imagePanel = new timelines.gui.Image();
 
+    //ZoomListener zoom = new ZoomListener();
     ImageDragListener drag = new ImageDragListener();
+
+    //imagePanel.addMouseWheelListener(zoom);
+
     imagePanel.addMouseListener( drag );
     imagePanel.addMouseMotionListener( drag );
 
-    add(hRulerPanel, BorderLayout.PAGE_END);
-    add(vRulerPanel, BorderLayout.LINE_START);
-    add(imagePanel, BorderLayout.CENTER);
+    add(imagePanel);
     //pack();
     setVisible(true);
   }
   //public static void main(String[] args){
   //  Window frame = new Window();
-  //}
+  //}*/
 }

@@ -1,7 +1,6 @@
-package timelines.gui;
+package timelines.gui.variant1;
 
 import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
 import java.awt.event.MouseEvent;
 
 /**
@@ -20,7 +19,7 @@ public class ImageDragListener extends MouseInputAdapter
 
   public void mouseDragged(MouseEvent me)
   {
-    Image image = (Image)me.getComponent();
+    timelines.gui.variant1.Image image = (Image)me.getComponent();
     //location = image.getLocation(location);
     int x = image.getX() - pressed.getX() + me.getX();
     int y = image.getY() - pressed.getY() + me.getY();

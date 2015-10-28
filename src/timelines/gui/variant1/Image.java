@@ -1,12 +1,11 @@
-package timelines.gui;
+package timelines.gui.variant1;
 
-import java.awt.Graphics;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.JPanel;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
@@ -25,9 +24,17 @@ public class Image extends JPanel {
   public void setX(int x){ this.x = x;}
   public void setY(int y){ this.y = y;}
 
+  public BufferedImage getImage() {
+    return image;
+  }
+
+  public void setImage(BufferedImage image) {
+    this.image = image;
+  }
+
   public Image(){
     try {
-      image = ImageIO.read(new File("src/timelines/gui/ajrKzgp_460s.jpg"));
+      BufferedImage image = ImageIO.read(new File("src/timelines/gui/ajrKzgp_460s.jpg"));
     } catch (IOException ex) {
       System.out.println("error");
       // handle exception...
