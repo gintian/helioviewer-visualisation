@@ -87,10 +87,36 @@ public class Image extends JComponent {
     repaint();
   }
 
+  private void paintRulers(Graphics g){
+    int h = this.window.getContentPane().getHeight();
+    int w = this.window.getContentPane().getWidth();
+    Color rulerColor = g.getColor();
+    Color scaleColor = new Color(255,255,255);
+
+    g.fillRect(0,0,20,h);
+    g.setColor(scaleColor);
+    int i = 0;
+    while(i<h){
+      g.drawLine(5,i*10,15,i*10);
+      i++;
+    }
+
+    g.setColor(rulerColor);
+    g.fillRect(0,h-20,w,20);
+    g.setColor(scaleColor);
+    int j = 0;
+    while(j<w){
+      g.drawLine(20+j*10,h-5,20+j*10,h-15);
+      j++;
+    }
+    g.setColor(rulerColor);
+  }
+
   @Override
   public void paint(Graphics g){
     super.paintComponent(g);
     //focusImage();
     g.drawImage(image, xOrigin, yOrigin, width , height , null);
+    paintRulers(g);
   }
 }
