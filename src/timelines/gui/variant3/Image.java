@@ -26,6 +26,7 @@ public class Image extends JComponent {
     setHeights(image.getHeight());
     this.xOrigin = 0;
     this.yOrigin = 0;
+    //setFocus();
   }
 
   public Image(BufferedImage image, JFrame jF){
@@ -36,19 +37,30 @@ public class Image extends JComponent {
     System.out.println("img:"+jF.getContentPane().getWidth()+":"+jF.getContentPane().getHeight());
 
     centerImage();
+    //setFocus();
   }
 
   private void centerImage(){
-    int x = (window.getContentPane().getWidth()/2)-(width/2);
-    int y = (window.getContentPane().getHeight()/2)-(height/2);
+    int x = (this.window.getContentPane().getWidth()/2)-(this.width/2);
+    int y = (this.window.getContentPane().getHeight()/2)-(this.height/2);
     this.xOrigin = x;
     this.yOrigin = y;
   }
 
   private void setFocus(){
-    int x = (window.getContentPane().getWidth()/2)-xOrigin;
-    int y = (window.getContentPane().getHeight()/2)-yOrigin;
+    int x = (this.window.getContentPane().getWidth()/2)-this.xOrigin;
+    int y = (this.window.getContentPane().getHeight()/2)-this.yOrigin;
     this.focus = new Point(x,y);
+  }
+
+  private void focusImage(){
+    this.xOrigin = (this.window.getContentPane().getWidth()/2)-this.focus.x;
+    this.yOrigin = (this.window.getContentPane().getHeight()/2)-this.focus.y;
+  }
+
+  private void adjustFocus(int zoomLevel){
+    this.focus.x *= zoomLevel;
+    this.focus.y *= zoomLevel;
   }
 
   public void setHeights(int height) {
@@ -64,24 +76,21 @@ public class Image extends JComponent {
   public void zoom(int level){
     this.width = this.originalWidth * level;
     this.height = this.originalHeight * level;
-    //adjustLocation(level);
+    //adjustFocus(level);
     repaint();
-  }
-
-  private void adjustLocation(int level){
-    this.xOrigin *= level;
-    this.yOrigin *= level;
   }
 
   public void moveBy(int xChange, int yChange){
     this.xOrigin += xChange;
     this.yOrigin += yChange;
+    //setFocus();
     repaint();
   }
 
   @Override
   public void paint(Graphics g){
     super.paintComponent(g);
+    //focusImage();
     g.drawImage(image, xOrigin, yOrigin, width , height , null);
   }
 }
