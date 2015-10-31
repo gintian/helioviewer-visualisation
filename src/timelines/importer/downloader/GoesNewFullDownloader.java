@@ -11,7 +11,7 @@ import timelines.importer.csv.CsvToGoesSxrLeafConverter;
 import timelines.utils.StringUtils;
 import timelines.utils.TimeUtils;
 
-public class GoesNewFullDownloader extends AbstractGoesNewDownloader {
+public class GoesNewFullDownloader extends AbstractGoesDownloader {
 
   private String templateUrl = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_full/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_2s_{date}_{date}.csv";
 
@@ -25,14 +25,6 @@ public class GoesNewFullDownloader extends AbstractGoesNewDownloader {
 
   public GoesNewFullDownloader(int minGoesNr, int maxGoesNr) {
     super(minGoesNr, maxGoesNr, createCsvToGoesSxrLeafConverter());
-
-//    try {
-//      goesNewFullStartDateMidnight = TimeUtils.setMidnight(TimeUtils.fromString("2009-12-01", "yyyy-MM-dd"));
-//    } catch (ParseException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    }
-
 
   }
 

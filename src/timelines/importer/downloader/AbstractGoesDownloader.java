@@ -6,13 +6,16 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import timelines.importer.csv.CsvToGoesSxrLeafConverter;
 import timelines.importer.csv.GoesSxrLeaf;
 import timelines.utils.TimeUtils;
 
-abstract class AbstractGoesNewDownloader implements IDownloader {
+abstract class AbstractGoesDownloader implements IDownloader {
   //	protected final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = Logger.getLogger(AbstractGoesDownloader.class.getName());
 
   protected int currentGoesNr;
 
@@ -22,15 +25,31 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
 
   private final CsvToGoesSxrLeafConverter csvParser;
 
-  public AbstractGoesNewDownloader(int minGoesNr, int maxGoesNr, CsvToGoesSxrLeafConverter csvToGoesSxrLeafConverter) {
+  private boolean skipToData;
+
+  /**
+   * @param minGoesNr the minimum goes nr to get data from
+   * @param maxGoesNr the maximum goes nr to get data from
+   * @param csvToGoesSxrLeafConverter the CSV converter
+   * @param skipToData whether or not we have to skip through header data in the csv file
+   */
+  public AbstractGoesDownloader(int minGoesNr, int maxGoesNr, CsvToGoesSxrLeafConverter csvToGoesSxrLeafConverter, boolean skipToData) {
     this.MIN_GOESNR = minGoesNr;
     this.currentGoesNr = minGoesNr;
     this.MAX_GOESNR = maxGoesNr;
     this.csvParser = csvToGoesSxrLeafConverter;
+    this.skipToData = skipToData;
+  }
+
+  public AbstractGoesDownloader(int minGoesNr, int maxGoesNr, CsvToGoesSxrLeafConverter csvToGoesSxrLeafConverter) {
+    this(minGoesNr, maxGoesNr, csvToGoesSxrLeafConverter, true);
   }
 
   @Override
   public List<GoesSxrLeaf> getGoesSxrLeafs(Date minTimestamp, Date csvFileDate) {
+
+    logger.log(Level.INFO, "getting all data from {0} which is dated after {1}", new Object[]{csvFileDate, minTimestamp});
+
     int downloadTrials = 0;
 
     while (downloadTrials < MAX_GOESNR) {
@@ -80,11 +99,17 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
    */
   private List<GoesSxrLeaf> downloadGoesSxrLeafs(URL url, Date startTimestamp, Date endTimestamp) throws IOException {
 
+    logger.log(Level.INFO, "accessing {0} from {1} to {2}", new Object[]{url, startTimestamp, endTimestamp});
+
     BufferedReader dataReader = new BufferedReader(new InputStreamReader(url.openStream())); // IOUtils.toBufferedReader(stringReader);
 
     List<GoesSxrLeaf> parsedLeafs = null;
     try {
-      skipToData(dataReader);
+
+      if(skipToData) {
+        System.out.println("skipping to data"); // TODO
+        skipToData(dataReader);
+      }
       parsedLeafs = csvParser.parseFile(startTimestamp, endTimestamp, dataReader);
 
     } catch (IOException e) {
@@ -98,25 +123,6 @@ abstract class AbstractGoesNewDownloader implements IDownloader {
     return parsedLeafs;
   }
 
-  private byte[] downloadGoesSxrData(URL url, Date startTimestamp, Date endTimestamp) throws IOException {
-
-    BufferedReader dataReader = new BufferedReader(new InputStreamReader(url.openStream())); // IOUtils.toBufferedReader(stringReader);
-
-    byte[] parsedData = null;
-    try {
-      skipToData(dataReader);
-      //parsedData = csvParser.parseFile(startTimestamp, endTimestamp, dataReader); TODO
-
-    } catch (IOException e) {
-      // TODO: handle exception
-      e.printStackTrace();
-
-    } finally {
-      dataReader.close();
-//      IOUtils.closeQuietly(dataReader);
-    }
-    return parsedData;
-  }
 
   /**
    * Moves the reader to the line which starts with "data:".

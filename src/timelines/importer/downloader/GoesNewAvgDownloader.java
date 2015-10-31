@@ -12,7 +12,7 @@ import timelines.importer.csv.CsvToGoesSxrLeafConverter;
 import timelines.utils.StringUtils;
 import timelines.utils.TimeUtils;
 
-public class GoesNewAvgDownloader extends AbstractGoesNewDownloader  {
+public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
 
   private String urlTemplate = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_avg/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_1m_{startdate}_{enddate}.csv";
 
