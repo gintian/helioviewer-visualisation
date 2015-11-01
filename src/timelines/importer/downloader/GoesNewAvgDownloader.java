@@ -62,27 +62,23 @@ public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
-    System.out.println(url);
+//    System.out.println(url); // TODO
     return url;
   }
 
   /**
    * Use the static final field START_DATE instead
    */
-  @Deprecated
   @Override
   public Date getStartDateMidnight() {
-    // TODO Auto-generated method stub
     return START_DATE;
   }
 
   /**
    * Use the static final field END_DATE instead
    */
-  @Deprecated
   @Override
   public Date getEndDateMidnight() {
-    // TODO Auto-generated method stub
     return END_DATE;
   }
 

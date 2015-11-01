@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -97,9 +96,8 @@ public class Importer {
    */
   public void initializeDatabase() throws Exception {
 
-    // TODO get data from old services
-    getOldData();
-//    getAverageData();
+//    getOldData();
+    getAverageData();
 
   }
 
@@ -114,10 +112,11 @@ public class Importer {
     Calendar cal = Calendar.getInstance();
     cal.setTime(lastWrittenDate);
 
-    ArrayList<Float> highChannel = new ArrayList<>();
-    ArrayList<Float> lowChannel = new ArrayList<>();
+//    ArrayList<Float> highChannel = new ArrayList<>();
+//    ArrayList<Float> lowChannel = new ArrayList<>();
 
-    while (lastWrittenDate.before(GoesNewAvgDownloader.END_DATE)) {
+
+    while (cal.getTime().before(GoesNewAvgDownloader.END_DATE)) {
 
       List<GoesSxrLeaf> leafs = averageDownloader.getGoesSxrLeafs(cal.getTime(), cal.getTime());
       System.out.println("got data");
@@ -125,6 +124,10 @@ public class Importer {
       if (leafs == null) {
         throw new Exception("Data could not be retrieved");
       }
+
+      ByteBuffer bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES * 30);
+      ByteBuffer bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES * 30);
+
 
       for (GoesSxrLeaf leaf : leafs) {
         long currentTime = leaf.getTimestamp().getTime();
@@ -137,22 +140,45 @@ public class Importer {
 //          System.out.println(lastTime);
 //          System.out.println(currentTime - lastTime + "\n");
           // add empty entry
-          highChannel.add(Float.NaN);
-          lowChannel.add(Float.NaN);
+          bufferLow.putFloat(Float.NaN);
+          bufferHigh.putFloat(Float.NaN);
           lastTime += 2000;
           empty ++;
+
+          if (!bufferHigh.hasRemaining()) {
+            appendBufferToDb(bufferLow, lowChannelDB);
+            appendBufferToDb(bufferHigh, highChannelDB);
+            bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+            bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+          }
+
         }
-        System.out.println("adding value " + leaf + " empty values before: " + empty);
-        highChannel.add(leaf.getHighChannel());
-        lowChannel.add(leaf.getLowChannel());
+//        System.out.println("adding value " + leaf + " empty values before: " + empty);
+        bufferHigh.putFloat(leaf.getHighChannel());
+        bufferLow.putFloat(leaf.getLowChannel());
         lastTime = leaf.getTimestamp().getTime();
+
+        if (!bufferHigh.hasRemaining()) {
+          appendBufferToDb(bufferLow, lowChannelDB);
+          appendBufferToDb(bufferHigh, highChannelDB);
+          bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+          bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+        }
         // maybe write here already and empty the lists?
       }
       cal.add(Calendar.MONTH, 1);
-      System.out.println(highChannel);
+      cal.set(Calendar.DAY_OF_MONTH, 1);
+
+      appendBufferToDb(bufferLow, lowChannelDB);
+      appendBufferToDb(bufferHigh, highChannelDB);
+      bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+      bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+
+//      System.out.println(highChannel);
     }
 
     // TODO write to DB
+
   }
 
   private void getOldData() throws Exception {
@@ -168,6 +194,7 @@ public class Importer {
 
       List<GoesSxrLeaf> leafs = downloader.getGoesSxrLeafs(lastWrittenDate, cal.getTime());
       cal.add(Calendar.MONTH, 1);
+      cal.set(Calendar.DAY_OF_MONTH, 1);
 
       System.out.println("got data.");
 
@@ -247,7 +274,8 @@ public class Importer {
       System.out.println("writing data");
       appendBufferToDb(bufferLow, lowChannelDB);
       appendBufferToDb(bufferHigh, highChannelDB);
-
+      bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+      bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
       //
       // reset the lists
       //
