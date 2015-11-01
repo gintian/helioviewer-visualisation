@@ -226,7 +226,7 @@ public class Importer {
           lastWrittenDate = new Date(lastTime);
           c ++;
 
-          // TODO refactor this so we don't have this block twice
+          // TODO refactor this so we don't have the block twice
           if (!bufferHigh.hasRemaining()) {
             appendBufferToDb(bufferLow, lowChannelDB);
             appendBufferToDb(bufferHigh, highChannelDB);
