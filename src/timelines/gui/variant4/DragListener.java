@@ -8,17 +8,17 @@ import java.awt.event.MouseEvent;
  * Created by Tobias Kohler on 28.10.2015.
  */
 public class DragListener extends MouseInputAdapter {
-  private Coordinates base;
+  private int xBase;
 
   public void mousePressed(MouseEvent me)
   {
-    this.base = new Coordinates(me.getX(), me.getY());
+    this.xBase = me.getX();
   }
 
   public void mouseDragged(MouseEvent me)
   {
     Image img = (Image)me.getSource();
-    img.moveBy(new Coordinates(me.getX() - this.base.x,me.getY() - this.base.y));
-    this.base = new Coordinates(me.getX(),me.getY());
+    img.moveBy(me.getX() - this.xBase);
+    this.xBase = me.getX();
   }
 }

@@ -25,7 +25,7 @@ public class ZoomListener extends MouseInputAdapter {
     int change = mwe.getWheelRotation();
     if (!((zoomLevel-change)<minLevel||(zoomLevel-change)>maxLevel)) {
       zoomLevel -= mwe.getWheelRotation();
-      img.zoom(zoomLevel, new Coordinates(mwe.getX(),mwe.getY()));
+      img.zoom(zoomLevel, mwe.getX());
     }
   }
 
