@@ -12,7 +12,7 @@ import timelines.importer.csv.CsvToGoesSxrLeafConverter;
 import timelines.utils.StringUtils;
 import timelines.utils.TimeUtils;
 
-public class GoesNewAvgDownloader extends AbstractGoesNewDownloader  {
+public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
 
   private String urlTemplate = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_avg/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_1m_{startdate}_{enddate}.csv";
 
@@ -62,27 +62,23 @@ public class GoesNewAvgDownloader extends AbstractGoesNewDownloader  {
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
-    System.out.println(url);
+//    System.out.println(url); // TODO
     return url;
   }
 
   /**
    * Use the static final field START_DATE instead
    */
-  @Deprecated
   @Override
   public Date getStartDateMidnight() {
-    // TODO Auto-generated method stub
     return START_DATE;
   }
 
   /**
    * Use the static final field END_DATE instead
    */
-  @Deprecated
   @Override
   public Date getEndDateMidnight() {
-    // TODO Auto-generated method stub
     return END_DATE;
   }
 

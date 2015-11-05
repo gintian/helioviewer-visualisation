@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import timelines.utils.TimeUtils;
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
-import timelines.utils.TimeUtils;
 
 public class CsvToGoesSxrLeafConverter {
 
@@ -34,16 +35,22 @@ public class CsvToGoesSxrLeafConverter {
 
     try {
       boolean foundValid = false;
+      System.out.println("reading");
       while ((nextLine = csvReader.readNext()) != null) {
         GoesSxrLeaf goesSxrLeaf = parseDataRow(nextLine);
 
+
+        if(!foundValid) {
+          foundValid = true;
+          System.out.println("first line in file: " + Arrays.toString(nextLine));
+          System.out.println("valid: " + isValid(goesSxrLeaf));
+          System.out.println("fitting in interval " + startTimestamp + " to " + endTimestamp + ": " + TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp));
+          // TODO remove debugging stuff
+        }
+
         if (isValid(goesSxrLeaf) && TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp)) {
           goesSxrLeafs.add(goesSxrLeaf);
-          if(!foundValid) {
-            foundValid = true;
-            System.out.println(goesSxrLeaf);
-            // TODO remove debugging stuff
-          }
+
         } else {
 //          System.out.println(goesSxrLeaf.getTimestamp() + " " + startTimestamp + " " + endTimestamp);
 //          System.out.println(TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp));
@@ -55,28 +62,6 @@ public class CsvToGoesSxrLeafConverter {
     }
 
     return goesSxrLeafs;
-  }
-
-  public byte[] parseData(Date startTimestamp, Date endTimestamp, Reader fileReader) throws IOException {
-    byte[] goesSxrData;
-    String[] nextLine;
-    CSVReader csvReader = new CSVReader(fileReader, CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
-
-    try {
-      while ((nextLine = csvReader.readNext()) != null) {
-        GoesSxrLeaf goesSxrLeaf = parseDataRow(nextLine);
-
-        if (isValid(goesSxrLeaf) && TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp)) {
-          //goesSxrData.add(goesSxrLeaf); // TODO
-        }
-      }
-    } finally {
-      csvReader.close();
-//      IOUtils.closeQuietly(csvReader);
-    }
-
-    //return goesSxrData;
-    return null; // TODO
   }
 
   private GoesSxrLeaf parseDataRow(String[] line) {

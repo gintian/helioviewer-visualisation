@@ -205,6 +205,10 @@ public class MemoryMappedFile {
     return buffers.get(bufferIndex);
   }
 
+  /**
+   * @return The length of the file, measured in bytes
+   * @throws IOException
+   */
   public long getFileSize() throws IOException {
     return memoryMappedFile.length();
   }
