@@ -21,6 +21,8 @@ public class Image extends JComponent {
   private JFrame window;
   private int zoomLevel = 1;
   private int rulerWidth = 20;
+  private long timeScalMin;
+  private double IntensScaleMax;
 
   public Image(BufferedImage image){
     this.image = image;
@@ -41,12 +43,6 @@ public class Image extends JComponent {
   }
 
   public Coordinates getWindowCenter(){
-    /*return new Coordinates(
-        (this.window.getContentPane().getWidth()/2),
-        (this.window.getContentPane().getHeight()/2));*/
-    /*return new Coordinates(
-        (this.window.getContentPane().getWidth()/2)+this.rulerWidth,
-        (this.window.getContentPane().getHeight()/2)-this.rulerWidth);*/
     return new Coordinates(
         (this.window.getContentPane().getWidth()+this.rulerWidth)/2,
         (this.window.getContentPane().getHeight()-this.rulerWidth)/2);
@@ -104,26 +100,31 @@ public class Image extends JComponent {
   private void paintRulers(Graphics g){
     int h = this.window.getContentPane().getHeight();
     int w = this.window.getContentPane().getWidth();
+    int xOffset = 0;
+    int yOffset = 0;
+    int rw = this.rulerWidth;
+    int sp = rw/4;
     Color rulerColor = g.getColor();
     Color scaleColor = new Color(255,255,255);
 
-    g.fillRect(0,0,20,h-20);
+    g.fillRect(0,0,rw,h-rw);
     g.setColor(scaleColor);
     int i = h;
-    while(i>0){
-      g.drawLine(5,i,15,i);
-      i-=10;
+    while(i+yOffset>0){
+      g.drawLine(sp,i+yOffset,rw-sp,i+yOffset);
+      i-=(10*zoomLevel);
     }
 
     g.setColor(rulerColor);
-    g.fillRect(20,h-20,w-20,20);
+    g.fillRect(rw,h-rw,w-rw,rw);
     g.setColor(scaleColor);
     int j = w;
-    while(j>0){
-      g.drawLine(20+j,h-5,20+j,h-15);
-      j-=10;
+    while(j+xOffset>0){
+      g.drawLine(rw+j+xOffset,h-sp,rw+j+xOffset,h-(rw-sp));
+      j-=(10*zoomLevel);
     }
     g.setColor(rulerColor);
+    g.fillRect(0, h - rw, rw, rw);
   }
 
   @Override
