@@ -15,32 +15,19 @@ import timelines.utils.TimeUtils;
 
 public class DiagramRenderer {
 
-//  private MemoryMappedFile lowChannelDB;
-//  private MemoryMappedFile highChannelDB;
   private TimelinesDB timelinesDB;
 
   public static final int IMAGE_HEIGHT = 300;
   public static final int IMAGE_WIDTH = 1000;
 
   public DiagramRenderer() throws Exception {
-//      lowChannelDB = new MemoryMappedFile("res/dbL");
-//      highChannelDB = new MemoryMappedFile("res/dbH");
     timelinesDB = new TimelinesDB();
   }
 
   public BufferedImage getDiagramForTimespan(Date from, Date to) throws Exception {
 
-    long startIndex = (from.getTime() - GoesOldFullDownloader.START_DATE.getTime()) / 1000 / 2;
-    long length = (to.getTime() - from.getTime()) / 1000 / 2 * Float.BYTES;
-
-    if (length > Integer.MAX_VALUE) {
-      throw new Exception("Can't access more than Integer.MAX_VALUE entries at once");
-    }
-
     ByteBuffer bufferL = timelinesDB.getLowChannelData(from, to); // lowChannelDB.read(startIndex, (int) length);
     ByteBuffer bufferH = timelinesDB.getHighChannelData(from, to);
-
-//    ByteBuffer bufferL = ByteBuffer.wrap(dataL);
 
     float rangeStart = 10E-11f;
     float rangeEnd   = 10E-3f;
@@ -48,12 +35,11 @@ public class DiagramRenderer {
     int offset =  (int)(Math.abs(scaling * Math.log10(rangeEnd)));
     System.out.println("offset: " + offset);
     System.out.println("scaling: " + scaling);
-    System.out.println("min: " + (Math.abs(scaling * (Math.log10(rangeStart))) - offset));
-    System.out.println("max: " + (Math.abs(scaling * (Math.log10(rangeEnd))) - offset));
+    System.out.println("min: " + (int)(Math.abs(scaling * (Math.log10(rangeStart))) - offset));
+    System.out.println("max: " + (int)(Math.abs(scaling * (Math.log10(rangeEnd))) - offset));
 
     float widthOnePercent = bufferL.remaining() / Float.BYTES / 100;
 
-    // draw the image
     BufferedImage image = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
 
     int index = 0;
@@ -61,13 +47,11 @@ public class DiagramRenderer {
 
       float valL = bufferL.getFloat();
       float valH = bufferH.getFloat();
-      int posX = (int) (index / widthOnePercent * 10);
+      int posX = (int) (index / widthOnePercent * (IMAGE_WIDTH / 100));
 
       int posYL = getPosY(valL, scaling, offset);
       int posYH = getPosY(valH, scaling, offset);
 
-//      System.out.println("val: " + val + " pos y: " + posY);
-//      System.out.println(val + " " + posY);
       try {
         image.setRGB(posX, posYL, Color.RED.getRGB());
         image.setRGB(posX, posYH, Color.BLUE.getRGB());
