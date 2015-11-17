@@ -3,32 +3,29 @@ package timelines.renderer;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
 
-import timelines.database.MemoryMappedFile;
+import timelines.database.TimelinesDB;
 import timelines.importer.downloader.GoesOldFullDownloader;
 import timelines.utils.TimeUtils;
 
 public class DiagramRenderer {
 
-  private MemoryMappedFile lowChannelDB;
-  private MemoryMappedFile highChannelDB;
+//  private MemoryMappedFile lowChannelDB;
+//  private MemoryMappedFile highChannelDB;
+  private TimelinesDB timelinesDB;
 
   public static final int IMAGE_HEIGHT = 300;
   public static final int IMAGE_WIDTH = 1000;
 
   public DiagramRenderer() throws Exception {
-    try {
-      lowChannelDB = new MemoryMappedFile("res/dbL");
-      highChannelDB = new MemoryMappedFile("res/dbH");
-    } catch (IOException e) {
-      throw new Exception("Database could not be accessed", e);
-    }
+//      lowChannelDB = new MemoryMappedFile("res/dbL");
+//      highChannelDB = new MemoryMappedFile("res/dbH");
+    timelinesDB = new TimelinesDB();
   }
 
   public BufferedImage getDiagramForTimespan(Date from, Date to) throws Exception {
@@ -40,47 +37,55 @@ public class DiagramRenderer {
       throw new Exception("Can't access more than Integer.MAX_VALUE entries at once");
     }
 
-    byte[] dataL = lowChannelDB.read(startIndex, (int) length);
+    ByteBuffer bufferL = timelinesDB.getLowChannelData(from, to); // lowChannelDB.read(startIndex, (int) length);
+    ByteBuffer bufferH = timelinesDB.getHighChannelData(from, to);
 
-    ByteBuffer bufferL = ByteBuffer.wrap(dataL);
+//    ByteBuffer bufferL = ByteBuffer.wrap(dataL);
 
-    float rangeStart = 0.0000000000005f;
-    rangeStart = (float) 1.0E-12;
-    float rangeEnd   = 0.00000002f;
-    rangeEnd = (float) 6.745E-7;
-    float rangeOnePercent = rangeEnd - rangeStart / 100;
+    float rangeStart = 10E-11f;
+    float rangeEnd   = 10E-3f;
+    float scaling = (float) (IMAGE_HEIGHT / (Math.log10(rangeEnd) - Math.log10(rangeStart)));
+    int offset =  (int)(Math.abs(scaling * Math.log10(rangeEnd)));
+    System.out.println("offset: " + offset);
+    System.out.println("scaling: " + scaling);
+    System.out.println("min: " + (Math.abs(scaling * (Math.log10(rangeStart))) - offset));
+    System.out.println("max: " + (Math.abs(scaling * (Math.log10(rangeEnd))) - offset));
 
-    float widthOnePercent = dataL.length / 4 / 100;
-
+    float widthOnePercent = bufferL.remaining() / Float.BYTES / 100;
 
     // draw the image
     BufferedImage image = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
-    int prevIndex = 0;
-    int index = 0;
-    System.out.println(dataL.length);
-    while (bufferL.hasRemaining()) {
-      float val = bufferL.getFloat();
 
-//      System.out.println(index % IMAGE_WIDTH);
+    int index = 0;
+    while (bufferL.hasRemaining()) {
+
+      float valL = bufferL.getFloat();
+      float valH = bufferH.getFloat();
       int posX = (int) (index / widthOnePercent * 10);
-      if (posX != prevIndex && posX != prevIndex + 1) {
-        System.out.println(prevIndex + " " + posX);
-      } else {
-        prevIndex = posX;
-      }
-      int posY = Math.min(IMAGE_HEIGHT - 1, IMAGE_HEIGHT - (int) (val / rangeOnePercent * 3f));
+
+      int posYL = getPosY(valL, scaling, offset);
+      int posYH = getPosY(valH, scaling, offset);
+
+//      System.out.println("val: " + val + " pos y: " + posY);
 //      System.out.println(val + " " + posY);
       try {
-        Color current = new Color(image.getRGB(posX, posY));
-        image.setRGB(posX, posY, new Color(255, 0, 0, Math.min(255, current.getAlpha() + 1)).getRGB());
+        image.setRGB(posX, posYL, Color.RED.getRGB());
+        image.setRGB(posX, posYH, Color.BLUE.getRGB());
       } catch (ArrayIndexOutOfBoundsException e) {
         // e.printStackTrace();
-        System.out.println("erronous x: " + posX + " y: " + posY + " val: " + val);
+        System.out.println("erronous x: " + posX + " y: " + posYL + " val: " + valL);
       }
       index ++;
     }
 
     return image;
+  }
+
+  private int getPosY(Float f, float scaling, float offset) {
+    if (f != Float.NaN && f != 0) {
+      return (int) Math.min(299, (Math.abs(scaling * (Math.log10(f))) - offset));
+    }
+    return 299;
   }
 
   public static void main(String[] args) throws Exception {
@@ -93,8 +98,8 @@ public class DiagramRenderer {
 
     BufferedImage image = renderer.getDiagramForTimespan(TimeUtils.fromString("1992-01-01", "yyyy-MM-dd"), TimeUtils.fromString("1993-01-01", "yyyy-MM-dd"));
 
-    File file = new File("res/testRender.jpg");
-    ImageIO.write(image, "jpg", file);
+    File file = new File("res/testRender.png");
+    ImageIO.write(image, "png", file);
 
   }
 
