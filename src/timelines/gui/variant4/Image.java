@@ -14,12 +14,8 @@ public class Image extends JComponent {
   private int originalWidth;
   private int originalHeight;
   private int width;
-  //private int height;
-  //private Coordinates origin;
   private int xOrigin;
-  //private Coordinates focusPoint;
   private int xFocus;
-  //private Coordinates originToFocus; //difference betwene focusPoint and originPoint
   private int originToFocus; //difference betwene xFocus and xOrigin
   private JFrame window;
   private int zoomLevel = 1;
@@ -76,13 +72,20 @@ public class Image extends JComponent {
     this.originalWidth = width;
   }
 
-  public void zoom(int level, int x){
-    setFocusPoint(x);
-    this.width = this.originalWidth * level;
+  public void getNewImage(int zoomLevel, int xFocus){
+
+  }
+  public void strechImage(int zoomLevel){
+    this.width = this.originalWidth * zoomLevel;
     //this.height = this.originalHeight * level;
-    adjustFocus(level);
-    this.zoomLevel = level;
+    adjustFocus(zoomLevel);
+    this.zoomLevel = zoomLevel;
     repaint();
+  }
+  public void zoom(int level, int xFocus){
+    setFocusPoint(xFocus);
+    strechImage(level);
+    getNewImage(level, xFocus);
   }
 
   public void moveBy(int change){
@@ -125,6 +128,7 @@ public class Image extends JComponent {
     super.paintComponent(g);
     focusImage();
     g.drawImage(image, xOrigin, 0, width, originalHeight, null);
+    System.out.println(image.getType());
     paintRulers(g);
   }
 }
