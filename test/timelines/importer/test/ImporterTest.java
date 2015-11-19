@@ -1,6 +1,7 @@
 package timelines.importer.test;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -8,8 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import timelines.database.MemoryMappedFile;
-import timelines.importer.downloader.GoesOldFullDownloader;
+import timelines.database.TimelinesDB;
 import timelines.utils.TimeUtils;
 
 public class ImporterTest {
@@ -21,11 +21,16 @@ public class ImporterTest {
   @Test
   public void testInitializeDatabase() throws IOException, ParseException {
 
-    MemoryMappedFile db = new MemoryMappedFile("res/dbL");
+    TimelinesDB db = new TimelinesDB();
 
     // first available entry in the data
     Date date = TimeUtils.fromString("1974-07-01 00:01:16", "yyyy-MM-dd hh:mm:ss");
-    long index = (date.getTime() - GoesOldFullDownloader.START_DATE.getTime()) / 1000L / 2L * 4L - 4L;
+    Date date2 = new Date(date.getTime() + 2000);
+    ByteBuffer buffer = db.getLowChannelData(date, date2);
+
+//    while(buffer.hasRemaining()) {
+//      System.out.println(buffer.getFloat());
+//    }
 
 //    System.out.println(index);
 //    System.out.println(db.readFloat(index));
@@ -36,7 +41,7 @@ public class ImporterTest {
 //    }
 
     // test data from old service
-    float f = db.readFloat(index);
+    float f = buffer.getFloat();
     Assert.assertEquals("expected 1.000e-09, found " + f, 1.000e-09, f, 0.2e-9);
 
 

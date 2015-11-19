@@ -96,8 +96,8 @@ public class Importer {
    */
   public void initializeDatabase() throws Exception {
 
-//    getOldData();
-    getAverageData();
+    getOldData();
+//    getAverageData();
 
   }
 
@@ -146,8 +146,9 @@ public class Importer {
           empty ++;
 
           if (!bufferHigh.hasRemaining()) {
-            appendBufferToDb(bufferLow, lowChannelDB);
-            appendBufferToDb(bufferHigh, highChannelDB);
+            appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
+            appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
+            lastWrittenDate = new Date(lastTime);
             bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
             bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
           }
@@ -159,8 +160,9 @@ public class Importer {
         lastTime = leaf.getTimestamp().getTime();
 
         if (!bufferHigh.hasRemaining()) {
-          appendBufferToDb(bufferLow, lowChannelDB);
-          appendBufferToDb(bufferHigh, highChannelDB);
+          appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
+          appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
+          lastWrittenDate = new Date(lastTime);
           bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
           bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
         }
@@ -169,8 +171,9 @@ public class Importer {
       cal.add(Calendar.MONTH, 1);
       cal.set(Calendar.DAY_OF_MONTH, 1);
 
-      appendBufferToDb(bufferLow, lowChannelDB);
-      appendBufferToDb(bufferHigh, highChannelDB);
+      appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
+      appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
+      lastWrittenDate = new Date(lastTime);
       bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
       bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
 
@@ -186,13 +189,15 @@ public class Importer {
 
     GoesOldFullDownloader downloader = new GoesOldFullDownloader(1, 92);
 
-    Date lastWrittenDate = GoesOldFullDownloader.START_DATE; // TODO if we want this to be capable of writing with some data available already, we need the start date from the DB
+    Date lastAddedDate = GoesOldFullDownloader.START_DATE; // TODO if we want this to be capable of writing with some data available already, we need the start date from the DB
     Calendar cal = Calendar.getInstance();
-    cal.setTime(lastWrittenDate);
+    cal.setTime(lastAddedDate);
+
+    long lastWrittenDate = GoesOldFullDownloader.START_DATE.getTime();
 
     while (cal.getTime().before(GoesOldFullDownloader.END_DATE)) {
 
-      List<GoesSxrLeaf> leafs = downloader.getGoesSxrLeafs(lastWrittenDate, cal.getTime());
+      List<GoesSxrLeaf> leafs = downloader.getGoesSxrLeafs(lastAddedDate, cal.getTime());
       cal.add(Calendar.MONTH, 1);
       cal.set(Calendar.DAY_OF_MONTH, 1);
 
@@ -218,6 +223,7 @@ public class Importer {
       ByteBuffer bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
       ByteBuffer bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
 
+
       int c = 0;
       long prevTime = 0;
       for (GoesSxrLeaf leaf : leafs) {
@@ -240,8 +246,9 @@ public class Importer {
             c ++;
 
             if (!bufferHigh.hasRemaining()) {
-              appendBufferToDb(bufferLow, lowChannelDB);
-              appendBufferToDb(bufferHigh, highChannelDB);
+              appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
+              appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
+              lastWrittenDate = lastTime;
               bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
               bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
             }
@@ -250,13 +257,14 @@ public class Importer {
           bufferLow.putFloat(leaf.getLowChannel());
           bufferHigh.putFloat(leaf.getHighChannel());
           lastTime += 2000;
-          lastWrittenDate = new Date(lastTime);
+          lastAddedDate = new Date(lastTime);
           c ++;
 
           // TODO refactor this so we don't have the block twice
           if (!bufferHigh.hasRemaining()) {
-            appendBufferToDb(bufferLow, lowChannelDB);
-            appendBufferToDb(bufferHigh, highChannelDB);
+            appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
+            appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
+            lastWrittenDate = lastTime;
             bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
             bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
           }
@@ -272,8 +280,9 @@ public class Importer {
       // write
       //
       System.out.println("writing data");
-      appendBufferToDb(bufferLow, lowChannelDB);
-      appendBufferToDb(bufferHigh, highChannelDB);
+      appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
+      appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
+      lastWrittenDate = lastTime;
       bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
       bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
       //
@@ -285,8 +294,9 @@ public class Importer {
     }
   }
 
-  private void appendBufferToDb(ByteBuffer buffer, MemoryMappedFile db) throws IOException {
-    db.write(buffer.array(), db.getFileSize());
+  private void appendBufferToDb(ByteBuffer buffer, MemoryMappedFile db, long date) throws IOException {
+    long index = (date - GoesOldFullDownloader.START_DATE.getTime()) / 1000 / 2 * Float.BYTES;
+    db.write(buffer.array(), index);
   }
 
 
