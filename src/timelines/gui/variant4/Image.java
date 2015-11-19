@@ -3,6 +3,7 @@ package timelines.gui.variant4;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Date;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
@@ -22,23 +23,23 @@ public class Image extends JComponent {
   private int rulerWidth = 20;
   private long timeScalMin;
   private double IntensScaleMax;
+  private ImageLoader imageLoader;
+  private Date date; //TODO: calculate date and origin coordinates
 
-  public Image(BufferedImage image){
-    this.image = image;
-    setWidths(image.getWidth());
-    this.originalHeight = image.getHeight();
-    this.xOrigin = 0;
-    setFocusPointCenter();
-  }
-
-  public Image(BufferedImage image, JFrame jF){
+  public Image(BufferedImage image, JFrame jF, ImageLoader il){
     this.window = jF;
     this.image = image;
     setWidths(image.getWidth());
     this.originalHeight = image.getHeight();
+    this.imageLoader = il;
 
     centerImage();
     setFocusPointCenter();
+  }
+
+  public void setImage(BufferedImage img){
+    this.image = img;
+    repaint();
   }
 
   public int getWindowCenter(){
@@ -83,6 +84,7 @@ public class Image extends JComponent {
     repaint();
   }
   public void zoom(int level, int xFocus){
+    //imageLoader.requestImage(this.date, level);
     setFocusPoint(xFocus);
     strechImage(level);
     getNewImage(level, xFocus);

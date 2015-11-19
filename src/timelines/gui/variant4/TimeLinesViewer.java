@@ -7,7 +7,12 @@ import javax.swing.*;
  * Created by Tobias Kohler on 12.10.2015.
  */
 public class TimeLinesViewer {
+
+  private static final String serverBaseURLStr = "http://www.myserver.ch";
+
   public static void main(String[] args){
-    JFrame TLViewer = new Window();
+    ImageLoader iL = new ImageLoader(serverBaseURLStr);
+    Window tLVWindow = new Window(iL);
+    iL.addObserver(tLVWindow);
   }
 }

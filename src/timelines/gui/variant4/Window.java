@@ -12,11 +12,18 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
 
-public class Window extends JFrame {
+public class Window extends JFrame implements Observer {
   Image image;
 
-  public Window(){
+  @Override
+  public void update(Observable o, Object arg) {
+    image.setImage((BufferedImage)arg);
+  }
+
+  public Window(ImageLoader il){
     super("i4ds05 - Time Lines Viewer");
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(500, 500);
@@ -25,7 +32,7 @@ public class Window extends JFrame {
 
     try {
       BufferedImage bImage = ImageIO.read(new File("src\\timelines\\gui\\ajrKzgp_460s.jpg"));
-      image = new Image(bImage, this);
+      image = new Image(bImage, this, il);
       add(image);
 
       ZoomListener zoom = new ZoomListener();
