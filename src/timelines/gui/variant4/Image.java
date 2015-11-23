@@ -39,6 +39,8 @@ public class Image extends JComponent {
 
   public void setImage(BufferedImage img){
     this.image = img;
+    setWidths(image.getWidth());
+    this.originalHeight = image.getHeight();
     repaint();
   }
 
@@ -84,7 +86,7 @@ public class Image extends JComponent {
     repaint();
   }
   public void zoom(int level, int xFocus){
-    //imageLoader.requestImage(this.date, level);
+    imageLoader.requestImage(this.date, level);
     setFocusPoint(xFocus);
     strechImage(level);
     getNewImage(level, xFocus);
@@ -120,7 +122,6 @@ public class Image extends JComponent {
       g.drawLine(j,h-sp,j,h-(rw-sp));
       j+=(10*zoomLevel);
     }
-    System.out.println(width);
     g.setColor(rulerColor);
     g.fillRect(0, h - rw, rw, rw);
   }
@@ -130,7 +131,6 @@ public class Image extends JComponent {
     super.paintComponent(g);
     focusImage();
     g.drawImage(image, xOrigin, 0, width, originalHeight, null);
-    System.out.println(image.getType());
     paintRulers(g);
   }
 }

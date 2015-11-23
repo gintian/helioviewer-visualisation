@@ -8,7 +8,7 @@ import javax.swing.*;
  */
 public class TimeLinesViewer {
 
-  private static final String serverBaseURLStr = "http://www.myserver.ch";
+  private static final String serverBaseURLStr = "127.0.0.1";
 
   public static void main(String[] args){
     ImageLoader iL = new ImageLoader(serverBaseURLStr);
