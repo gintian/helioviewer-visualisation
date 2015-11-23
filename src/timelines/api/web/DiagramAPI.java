@@ -184,8 +184,5 @@ public class DiagramAPI extends HttpServlet {
     writer.setOutput(stream);
     writer.write(metadata, new IIOImage(buffImg, null, metadata), writeParam);
     stream.close();
-    System.out.println("written");
-
-//    return baos.toByteArray();
   }
 }

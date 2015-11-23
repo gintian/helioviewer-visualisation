@@ -26,6 +26,8 @@ public class DiagramRenderer {
   public static final int IMAGE_HEIGHT = 300;
   public static final int IMAGE_WIDTH = 1000;
 
+  public static final int SUPER_SAMPLE = 3;
+
   public DiagramRenderer() throws Exception {
     timelinesDB = new TimelinesDB();
   }
@@ -33,6 +35,7 @@ public class DiagramRenderer {
   public BufferedImage getDiagramForTimespan(Date from, Date to) throws Exception {
 
     logger.log(Level.INFO, "Rendering image from {0} to {1}", new Object[] {from, to});
+    Date startDate = new Date();
 
     ByteBuffer bufferL = timelinesDB.getLowChannelData(from, to); // lowChannelDB.read(startIndex, (int) length);
     ByteBuffer bufferH = timelinesDB.getHighChannelData(from, to);
@@ -55,12 +58,13 @@ public class DiagramRenderer {
       }
     }
     bufferL.position(0);
-
-    int opacity =  Math.max(1, 255 / (validValCount / IMAGE_WIDTH));
-//    opacity *= 4;
+    System.out.println(validValCount);
+    int opacity =  (int) Math.max(2, 255f / (validValCount / 5f / IMAGE_WIDTH));
+//    opacity *= 2;
+    opacity = Math.min(255, opacity);
     System.out.println(opacity);
 
-    BufferedImage image = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+    BufferedImage image = new BufferedImage(IMAGE_WIDTH * SUPER_SAMPLE, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = image.createGraphics();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -73,8 +77,8 @@ public class DiagramRenderer {
       nextValL = bufferL.getFloat();
       float valH = nextValH;
       nextValH = bufferH.getFloat();
-      int posX = Math.min((int) (index / widthOnePercent * (IMAGE_WIDTH / 100)), IMAGE_WIDTH - 1);
-      int posXNext = Math.min((int) ((index + 1) / widthOnePercent * (IMAGE_WIDTH / 100)), IMAGE_WIDTH - 1);
+      int posX = Math.min((int) (index / widthOnePercent * (IMAGE_WIDTH * SUPER_SAMPLE / 100)), IMAGE_WIDTH * SUPER_SAMPLE - 1);
+      int posXNext = Math.min((int) ((index + 1) / widthOnePercent * (IMAGE_WIDTH * SUPER_SAMPLE / 100)), IMAGE_WIDTH * SUPER_SAMPLE - 1);
 
       int posYL = getPosY(valL, scaling, offset);
       int nextPosYL = getPosY(nextValL, scaling, offset);
@@ -101,7 +105,10 @@ public class DiagramRenderer {
       index ++;
     }
 
-    return image;
+
+    logger.log(Level.INFO, "Rendering completed in {0}", new Object[] {new Date().getTime() - startDate.getTime()});
+    return getScaledImage(image, IMAGE_WIDTH, IMAGE_HEIGHT);
+//    return image;
   }
 
   private int getPosY(Float f, float scaling, float offset) {
@@ -126,6 +133,22 @@ public class DiagramRenderer {
     File file = new File("res/testRender.png");
     ImageIO.write(image, "png", file);
 
+  }
+
+  /**
+   * Resizes an image using a Graphics2D object backed by a BufferedImage.
+   * @param srcImg - source image to scale
+   * @param w - desired width
+   * @param h - desired height
+   * @return - the new resized image
+   */
+  private BufferedImage getScaledImage(BufferedImage srcImg, int w, int h){
+      BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TRANSLUCENT);
+      Graphics2D g2 = resizedImg.createGraphics();
+      g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      g2.drawImage(srcImg, 0, 0, w, h, null);
+      g2.dispose();
+      return resizedImg;
   }
 
 }
