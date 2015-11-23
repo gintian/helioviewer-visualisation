@@ -25,8 +25,11 @@ public class ImageLoader extends Observable{
 
   public void requestImage(Date date, int zoomLevel){
     try {
-      getImageFromURL(createURL(date, zoomLevel));
+      //getImageFromURL(createURL(date, zoomLevel));
       //getImageFromURL(new URL("http://127.0.0.1/i4ds05/Chrysanthemum.jpg"));
+      System.out.println("get image");
+      getImageFromURL(new URL("localhost:8080/api?zoomLevel=6&dateFrom=1980-07-01:00:00:00"));
+      System.out.println("got image");
     }catch (MalformedURLException e){
       //do stuff
     }
