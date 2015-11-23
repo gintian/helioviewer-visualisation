@@ -1,6 +1,7 @@
 package timelines.renderer;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -46,20 +47,41 @@ public class DiagramRenderer {
 
     float widthOnePercent = bufferL.remaining() / Float.BYTES / 100;
 
+    int opacity =  Math.max(1, 255 / (bufferL.remaining() / Float.BYTES / IMAGE_WIDTH));
+    opacity *= 4;
+    System.out.println(opacity);
+
+//    int validValCount = 0;
+//    while(bufferL.hasRemaining()) {
+//      if(bufferL.getFloat() > 0) {}
+//    }
+
     BufferedImage image = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = image.createGraphics();
 
     int index = 0;
+    float nextValL = bufferL.getFloat();
+    float nextValH = bufferH.getFloat();
     while (bufferL.hasRemaining()) {
 
-      float valL = bufferL.getFloat();
-      float valH = bufferH.getFloat();
+      float valL = nextValL;
+      nextValL = bufferL.getFloat();
+      float valH = nextValH;
+      nextValH = bufferH.getFloat();
       int posX = Math.min((int) (index / widthOnePercent * (IMAGE_WIDTH / 100)), IMAGE_WIDTH - 1);
+      int posXNext = Math.min((int) ((index + 1) / widthOnePercent * (IMAGE_WIDTH / 100)), IMAGE_WIDTH - 1);
 
       int posYL = getPosY(valL, scaling, offset);
+      int nextPosYL = getPosY(nextValL, scaling, offset);
       int posYH = getPosY(valH, scaling, offset);
 
       try {
-        image.setRGB(posX, posYL, Color.RED.getRGB());
+        g.setColor(new Color(255, 0, 0, opacity));
+        if(nextPosYL > 0 && posYL > 0) {
+          g.drawLine(posX, posYL, posXNext, nextPosYL);
+        }
+
+//        image.setRGB(posX, posYL, Color.RED.getRGB());
         image.setRGB(posX, posYH, Color.BLUE.getRGB());
       } catch (ArrayIndexOutOfBoundsException e) {
         // e.printStackTrace();
