@@ -1,7 +1,7 @@
 package timelines.gui.variant4;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
@@ -28,7 +30,7 @@ public class ImageLoader extends Observable{
       //getImageFromURL(createURL(date, zoomLevel));
       //getImageFromURL(new URL("http://127.0.0.1/i4ds05/Chrysanthemum.jpg"));
       System.out.println("get image");
-      getImageFromURL(new URL("localhost:8080/api?zoomLevel=6&dateFrom=1980-07-01:00:00:00"));
+      getImageFromURL(new URL("http://localhost:8080/timelines/api?zoomLevel=10&dateFrom=1980-07-01:00:00:00"));
       System.out.println("got image");
     }catch (MalformedURLException e){
       //do stuff
@@ -38,10 +40,16 @@ public class ImageLoader extends Observable{
   private void getImageFromURL(URL url){
 
     Thread t = new Thread(new Runnable() {
+      @Override
       public void run() {
         try {
           img = ImageIO.read(url);
           updateImage();
+
+          // TODO remove test rendering stuff
+          File file = new File("res/testLoad.png");
+          ImageIO.write(img, "png", file);
+
         }catch (IOException e){
           logger.log(Level.WARNING, "ImageLoader Thread could not find the image under following URL: {0}", url.toString());
         }
@@ -57,5 +65,12 @@ public class ImageLoader extends Observable{
   private void updateImage(){
     setChanged();
     notifyObservers(img);
+  }
+
+  // TODO used for testing. remove
+  public static void main(String[] args) {
+    ImageLoader loader = new ImageLoader("localhost:8080/timelines/api");
+    loader.requestImage(null, 1);
+
   }
 }
