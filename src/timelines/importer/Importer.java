@@ -49,12 +49,14 @@ public class Importer {
 
   /**
    * Used to update the database
-   * @throws IOException
+   * @throws Exception
    */
-  public void importNewData() throws IOException {
+  public void importNewData() throws Exception { // TODO fix this bugger
 
     // get timestamp of last entry available in the database
     Date lastAvailableDate = downloader.getStartDateMidnight();
+    Date lastWrittenDate = lastAvailableDate;
+    long lastTime = lastWrittenDate.getTime();
     if (lowChannelDB.getFileSize() != 0) {
       lastAvailableDate = new Date(GoesOldFullDownloader.START_DATE.getTime() + lowChannelDB.getFileSize() * 2000);
     }
@@ -69,6 +71,13 @@ public class Importer {
     while (!currentDay.equals(TimeUtils.setMidnight(new Date()))) {
 
       List<GoesSxrLeaf> data = downloader.getGoesSxrLeafs(lastAvailableDate, currentDay);
+
+      if (data == null) {
+//        throw new Exception("Data could not be retrieved");
+        System.out.println("no data");
+        continue;
+      }
+
       lowChannelBuffer = ByteBuffer.allocate(data.size() * Float.BYTES);
       highChannelBuffer = ByteBuffer.allocate(data.size() * Float.BYTES);
 
@@ -76,10 +85,16 @@ public class Importer {
       for (GoesSxrLeaf leaf: data) {
         lowChannelBuffer.putFloat(leaf.getLowChannel()).array();
         highChannelBuffer.putFloat(leaf.getHighChannel()).array();
+        lastTime = leaf.getTimestamp().getTime();
       }
 
       // write to the end of the mem mapped file
       System.out.println("writing data");
+
+      appendBufferToDb(lowChannelBuffer, lowChannelDB, lastWrittenDate.getTime());
+      appendBufferToDb(highChannelBuffer, highChannelDB, lastWrittenDate.getTime());
+      lastWrittenDate = new Date(lastTime);
+
       lowChannelDB.write(lowChannelBuffer.array(), lowChannelDB.getFileSize());
       highChannelDB.write(highChannelBuffer.array(), highChannelDB.getFileSize());
 
@@ -96,8 +111,8 @@ public class Importer {
    */
   public void initializeDatabase() throws Exception {
 
-    getOldData();
-//    getAverageData();
+//    getOldData();
+    getAverageData();
 
   }
 
@@ -310,8 +325,8 @@ public class Importer {
     Importer importer = new Importer();
 
     try {
-      importer.initializeDatabase();
-//      importer.importNewData();
+//      importer.initializeDatabase();
+      importer.importNewData();
      } catch (Exception e) {
 //      // TODO Auto-generated catch block
       e.printStackTrace();

@@ -10,8 +10,7 @@ import java.util.Date;
 import javax.imageio.ImageIO;
 
 import timelines.database.TimelinesDB;
-import timelines.importer.downloader.GoesOldFullDownloader;
-import timelines.utils.TimeUtils;
+import timelines.importer.downloader.GoesNewAvgDownloader;
 
 public class DiagramRenderer {
 
@@ -29,7 +28,7 @@ public class DiagramRenderer {
     ByteBuffer bufferL = timelinesDB.getLowChannelData(from, to); // lowChannelDB.read(startIndex, (int) length);
     ByteBuffer bufferH = timelinesDB.getHighChannelData(from, to);
 
-    float rangeStart = 10E-11f;
+    float rangeStart = 10E-12f;
     float rangeEnd   = 10E-3f;
     float scaling = (float) (IMAGE_HEIGHT / (Math.log10(rangeEnd) - Math.log10(rangeStart)));
     int offset =  (int)(Math.abs(scaling * Math.log10(rangeEnd)));
@@ -77,10 +76,12 @@ public class DiagramRenderer {
     DiagramRenderer renderer = new DiagramRenderer();
 
     Calendar cal = Calendar.getInstance();
-    cal.setTime(GoesOldFullDownloader.START_DATE);
-    cal.add(Calendar.YEAR, 1);
+    cal.setTime(GoesNewAvgDownloader.END_DATE);
+    cal.add(Calendar.DAY_OF_YEAR, -100);
 
-    BufferedImage image = renderer.getDiagramForTimespan(TimeUtils.fromString("1992-01-01", "yyyy-MM-dd"), TimeUtils.fromString("1993-01-01", "yyyy-MM-dd"));
+//    BufferedImage image = renderer.getDiagramForTimespan(TimeUtils.fromString("1992-01-01", "yyyy-MM-dd"), TimeUtils.fromString("1993-01-01", "yyyy-MM-dd"));
+
+    BufferedImage image = renderer.getDiagramForTimespan(cal.getTime(), GoesNewAvgDownloader.END_DATE);
 
     File file = new File("res/testRender.png");
     ImageIO.write(image, "png", file);
