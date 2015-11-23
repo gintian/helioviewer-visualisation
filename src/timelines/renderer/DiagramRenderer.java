@@ -2,6 +2,7 @@ package timelines.renderer;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -47,17 +48,21 @@ public class DiagramRenderer {
 
     float widthOnePercent = bufferL.remaining() / Float.BYTES / 100;
 
-    int opacity =  Math.max(1, 255 / (bufferL.remaining() / Float.BYTES / IMAGE_WIDTH));
-    opacity *= 4;
-    System.out.println(opacity);
+    int validValCount = 0;
+    while(bufferL.hasRemaining()) {
+      if(bufferL.getFloat() > 0) {
+        validValCount ++;
+      }
+    }
+    bufferL.position(0);
 
-//    int validValCount = 0;
-//    while(bufferL.hasRemaining()) {
-//      if(bufferL.getFloat() > 0) {}
-//    }
+    int opacity =  Math.max(1, 255 / (validValCount / IMAGE_WIDTH));
+//    opacity *= 4;
+    System.out.println(opacity);
 
     BufferedImage image = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = image.createGraphics();
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     int index = 0;
     float nextValL = bufferL.getFloat();
@@ -74,6 +79,7 @@ public class DiagramRenderer {
       int posYL = getPosY(valL, scaling, offset);
       int nextPosYL = getPosY(nextValL, scaling, offset);
       int posYH = getPosY(valH, scaling, offset);
+      int nextPosYH = getPosY(nextValH, scaling, offset);
 
       try {
         g.setColor(new Color(255, 0, 0, opacity));
@@ -81,8 +87,13 @@ public class DiagramRenderer {
           g.drawLine(posX, posYL, posXNext, nextPosYL);
         }
 
+        g.setColor(new Color(0, 0, 255, opacity));
+        if(nextPosYH > 0 && posYH > 0) {
+          g.drawLine(posX, posYH, posXNext, nextPosYH);
+        }
+
 //        image.setRGB(posX, posYL, Color.RED.getRGB());
-        image.setRGB(posX, posYH, Color.BLUE.getRGB());
+//        image.setRGB(posX, posYH, Color.BLUE.getRGB());
       } catch (ArrayIndexOutOfBoundsException e) {
         // e.printStackTrace();
         System.out.println("erronous x: " + posX + " y: " + posYL + " val: " + valL);
