@@ -6,13 +6,18 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import timelines.api.web.DiagramAPI;
 import timelines.database.TimelinesDB;
 import timelines.importer.downloader.GoesNewAvgDownloader;
 
 public class DiagramRenderer {
+
+  private static final Logger logger = Logger.getLogger(DiagramAPI.class.getName());
 
   private TimelinesDB timelinesDB;
 
@@ -25,6 +30,8 @@ public class DiagramRenderer {
 
   public BufferedImage getDiagramForTimespan(Date from, Date to) throws Exception {
 
+    logger.log(Level.INFO, "Rendering image from {0} to {1}", new Object[] {from, to});
+
     ByteBuffer bufferL = timelinesDB.getLowChannelData(from, to); // lowChannelDB.read(startIndex, (int) length);
     ByteBuffer bufferH = timelinesDB.getHighChannelData(from, to);
 
@@ -32,10 +39,10 @@ public class DiagramRenderer {
     float rangeEnd   = 10E-3f;
     float scaling = (float) (IMAGE_HEIGHT / (Math.log10(rangeEnd) - Math.log10(rangeStart)));
     int offset =  (int)(Math.abs(scaling * Math.log10(rangeEnd)));
-    System.out.println("offset: " + offset);
-    System.out.println("scaling: " + scaling);
-    System.out.println("min: " + (int)(Math.abs(scaling * (Math.log10(rangeStart))) - offset));
-    System.out.println("max: " + (int)(Math.abs(scaling * (Math.log10(rangeEnd))) - offset));
+//    System.out.println("offset: " + offset);
+//    System.out.println("scaling: " + scaling);
+//    System.out.println("min: " + (int)(Math.abs(scaling * (Math.log10(rangeStart))) - offset));
+//    System.out.println("max: " + (int)(Math.abs(scaling * (Math.log10(rangeEnd))) - offset));
 
     float widthOnePercent = bufferL.remaining() / Float.BYTES / 100;
 

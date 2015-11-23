@@ -3,6 +3,7 @@
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/test"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/res"/>
         <property name="java-output-path" value="/i4ds05-visualisieren-von-timelines/build/classes"/>
         <property name="context-root" value="timelines"/>
     </wb-module>

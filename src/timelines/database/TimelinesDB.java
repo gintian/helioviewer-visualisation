@@ -14,8 +14,8 @@ import timelines.importer.downloader.GoesOldFullDownloader;
  */
 public class TimelinesDB {
 
-  public static final String LOW_CHANNEL_DB_PATH = "res/dbL";
-  public static final String HIGH_CHANNEL_DB_PATH = "res/dbH";
+  public static final String LOW_CHANNEL_DB_PATH = "dbL";
+  public static final String HIGH_CHANNEL_DB_PATH = "dbH";
 
   private MemoryMappedFile lowChannelDB;
   private MemoryMappedFile highChannelDB;
@@ -25,9 +25,11 @@ public class TimelinesDB {
   public TimelinesDB() {
     try {
 
-      File fileLow = new File(LOW_CHANNEL_DB_PATH);
-      File fileHigh = new File(HIGH_CHANNEL_DB_PATH);
+
+      File fileLow = new File(this.getClass().getClassLoader().getResource(LOW_CHANNEL_DB_PATH).getPath());
+      File fileHigh = new File(this.getClass().getClassLoader().getResource(HIGH_CHANNEL_DB_PATH).getPath());
       if (!fileLow.exists()) {
+        System.out.println(fileLow.getAbsolutePath());
         fileLow.createNewFile();
       }
       if (!fileHigh.exists()) {

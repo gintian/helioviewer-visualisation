@@ -27,7 +27,8 @@ public class MemoryMappedFile {
    */
   public MemoryMappedFile (String file) throws IOException {
 
-    memoryMappedFile = new RandomAccessFile(file, "rw");
+
+    memoryMappedFile = new RandomAccessFile(this.getClass().getClassLoader().getResource(file).getPath(), "rw");
 
     // create buffers over the entire files size
     long length = memoryMappedFile.length();
