@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -67,7 +69,7 @@ public class DiagramAPI extends HttpServlet {
     DiagramAPIParameters parameters = new DiagramAPIParameters();
     try {
       parameters.setDateFrom(TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM), DiagramAPIParameters.DATE_FORMAT));
-      parameters.setDateTo(TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO), DiagramAPIParameters.DATE_FORMAT));
+//      parameters.setDateTo(TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO), DiagramAPIParameters.DATE_FORMAT));
       parameters.setZoomLevel(Integer.parseInt(request.getParameter(DiagramAPIParameters.PARAM_ZOOM_LEVEL)));
 
     } catch (ParseException | NumberFormatException | NullPointerException e) {
@@ -95,11 +97,27 @@ public class DiagramAPI extends HttpServlet {
 
     renderer = new DiagramRenderer();
 
-    BufferedImage img = renderer.getDiagramForTimespan(parameters.getDateFrom(), parameters.getDateTo());
+    long dataPoints = (long) Math.pow(2, parameters.getZoomLevel()) * DiagramRenderer.IMAGE_WIDTH;
+//    dataPoints = (parameters.getZoomLevel() + 1) * DiagramRenderer.IMAGE_WIDTH;
+    Date currentEndDate = new Date(parameters.getDateFrom().getTime() + dataPoints * 2000);
+    Date currentStartDate = parameters.getDateFrom();
+
+    ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
+
+//    while (currentEndDate.before(parameters.getDateTo())) {
+      images.add(renderer.getDiagramForTimespan(currentStartDate, currentEndDate));
+//      currentStartDate = new Date(currentEndDate.getTime() + 2000);
+//      currentEndDate = new Date(currentEndDate.getTime() + dataPoints * 2000);
+//    }
+
+//    BufferedImage img = renderer.getDiagramForTimespan(parameters.getDateFrom(), parameters.getDateTo());
 
     response.setContentType("image/png");
     OutputStream out = response.getOutputStream();
-    ImageIO.write(img, "png", out);
+    for (BufferedImage img : images) {
+      ImageIO.write(img, "png", out);
+      out.flush();
+    }
     out.close();
 
   }
@@ -110,7 +128,7 @@ public class DiagramAPI extends HttpServlet {
     printWriter.println("<h1>Diagram API</h1>");
     printWriter.println("<p>Required Parameters:</p>");
     printWriter.println("<ul><li>'" + DiagramAPIParameters.PARAM_DATE_FROM + "' (" + DiagramAPIParameters.DATE_FORMAT + ")</li>");
-    printWriter.println("<li>'" + DiagramAPIParameters.PARAM_DATE_TO + "' (" + DiagramAPIParameters.DATE_FORMAT + ")</li>");
+//    printWriter.println("<li>'" + DiagramAPIParameters.PARAM_DATE_TO + "' (" + DiagramAPIParameters.DATE_FORMAT + ")</li>");
     printWriter.println("<li>'" + DiagramAPIParameters.PARAM_ZOOM_LEVEL + "' (int)</li></ul>");
     printWriter.close();
   }

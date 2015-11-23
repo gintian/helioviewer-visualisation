@@ -53,7 +53,7 @@ public class DiagramRenderer {
 
       float valL = bufferL.getFloat();
       float valH = bufferH.getFloat();
-      int posX = (int) (index / widthOnePercent * (IMAGE_WIDTH / 100));
+      int posX = Math.min((int) (index / widthOnePercent * (IMAGE_WIDTH / 100)), IMAGE_WIDTH - 1);
 
       int posYL = getPosY(valL, scaling, offset);
       int posYH = getPosY(valH, scaling, offset);
