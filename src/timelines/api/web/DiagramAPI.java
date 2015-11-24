@@ -1,11 +1,11 @@
 package timelines.api.web;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +14,8 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -21,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import timelines.database.TimelinesDB;
+import timelines.renderer.CacheRenderer;
 import timelines.renderer.DiagramRenderer;
 import timelines.utils.ImageUtils;
 import timelines.utils.TimeUtils;
@@ -106,36 +109,62 @@ public class DiagramAPI extends HttpServlet {
     Date currentStartDate = parameters.getDateFrom();
 
     long imageOffset = (currentStartDate.getTime() - TimelinesDB.DB_START_DATE.getTime()) / 2000 / dataPoints;
-    System.out.println("image offset: " + imageOffset);
+//    System.out.println("image offset: " + imageOffset);
     Date actualStartDate = new Date(TimelinesDB.DB_START_DATE.getTime() + imageOffset * dataPoints * 2000);
 
-    Date endDate = new Date(actualStartDate.getTime() + dataPoints * 2000);
+    BufferedImage img;
 
-    imageMetadata.put("dateFrom", TimeUtils.toString(actualStartDate, "yyyy-MM-dd:HH:mm:ss"));
-    imageMetadata.put("dateTo", TimeUtils.toString(endDate, "yyyy-MM-dd:HH:mm:ss"));
-    imageMetadata.put("zoomLevel", "" + parameters.getZoomLevel());
+    if (parameters.getZoomLevel() >= CacheRenderer.CACHE_ZOOM_START) {
+       img = getFromCache(actualStartDate, parameters.getZoomLevel());
+    } else {
 
-    ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
+      Date endDate = new Date(actualStartDate.getTime() + dataPoints * 2000);
 
-//    while (currentEndDate.before(parameters.getDateTo())) {
-      images.add(renderer.getDiagramForTimespan(actualStartDate, endDate));
-//      currentStartDate = new Date(currentEndDate.getTime() + 2000);
-//      currentEndDate = new Date(currentEndDate.getTime() + dataPoints * 2000);
-//    }
+      imageMetadata.put("dateFrom", TimeUtils.toString(actualStartDate, "yyyy-MM-dd:HH:mm:ss"));
+      imageMetadata.put("dateTo", TimeUtils.toString(endDate, "yyyy-MM-dd:HH:mm:ss"));
+      imageMetadata.put("zoomLevel", "" + parameters.getZoomLevel());
 
-//    BufferedImage img = renderer.getDiagramForTimespan(parameters.getDateFrom(), parameters.getDateTo());
+//      ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
+
+  //    while (currentEndDate.before(parameters.getDateTo())) {
+        img = renderer.getDiagramForTimespan(actualStartDate, endDate);
+  //      currentStartDate = new Date(currentEndDate.getTime() + 2000);
+  //      currentEndDate = new Date(currentEndDate.getTime() + dataPoints * 2000);
+  //    }
+
+  //    BufferedImage img = renderer.getDiagramForTimespan(parameters.getDateFrom(), parameters.getDateTo());
+    }
 
     response.setContentType("image/png");
     OutputStream out = response.getOutputStream();
-    for (BufferedImage img : images) {
-      ImageUtils.writeWithCustomData(out, img, imageMetadata);
+//    for (BufferedImage img : images) {
+    ImageUtils.writeWithCustomData(out, img, imageMetadata);
 //      ImageIO.write(img, "png", out);
 //      out.flush();
-    }
+//    }
     out.close();
 
   }
 
+
+  private BufferedImage getFromCache(Date date, int zoomLevel) {
+
+    logger.log(Level.INFO, "Getting image from Cache. Zoom level: {0}, Date: {1}", new Object[] {zoomLevel, date});
+
+    ServletContext context = getServletContext();
+
+    String path = "WEB-INF/classes/" + zoomLevel + "/" + date.getTime() + ".png";
+//    System.out.println("path: " + path);
+    File f = new File(context.getRealPath(path));
+//    System.out.println("File: " + f);
+    BufferedImage img = null;
+    try {
+      img = ImageIO.read(f);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return img;
+  }
 
   private void writeAPIDoc(HttpServletResponse response) throws IOException {
     PrintWriter printWriter = response.getWriter();

@@ -57,6 +57,17 @@ public class MemoryMappedFile {
    */
   public byte[] read(long index, int length) throws IOException {
     byte[] result = new byte[length];
+
+    if (index > getFileSize()) {
+      return result;
+
+    } else if (index + length > getFileSize()) {
+      System.out.println("length before adjusting: " + length);
+      length = (int) (getFileSize() - index);
+      System.out.println(getFileSize() - index);
+      System.out.println("adjusted length: " + length);
+    }
+
     read(index, result, 0, length);
     return result;
   }
@@ -73,8 +84,13 @@ public class MemoryMappedFile {
     int originalPosition = buffer.position();
     buffer.position((int) (index % Integer.MAX_VALUE));
 
+    if(buffer.remaining() == 0) {
+      return;
+    }
+
     // check whether we need to access multiple buffers
     if (length > buffer.remaining()) {
+//      System.out.println(buffer.remaining());
       read(index + buffer.remaining(), result, buffer.remaining(), result.length - buffer.remaining());
       buffer.get(result, 0, buffer.remaining());
 
@@ -203,6 +219,8 @@ public class MemoryMappedFile {
     if (bufferIndex > buffers.size() - 1 || index > memoryMappedFile.length()) {
       return null;
     }
+    System.out.println("bufferIndex: " + bufferIndex + " buffer count: " + buffers.size());
+    System.out.println(buffers.get(1).capacity());
     return buffers.get(bufferIndex);
   }
 
