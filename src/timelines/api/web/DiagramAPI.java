@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import timelines.database.TimelinesDB;
 import timelines.renderer.DiagramRenderer;
 import timelines.utils.TimeUtils;
 
@@ -109,16 +110,21 @@ public class DiagramAPI extends HttpServlet {
 
     long dataPoints = (long) Math.pow(2, parameters.getZoomLevel()) * DiagramRenderer.IMAGE_WIDTH;
 //    dataPoints = (parameters.getZoomLevel() + 1) * DiagramRenderer.IMAGE_WIDTH;
-    Date currentEndDate = new Date(parameters.getDateFrom().getTime() + dataPoints * 2000);
     Date currentStartDate = parameters.getDateFrom();
 
-    imageMetadata.put("dateFrom", TimeUtils.toString(currentStartDate, "yyyy-MM-dd:HH:mm:ss"));
-    imageMetadata.put("dateTo", TimeUtils.toString(currentEndDate, "yyyy-MM-dd:HH:mm:ss"));
+    long imageOffset = (currentStartDate.getTime() - TimelinesDB.DB_START_DATE.getTime()) / 2000 / dataPoints;
+    System.out.println("image offset: " + imageOffset);
+    Date actualStartDate = new Date(TimelinesDB.DB_START_DATE.getTime() + imageOffset * dataPoints * 2000);
+
+    Date endDate = new Date(actualStartDate.getTime() + dataPoints * 2000);
+
+    imageMetadata.put("dateFrom", TimeUtils.toString(actualStartDate, "yyyy-MM-dd:HH:mm:ss"));
+    imageMetadata.put("dateTo", TimeUtils.toString(endDate, "yyyy-MM-dd:HH:mm:ss"));
 
     ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 
 //    while (currentEndDate.before(parameters.getDateTo())) {
-      images.add(renderer.getDiagramForTimespan(currentStartDate, currentEndDate));
+      images.add(renderer.getDiagramForTimespan(actualStartDate, endDate));
 //      currentStartDate = new Date(currentEndDate.getTime() + 2000);
 //      currentEndDate = new Date(currentEndDate.getTime() + dataPoints * 2000);
 //    }
@@ -184,8 +190,5 @@ public class DiagramAPI extends HttpServlet {
     writer.setOutput(stream);
     writer.write(metadata, new IIOImage(buffImg, null, metadata), writeParam);
     stream.close();
-    System.out.println("written");
-
-//    return baos.toByteArray();
   }
 }
