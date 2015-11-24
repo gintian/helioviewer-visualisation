@@ -26,12 +26,13 @@ public class Image extends JComponent {
   private ImageLoader imageLoader;
   private Date date; //TODO: calculate date and origin coordinates
 
-  public Image(BufferedImage image, JFrame jF, ImageLoader il){
+  public Image(BufferedImage image, JFrame jF, ImageLoader il, Date date){
     this.window = jF;
     this.image = image;
     setWidths(image.getWidth());
     this.originalHeight = image.getHeight();
     this.imageLoader = il;
+    this.date = date;
 
     centerImage();
     setFocusPointCenter();
@@ -86,7 +87,8 @@ public class Image extends JComponent {
     repaint();
   }
   public void zoom(int level, int xFocus){
-    imageLoader.requestImage(this.date, level);
+    //imageLoader.requestImage(this.date, level);
+    imageLoader.requestImage(date, level);
     setFocusPoint(xFocus);
     strechImage(level);
     getNewImage(level, xFocus);

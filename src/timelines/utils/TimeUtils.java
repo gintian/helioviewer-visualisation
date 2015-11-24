@@ -115,5 +115,11 @@ public class TimeUtils {
     return calendar.getTime();
   }
 
+  public static Date changeDateBy(Date date, int calendarField, int amount){
+    calendar.setTime(date);
+    calendar.add(calendarField, amount);
+    return calendar.getTime();
+  }
+
 
 }

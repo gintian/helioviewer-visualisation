@@ -1,6 +1,8 @@
 package timelines.gui.variant4;
 
 import javax.swing.*;
+import javax.swing.text.DateFormatter;
+import java.util.Date;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
@@ -8,11 +10,12 @@ import javax.swing.*;
  */
 public class TimeLinesViewer {
 
-  private static final String serverBaseURLStr = "127.0.0.1";
+  private static final String serverBaseURLStr = "http://localhost:8080";
+  private static final Date date = new Date();
 
   public static void main(String[] args){
     ImageLoader iL = new ImageLoader(serverBaseURLStr);
-    Window tLVWindow = new Window(iL);
+    Window tLVWindow = new Window(iL, date);
     iL.addObserver(tLVWindow);
   }
 }
