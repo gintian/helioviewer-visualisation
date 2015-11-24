@@ -89,7 +89,7 @@ public class TimelinesDB {
     }
 
     // count of passed 2sec intervals between start date and date * single DB entry length
-    return (date.getTime() - DB_START_DATE.getTime()) / 1000 / 2 * Float.BYTES - Float.BYTES;
+    return Math.max(0, (date.getTime() - DB_START_DATE.getTime()) / 1000 / 2 * Float.BYTES - Float.BYTES);
   }
 
   private long getDBLengthForTimespan(Date from, Date to) {

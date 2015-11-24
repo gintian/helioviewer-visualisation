@@ -58,11 +58,11 @@ public class DiagramRenderer {
       }
     }
     bufferL.position(0);
-    System.out.println(validValCount);
+//    System.out.println(validValCount);
     int opacity =  (int) Math.max(2, 255f / (validValCount / 5f / IMAGE_WIDTH));
 //    opacity *= 2;
     opacity = Math.min(255, opacity);
-    System.out.println(opacity);
+//    System.out.println(opacity);
 
     BufferedImage image = new BufferedImage(IMAGE_WIDTH * SUPER_SAMPLE, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = image.createGraphics();
@@ -106,7 +106,7 @@ public class DiagramRenderer {
     }
 
 
-    logger.log(Level.INFO, "Rendering completed in {0}", new Object[] {new Date().getTime() - startDate.getTime()});
+    logger.log(Level.INFO, "Rendering completed in {0}ms", new Object[] {new Date().getTime() - startDate.getTime()});
     return getScaledImage(image, IMAGE_WIDTH, IMAGE_HEIGHT);
 //    return image;
   }
