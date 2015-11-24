@@ -1,10 +1,14 @@
 package timelines.gui.variant4;
 
+import sun.plugin2.message.Message;
+import timelines.utils.TimeUtils;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Observable;
 import java.util.logging.Level;
@@ -27,11 +31,10 @@ public class ImageLoader extends Observable{
 
   public void requestImage(Date date, int zoomLevel){
     try {
-      //getImageFromURL(createURL(date, zoomLevel));
+      getImageFromURL(createURL(date, zoomLevel));
+
       //getImageFromURL(new URL("http://127.0.0.1/i4ds05/Chrysanthemum.jpg"));
-      System.out.println("get image");
-      getImageFromURL(new URL("http://localhost:8080/timelines/api?zoomLevel=10&dateFrom=1980-07-01:00:00:00"));
-      System.out.println("got image");
+      //getImageFromURL(new URL("http://localhost:8080/api?zoomLevel=10&dateFrom=1980-07-01:00:00:00"));
     }catch (MalformedURLException e){
       //do stuff
     }
@@ -45,11 +48,6 @@ public class ImageLoader extends Observable{
         try {
           img = ImageIO.read(url);
           updateImage();
-
-          // TODO remove test rendering stuff
-          File file = new File("res/testLoad.png");
-          ImageIO.write(img, "png", file);
-
         }catch (IOException e){
           logger.log(Level.WARNING, "ImageLoader Thread could not find the image under following URL: {0}", url.toString());
         }
@@ -59,18 +57,12 @@ public class ImageLoader extends Observable{
     logger.log(Level.INFO, "ImageLoader new Thread started with following URL: {0}", url.toString());
   }
   private URL createURL(Date date, int zoomLevel) throws MalformedURLException{
-    return new URL(String.format("{0}/{1}/{2}", serverBaseURLStr, zoomLevel, date));
+    //return new URL(String.format("{0}/api?zoomLevel={1}&dateFrom={2}", serverBaseURLStr, zoomLevel, TimeUtils.toString(date, "yyyy-MM-dd:HH:mm:ss")));
+    return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", serverBaseURLStr, zoomLevel, "1980-07-01:00:00:00"));
   }
 
   private void updateImage(){
     setChanged();
     notifyObservers(img);
-  }
-
-  // TODO used for testing. remove
-  public static void main(String[] args) {
-    ImageLoader loader = new ImageLoader("localhost:8080/timelines/api");
-    loader.requestImage(null, 1);
-
   }
 }
