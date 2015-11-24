@@ -14,14 +14,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.metadata.IIOMetadataNode;
-import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import timelines.database.TimelinesDB;
 import timelines.renderer.DiagramRenderer;
+import timelines.utils.ImageUtils;
 import timelines.utils.TimeUtils;
 
 /**
@@ -120,6 +113,7 @@ public class DiagramAPI extends HttpServlet {
 
     imageMetadata.put("dateFrom", TimeUtils.toString(actualStartDate, "yyyy-MM-dd:HH:mm:ss"));
     imageMetadata.put("dateTo", TimeUtils.toString(endDate, "yyyy-MM-dd:HH:mm:ss"));
+    imageMetadata.put("zoomLevel", "" + parameters.getZoomLevel());
 
     ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 
@@ -134,7 +128,7 @@ public class DiagramAPI extends HttpServlet {
     response.setContentType("image/png");
     OutputStream out = response.getOutputStream();
     for (BufferedImage img : images) {
-      writeImageWithCustomData(out, img, imageMetadata);
+      ImageUtils.writeWithCustomData(out, img, imageMetadata);
 //      ImageIO.write(img, "png", out);
 //      out.flush();
     }
@@ -159,36 +153,5 @@ public class DiagramAPI extends HttpServlet {
       result += entry.getKey() + ": " + Arrays.toString(entry.getValue()) + " ";
     }
     return result;
-  }
-
-  private void writeImageWithCustomData(OutputStream out, BufferedImage buffImg, Map<String, String> customData) throws Exception {
-    ImageWriter writer = ImageIO.getImageWritersByFormatName("png").next();
-
-    ImageWriteParam writeParam = writer.getDefaultWriteParam();
-    ImageTypeSpecifier typeSpecifier = ImageTypeSpecifier.createFromBufferedImageType(BufferedImage.TYPE_INT_ARGB);
-
-    //adding metadata
-    IIOMetadata metadata = writer.getDefaultImageMetadata(typeSpecifier, writeParam);
-    IIOMetadataNode text = new IIOMetadataNode("tEXt");
-
-    for (Entry<String, String> entry : customData.entrySet()) {
-
-      IIOMetadataNode textEntry = new IIOMetadataNode("tEXtEntry");
-      textEntry.setAttribute("keyword", entry.getKey());
-      textEntry.setAttribute("value", entry.getValue());
-      text.appendChild(textEntry);
-    }
-
-    IIOMetadataNode root = new IIOMetadataNode("javax_imageio_png_1.0");
-    root.appendChild(text);
-
-    metadata.mergeTree("javax_imageio_png_1.0", root);
-
-    //writing the data
-//    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ImageOutputStream stream = ImageIO.createImageOutputStream(out);
-    writer.setOutput(stream);
-    writer.write(metadata, new IIOImage(buffImg, null, metadata), writeParam);
-    stream.close();
   }
 }
