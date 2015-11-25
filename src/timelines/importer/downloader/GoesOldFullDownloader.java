@@ -24,7 +24,7 @@ public class GoesOldFullDownloader extends AbstractGoesDownloader {
   private String templateUrl = "http://satdat.ngdc.noaa.gov/sem/goes/data/full/xrays/{year}/x{goesnr}3{yymm}.csv";
 
   public static final Date START_DATE = new Date(141865200000L); // 1974-07-01
-  public static final Date END_DATE = new Date(839800800000L); // 1996-08-12
+  public static final Date END_DATE = new Date(839961314000L); // 1996-08-13 20:35:14
 
   static class Columns {
     public static final int TIMESTAMP = 0;

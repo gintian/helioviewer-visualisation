@@ -4,18 +4,17 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.nio.ByteBuffer;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-
 import timelines.api.web.DiagramAPI;
 import timelines.database.TimelinesDB;
 import timelines.importer.downloader.GoesNewAvgDownloader;
+import timelines.importer.downloader.GoesNewFull3sDownloader;
+import timelines.importer.downloader.GoesNewFullDownloader;
+import timelines.importer.downloader.GoesOldFullDownloader;
 
 public class DiagramRenderer {
 
@@ -120,18 +119,36 @@ public class DiagramRenderer {
 
   public static void main(String[] args) throws Exception {
 
-    DiagramRenderer renderer = new DiagramRenderer();
+//    DiagramRenderer renderer = new DiagramRenderer();
+//
+//    Calendar cal = Calendar.getInstance();
+//    cal.setTime(GoesNewAvgDownloader.END_DATE);
+//    cal.add(Calendar.DAY_OF_YEAR, -100);
+//
+//    BufferedImage image = renderer.getDiagramForTimespan(cal.getTime(), GoesNewAvgDownloader.END_DATE);
+//
+//    File file = new File("res/testRender.png");
+//    ImageIO.write(image, "png", file);
 
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(GoesNewAvgDownloader.END_DATE);
-    cal.add(Calendar.DAY_OF_YEAR, -100);
 
-//    BufferedImage image = renderer.getDiagramForTimespan(TimeUtils.fromString("1992-01-01", "yyyy-MM-dd"), TimeUtils.fromString("1993-01-01", "yyyy-MM-dd"));
+    System.out.println("start old:    " + GoesOldFullDownloader.START_DATE);
+    System.out.println("end old:      " + GoesOldFullDownloader.END_DATE);
+    System.out.println("start avg:    " + GoesNewAvgDownloader.START_DATE);
+    System.out.println("end avg:      " + GoesNewAvgDownloader.END_DATE);
+    System.out.println("start new 3s: " + GoesNewFull3sDownloader.START_DATE);
+    System.out.println("end new 3s:   " + GoesNewFull3sDownloader.END_DATE);
+    System.out.println("start new:    " + GoesNewFullDownloader.START_DATE);
 
-    BufferedImage image = renderer.getDiagramForTimespan(cal.getTime(), GoesNewAvgDownloader.END_DATE);
+//    System.out.println("actual old end date: " + TimeUtils.fromString("1996-08-13 20:35:14", "yyyy-MM-dd HH:mm:ss").getTime());
+//    System.out.println("actual new avg start date: " + TimeUtils.fromString("1996-08-13 20:35:16", "yyyy-MM-dd HH:mm:ss").getTime());
+//    System.out.println("actual new avg end date: " + TimeUtils.fromString("2001-03-01 00:00:00", "yyyy-MM-dd HH:mm:ss").getTime() );
 
-    File file = new File("res/testRender.png");
-    ImageIO.write(image, "png", file);
+//    System.out.println("actual new full 3s start date: " + TimeUtils.fromString("2001-03-01 00:00:00", "yyyy-MM-dd HH:mm:ss").getTime());
+//    System.out.println("actual new full 3s end date: " + TimeUtils.fromString("2009-11-30 23:59:58", "yyyy-MM-dd HH:mm:ss").getTime());
+
+//    System.out.println("actual new full start date: " + TimeUtils.fromString("2009-12-01 00:00:00", "yyyy-MM-dd HH:mm:ss").getTime());
+
+
 
   }
 

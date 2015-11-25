@@ -2,7 +2,6 @@ package timelines.importer.downloader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,8 +15,8 @@ public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
 
   private String urlTemplate = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_avg/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_1m_{startdate}_{enddate}.csv";
 
-  public static final Date START_DATE= new Date(842565600000L);
-  public static final Date END_DATE= new Date(1259535600000L); // the full downloader starts after this
+  public static final Date START_DATE= new Date(839961316000L); // 1996-08-13 20:35:16
+  public static final Date END_DATE= new Date(983401198000L); // the full downloader starts after this
 
 //  private Date goesNewAvgEndDateMidnight;
 
@@ -27,11 +26,12 @@ public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
     public static final int XL = 2;
   }
 
-  public GoesNewAvgDownloader(int minGoesNr, int maxGoesNr) throws ParseException {
+  public GoesNewAvgDownloader(int minGoesNr, int maxGoesNr) {
     super(minGoesNr, maxGoesNr, createCsvToGoesSxrLeafConverter());
+  }
 
-    //goesNewAvgStartDateMidnight = TimeUtils.setMidnight(TimeUtils.fromString("1996-08-13", "yyyy-MM-dd"));
-//    goesNewAvgEndDateMidnight = TimeUtils.setMidnight(TimeUtils.fromString("2009-11-30", "yyyy-MM-dd"));
+  public GoesNewAvgDownloader() {
+    super(0, 20, createCsvToGoesSxrLeafConverter()); // TODO make numbers public static final
   }
 
   private static CsvToGoesSxrLeafConverter createCsvToGoesSxrLeafConverter() {

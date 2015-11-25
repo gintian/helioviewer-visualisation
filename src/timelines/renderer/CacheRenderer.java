@@ -18,8 +18,8 @@ public class CacheRenderer {
 
   private static final Logger logger = Logger.getLogger(DiagramAPI.class.getName());
 
-  public static final int CACHE_ZOOM_START = 11;
-  public static final int CACHE_ZOOM_END = 18;
+  public static final int CACHE_ZOOM_START = 17;
+  public static final int CACHE_ZOOM_END = 17;
 
   public static final String CACHE_FODLER = "cache";
 
@@ -49,7 +49,7 @@ public class CacheRenderer {
       currentTimePerImage = (long) (DiagramRenderer.IMAGE_WIDTH * Math.pow(2, i) * 1000);
       Date currentStartDate = TimelinesDB.DB_START_DATE;
 
-      while (new Date(currentStartDate.getTime() + currentTimePerImage).before(now)) {
+      while (currentStartDate.before(now)) {
         try {
 
 

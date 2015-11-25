@@ -27,7 +27,6 @@ public class MemoryMappedFile {
    */
   public MemoryMappedFile (String file) throws IOException {
 
-
     memoryMappedFile = new RandomAccessFile(this.getClass().getClassLoader().getResource(file).getPath(), "rw");
 
     // create buffers over the entire files size
@@ -62,10 +61,10 @@ public class MemoryMappedFile {
       return result;
 
     } else if (index + length > getFileSize()) {
-      System.out.println("length before adjusting: " + length);
+//      System.out.println("length before adjusting: " + length);
       length = (int) (getFileSize() - index);
-      System.out.println(getFileSize() - index);
-      System.out.println("adjusted length: " + length);
+//      System.out.println(getFileSize() - index);
+//      System.out.println("adjusted length: " + length);
     }
 
     read(index, result, 0, length);
@@ -219,8 +218,8 @@ public class MemoryMappedFile {
     if (bufferIndex > buffers.size() - 1 || index > memoryMappedFile.length()) {
       return null;
     }
-    System.out.println("bufferIndex: " + bufferIndex + " buffer count: " + buffers.size());
-    System.out.println(buffers.get(1).capacity());
+//    System.out.println("bufferIndex: " + bufferIndex + " buffer count: " + buffers.size());
+//    System.out.println(buffers.get(1).capacity());
     return buffers.get(bufferIndex);
   }
 
