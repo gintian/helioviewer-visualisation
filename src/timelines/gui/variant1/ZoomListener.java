@@ -1,7 +1,9 @@
-package timelines.gui;
+package timelines.gui.variant1;
 
 import javax.swing.event.MouseInputAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
@@ -9,10 +11,10 @@ import java.awt.event.MouseWheelEvent;
  */
 public class ZoomListener extends MouseInputAdapter {
 
+  MouseEvent scrolled;
+
   public void mouseWheelMoved(MouseWheelEvent mwe){
-    Image img = (Image)mwe.getSource();
-    int change = mwe.getWheelRotation();
-    img.zoom(change, mwe.getX());
+    System.out.println(mwe.getWheelRotation());
   }
 
 }

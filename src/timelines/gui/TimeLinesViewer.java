@@ -1,4 +1,4 @@
-package timelines.gui.variant4;
+package timelines.gui;
 
 import timelines.utils.TimeUtils;
 

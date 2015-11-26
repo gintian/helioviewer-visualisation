@@ -1,4 +1,4 @@
-package timelines.gui.variant4;
+package timelines.gui;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
@@ -6,15 +6,8 @@ package timelines.gui.variant4;
  */
 
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Date;
-import java.util.Observable;
-import java.util.Observer;
 
 public class Window extends JFrame {
   private Image image;
@@ -38,4 +31,4 @@ public class Window extends JFrame {
     repaint();
   }
 
-}
+  }

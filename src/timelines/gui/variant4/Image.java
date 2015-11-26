@@ -1,5 +1,7 @@
 package timelines.gui.variant4;
 
+import timelines.utils.TimeUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,92 +13,146 @@ import java.util.Date;
  */
 public class Image extends JComponent {
 
+  private static final String serverBaseURLStr = "http://localhost:8080";
+
   private BufferedImage image;
   private int originalWidth;
   private int originalHeight;
   private int width;
-  private int xOrigin;
-  private int xFocus;
-  private int originToFocus; //difference betwene xFocus and xOrigin
-  private JFrame window;
+  private int pixelOrigin;
+  private int pixelFocus;
+  private int originToFocusPixel; //difference between pixelFocus and pixelOrigin
+  private long originToFocusDate; //difference between dateFocus and dateOrigin
+  private Window window;
   private int zoomLevel = 1;
   private int rulerWidth = 20;
   private long timeScalMin;
   private double IntensScaleMax;
   private ImageLoader imageLoader;
-  private Date date; //TODO: calculate date and origin coordinates
+  private Date dateFocus; //TODO: calculate date and origin coordinates
+  private Date dateOrigin; //TODO: calculate date and origin coordinates
 
-  public Image(BufferedImage image, JFrame jF, ImageLoader il, Date date){
-    this.window = jF;
-    this.image = image;
-    setWidths(image.getWidth());
-    this.originalHeight = image.getHeight();
-    this.imageLoader = il;
-    this.date = date;
 
-    centerImage();
-    setFocusPointCenter();
+
+  public Image(Window window, Date date){
+    this.window = window;
+    this.dateFocus = date;
+    this.dateOrigin = date;
+    this.imageLoader = new ImageLoader(this, serverBaseURLStr, date);
+
+    leftAlignImage();
+    focusCenter();
   }
 
-  public void setImage(BufferedImage img){
-    this.image = img;
-    setWidths(image.getWidth());
-    this.originalHeight = image.getHeight();
-    repaint();
-  }
 
-  public int getWindowCenter(){
-    return (this.window.getContentPane().getWidth()+this.rulerWidth)/2;
-  }
-
-  private void centerImage(){
-    this.xOrigin = getWindowCenter()-(this.width/2);
-    setFocusPointCenter();
-  }
-
-  private void setFocusPointCenter(){
-    setFocusPoint(getWindowCenter());
-  }
-
-  public void setFocusPoint(int x){
-    this.xFocus = x;
-    originToFocus = xFocus-xOrigin;
-  }
-
-  private void focusImage(){
-    this.xOrigin = getWindowCenter()-this.originToFocus;
-  }
-
-  private void adjustFocus(int level){
-    this.originToFocus *= ((double)level/(double)zoomLevel);
-  }
 
   public void setWidths(int width) {
     this.width = width;
     this.originalWidth = width;
   }
 
-  public void getNewImage(int zoomLevel, int xFocus){
+  private void setImage(BufferedImage img){
+    this.image = img;
+    setWidths(image.getWidth());
+    this.originalHeight = image.getHeight();
+    repaint();
+  }
+
+  public void updateImage(BufferedImage img){
+    this.image = img;
+    setWidths(image.getWidth());
+    this.originalHeight = image.getHeight();
+    repaint();
+  }
+
+
+
+  private int timeToPixel(long time, int zoomLevel){
+    return (int)(time/Math.pow(2, zoomLevel));
+  }
+  private long pixelToTime(int pixel, int zoomLevel){
+    return (long)Math.pow(2, zoomLevel)*pixel;
+  }
+
+
+
+  public Window getWindow() {
+    return window;
+  }
+
+  public int getWindowCenter(){
+    return (this.window.getContentPane().getWidth()+this.rulerWidth)/2;
+  }
+
+
+
+  private void focusCenter(){
+    setFocus(getWindowCenter());
+  }
+
+  private void leftAlignImage(){
+    this.pixelOrigin = 0;
+    focusCenter();
+  }
+
+
+
+  private void setFocus(int x){
+    setFocusPixel(x);
+    setFocusDate();
+  }
+  private void setFocusDate(){
+    this.originToFocusDate = pixelToTime(this.originToFocusPixel, this.zoomLevel);
+    this.dateFocus = TimeUtils.addTime(this.dateOrigin, this.originToFocusDate);
+  }
+  public void setFocusPixel(int x){
+    this.pixelFocus = x;
+    originToFocusPixel = pixelFocus - pixelOrigin;
+  }
+
+
+
+  private void focusImage(){
+    focusImagePixel();
+    focusImageDate();
+  }
+  private void focusImagePixel(){
+    this.pixelOrigin = getWindowCenter()-this.originToFocusPixel;
+  }
+  private void focusImageDate(){
 
   }
+
+
+
+  private void adjustFocus(int level){
+    adjustFocusPixel(level);
+    adjustFocusDate(level);
+  }
+  private void adjustFocusPixel(int level){
+    this.originToFocusPixel *= ((double)level/(double)zoomLevel);
+  }
+  private void adjustFocusDate(int level){
+
+  }
+
+
+
   public void strechImage(int zoomLevel){
     this.width = this.originalWidth * zoomLevel;
-    //this.height = this.originalHeight * level;
     adjustFocus(zoomLevel);
     this.zoomLevel = zoomLevel;
     repaint();
   }
   public void zoom(int level, int xFocus){
-    //imageLoader.requestImage(this.date, level);
-    imageLoader.requestImage(date, level);
-    setFocusPoint(xFocus);
+    setFocus(xFocus);
     strechImage(level);
-    getNewImage(level, xFocus);
+    imageLoader.requestImage(this.dateFocus, level);
   }
 
   public void moveBy(int change){
-    xOrigin += change;
-    setFocusPointCenter();
+    pixelOrigin += change;
+    focusCenter();
     repaint();
   }
 
@@ -119,8 +175,8 @@ public class Image extends JComponent {
     g.setColor(rulerColor);
     g.fillRect(rw,h-rw,w-rw,rw);
     g.setColor(scaleColor);
-    int j = xOrigin;
-    while(j<=width+xOrigin){
+    int j = pixelOrigin;
+    while(j<=width+ pixelOrigin){
       g.drawLine(j,h-sp,j,h-(rw-sp));
       j+=(10*zoomLevel);
     }
@@ -132,7 +188,7 @@ public class Image extends JComponent {
   public void paint(Graphics g){
     super.paintComponent(g);
     focusImage();
-    g.drawImage(image, xOrigin, 0, width, originalHeight, null);
+    g.drawImage(image, pixelOrigin, 0, width, originalHeight, null);
     paintRulers(g);
   }
 }

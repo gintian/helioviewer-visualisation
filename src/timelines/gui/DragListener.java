@@ -1,4 +1,4 @@
-package timelines.gui.variant4;
+package timelines.gui;
 
 import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
@@ -18,7 +18,7 @@ public class DragListener extends MouseInputAdapter {
   public void mouseDragged(MouseEvent me)
   {
     Image img = (Image)me.getSource();
-    img.moveBy(me.getX() - this.xBase);
+    img.dragged(me.getX() - this.xBase);
     this.xBase = me.getX();
   }
 }
