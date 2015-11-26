@@ -139,4 +139,8 @@ abstract class AbstractGoesDownloader implements IDownloader {
       }
     }
   }
+
+  public void resetGoesNr() {
+    currentGoesNr = MIN_GOESNR;
+  }
 }

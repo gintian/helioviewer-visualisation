@@ -13,7 +13,6 @@ import timelines.database.MemoryMappedFile;
 import timelines.database.TimelinesDB;
 import timelines.importer.csv.GoesSxrLeaf;
 import timelines.importer.downloader.GoesNewAvgDownloader;
-import timelines.importer.downloader.GoesNewFull3sDownloader;
 import timelines.importer.downloader.GoesNewFullDownloader;
 import timelines.importer.downloader.GoesOldFullDownloader;
 import timelines.importer.downloader.IDownloader;
@@ -120,10 +119,10 @@ public class Importer {
 //    getData(new GoesNewAvgDownloader(), Calendar.MONTH, Calendar.DAY_OF_MONTH, 1, GoesNewAvgDownloader.START_DATE, GoesNewAvgDownloader.END_DATE);
 
     // new 3s data
-    getData(new GoesNewFull3sDownloader(0, 20), Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFull3sDownloader.START_DATE, GoesNewFull3sDownloader.END_DATE);
+//    getData(new GoesNewFull3sDownloader(0, 20), Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFull3sDownloader.START_DATE, GoesNewFull3sDownloader.END_DATE);
 
     // new data
-//    getData(downloader, Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFullDownloader.START_DATE, new Date());
+    getData(downloader, Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFullDownloader.START_DATE, new Date());
 
   }
 
@@ -335,9 +334,10 @@ public class Importer {
 
     while (cal.getTime().before(endDate)) {
 
-      List<GoesSxrLeaf> leafs = downloader.getGoesSxrLeafs(lastAddedDate, cal.getTime());
       cal.add(calendarFieldToIncrement, 1);
       cal.set(calendarFieldToReset, resetValue);
+
+      List<GoesSxrLeaf> leafs = downloader.getGoesSxrLeafs(lastAddedDate, cal.getTime());
 
       System.out.println("got data.");
 
@@ -347,7 +347,12 @@ public class Importer {
       }
       if (leafs.size() == 0) {
         System.out.println("no data?!");
-        continue;
+        downloader.resetGoesNr();
+        leafs = downloader.getGoesSxrLeafs(lastAddedDate, cal.getTime());
+
+        if (leafs.size() == 0) {
+          continue;
+        }
       }
 
       // we start with the expectation of perfectly valid files.
