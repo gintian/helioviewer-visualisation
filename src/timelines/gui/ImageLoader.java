@@ -1,20 +1,21 @@
 package timelines.gui;
 
 import timelines.api.APIImageMetadata;
-import timelines.utils.ImageUtils;
 import timelines.utils.TimeUtils;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 /**
  * Project i4ds05-visualisieren-von-timelines
  * Created by Tobias Kohler on 19.11.2015.
@@ -27,6 +28,7 @@ public class ImageLoader{
   private BufferedImage[] bImageArr;
   private Thread[] threads;
   private APIImageMetadata metadata;
+  private APIImageMetadata[] metadatas;
   private Thread imageBuilder;
   private Image image;
   private Date startDate;
@@ -50,7 +52,9 @@ public class ImageLoader{
     try {
       bImageArr = new BufferedImage[imgCount];
       threads = new Thread[imgCount];
+      metadatas = new APIImageMetadata[imgCount];
       for (int i = 0; i < imgCount; i++) {
+        //TODO: change date for next request
         getImageFromURL(createURL(date, zoomLevel), i);
       }
     }catch (MalformedURLException e){
@@ -64,15 +68,22 @@ public class ImageLoader{
       @Override
       public void run() {
         try {
-          Thread.sleep(2000);  //TODO: remove when done with testing
-          bImageArr[i] = ImageIO.read(url);
+          ImageReader imageReader = ImageIO.getImageReadersByFormatName("png").next();
+
+          InputStream is = new URL(url.toString()).openStream();
+          ImageInputStream iis = ImageIO.createImageInputStream(is);
+
+          cacheMetadata(i, new APIImageMetadata(iis));
+
+          BufferedImage bi = ImageIO.read(url); //TODO: make mor efficient
+          System.out.println(bi);
+
+          cacheBufferedImage(i, bi);
           if(i+1 == imgCount){
             buildBImage();
           }
         }catch (IOException e){
           logger.log(Level.WARNING, "ImageLoader Thread could not find the image under following URL: {0}", url.toString());
-        }catch (InterruptedException e){  //TODO: remove when done with testing
-
         }
       }
     });
@@ -88,8 +99,8 @@ public class ImageLoader{
     this.imageBuilder = new Thread(new Runnable() {
       @Override
       public void run() {
-        metadata = new APIImageMetadata(bImageArr[0]);
-        startDate = metadata.getDateFrom();
+        //metadata = new APIImageMetadata(bImageArr[0]);
+        startDate = metadatas[0].getDateFrom();
         int tileWidth = bImageArr[0].getWidth();
         setImageCount(tileWidth);
         int w = tileWidth * imgCount;
@@ -104,6 +115,13 @@ public class ImageLoader{
       }
     });
     this.imageBuilder.start();
+  }
+
+  private void cacheBufferedImage(int index, BufferedImage bImage){
+    bImageArr[index] = bImage;
+  }
+  private void cacheMetadata(int index, APIImageMetadata metadata){
+    metadatas[index] = metadata;
   }
 
   private void updateImage(){

@@ -16,6 +16,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
+import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.w3c.dom.Node;
@@ -55,10 +56,10 @@ public class ImageUtils {
     stream.close();
   }
 
-  public static Map<String, String> readCustomData(BufferedImage img, ArrayList<String> keys) throws IOException{
+  public static Map<String, String> readCustomData(ImageInputStream iis, ArrayList<String> keys) throws IOException{
     ImageReader imageReader = ImageIO.getImageReadersByFormatName("png").next();
 
-    imageReader.setInput(img); // ImageIO.createImageInputStream(new ByteArrayInputStream(imageData)), true);
+    imageReader.setInput(iis); // ImageIO.createImageInputStream(new ByteArrayInputStream(imageData)), true);
 
     // read metadata of first image
     IIOMetadata metadata = imageReader.getImageMetadata(0);

@@ -24,7 +24,8 @@ public class Image extends JComponent {
   private Window window;
   private int zoomLevel = 10;
   private int maxZoomLevel = 1;
-  private int minZoomLevel = 18;
+  //private int minZoomLevel = 18;
+  private int minZoomLevel = 10;
   private int rulerWidth = 20;
   private ImageLoader currentImageLoader;
   private Date dateOrigin; //current images start/leftmost date

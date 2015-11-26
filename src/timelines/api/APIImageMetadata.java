@@ -3,6 +3,7 @@ package timelines.api;
 import timelines.utils.ImageUtils;
 import timelines.utils.TimeUtils;
 
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.ParseException;
@@ -23,15 +24,14 @@ public class APIImageMetadata {
     private int zoomLevel;
 
     Map<String, String> imageMetadataMap;
-    ArrayList<String> keys = new ArrayList<String>(){{
-        add("dateFrom");
-        add("dateTo");
-        add("zoomLevel");
-    }};
+    ArrayList<String> keys = new ArrayList<String>();
 
-    public APIImageMetadata(BufferedImage bImage){
+    public APIImageMetadata(ImageInputStream iis){
+        keys.add("dateFrom");
+        keys.add("dateTo");
+        keys.add("zoomLevel");
         try {
-            imageMetadataMap = ImageUtils.readCustomData(bImage,keys);
+            imageMetadataMap = ImageUtils.readCustomData(iis,keys);
             dateFrom = TimeUtils.fromString(imageMetadataMap.get("dateFrom"),"yyyy-MM-dd:HH:mm:ss");
             dateTo = TimeUtils.fromString(imageMetadataMap.get("dateTo"),"yyyy-MM-dd:HH:mm:ss");
             zoomLevel = Integer.parseInt(imageMetadataMap.get("zoomLevel"));
