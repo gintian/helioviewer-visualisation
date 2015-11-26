@@ -34,18 +34,16 @@ public class ImageLoader{
   private Date startDate;
   private int imgCount = 1;
 
-  public ImageLoader(Image image, String serverBaseURLStr){
+  public ImageLoader(Image image, String serverBaseURLStr, Date date, int zoomLevel, int tileCount){
     this.image = image;
     this.serverBaseURLStr = serverBaseURLStr;
+
+    requestImages(date, zoomLevel, this.imgCount);
+    this.imgCount = tileCount;
   }
 
   private void setImageCount(int tileWidth){
     this.imgCount = (this.image.getWindow().getWidth() / tileWidth)+1;
-  }
-
-  public void requestImage(Date date, int zoomLevel, int tileCount){
-    requestImages(date, zoomLevel, this.imgCount);
-    this.imgCount = tileCount;
   }
 
   private void requestImages(Date date, int zoomLevel, int imgCount){
@@ -76,7 +74,6 @@ public class ImageLoader{
           cacheMetadata(i, new APIImageMetadata(iis));
 
           BufferedImage bi = ImageIO.read(url); //TODO: make mor efficient
-          System.out.println(bi);
 
           cacheBufferedImage(i, bi);
           if(i+1 == imgCount){

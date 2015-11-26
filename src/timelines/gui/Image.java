@@ -83,7 +83,7 @@ public class Image extends JComponent {
     return  zoomLevel;
   }
 
-  public void updateImage(ImageLoader il){
+  public void updateImage(ImageLoader il){  //TODO: fix if becomes problem with multithreading
     if(this.currentImageLoader.equals(il)){
       this.image = il.getbImage();
       this.imageWidth = image.getWidth();
@@ -91,13 +91,12 @@ public class Image extends JComponent {
       this.tileCount = il.getImgCount();
       this.dateOrigin = il.getStartDate();
 
-      repaint();
+      repaint();  //TODO: point of interest
     }
   }
 
   private void setImage(){
-    this.currentImageLoader = new ImageLoader(this, this.serverBaseURLStr);
-    this.currentImageLoader.requestImage(getRequestDate(), this.zoomLevel, this.tileCount);
+    this.currentImageLoader = new ImageLoader(this, this.serverBaseURLStr, getRequestDate(), this.zoomLevel, this.tileCount);
   }
 
   public Window getWindow() {
@@ -109,11 +108,6 @@ public class Image extends JComponent {
   }
   private int getWindowWidthHalf(){
     return (this.window.getContentPane().getWidth()/2);
-  }
-
-  private void leftAlignImage(){
-    this.pixelOrigin = 0;
-    setFocusPointCenter();
   }
 
   private void setFocusPointCenter(){
@@ -129,13 +123,6 @@ public class Image extends JComponent {
     this.pixelOrigin = getWindowCenter()-this.pixelOriginToFocus;
   }
 
-  private void adjustFocus(int level){
-    this.pixelOriginToFocus *= ((double)level/(double)zoomLevel);
-  }
-
-  public void getNewImage(int zoomLevel, int xFocus){
-
-  }
   public void stretchImage(int zoomLevelChange){
     if(zoomLevelChange < 0){
       this.imageWidth *=2;
@@ -150,16 +137,8 @@ public class Image extends JComponent {
       this.zoomLevel += levelChange;
       setImageOffset();
       repaint();
-      //imageLoader.requestImage(getRequestDate(), this.zoomLevel);
-
+      setImage();
     }
-/*
-    //imageLoader.requestImage(this.date, level);
-    imageLoader.requestImage(dateFocus, level);
-    //setFocusPoint(pixelFocus);
-    //leftAlignImage();
-    getNewImage(level, xFocus);
-*/
   }
 
   public void dragged(int change) {
