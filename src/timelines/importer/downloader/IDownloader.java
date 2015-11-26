@@ -40,4 +40,6 @@ public interface IDownloader {
    */
   public Date getEndDateMidnight();
 
+  public void resetGoesNr();
+
 }

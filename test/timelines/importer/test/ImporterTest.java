@@ -96,4 +96,29 @@ public class ImporterTest {
   }
 
 
+  @Test
+  public void testNew3sEntry() throws IOException, ParseException {
+
+    Date date = TimeUtils.fromString("2007-09-01 00:00:00", "yyyy-MM-dd hh:mm:ss");
+    Date date2 = new Date(date.getTime() + 2000 * 30);
+    ByteBuffer buffer = db.getLowChannelData(date, date2);
+
+    float f = buffer.getFloat();
+    while(buffer.hasRemaining()) {
+      System.out.println(buffer.getFloat());
+    }
+
+    Assert.assertEquals("expected 2.8280E-09, found " + f, 2.8280E-09, f, 0.2e-9);
+
+    buffer = db.getHighChannelData(date, date2);
+    f = buffer.getFloat();
+    while(buffer.hasRemaining()) {
+      System.out.println(buffer.getFloat());
+    }
+    Assert.assertEquals("expected 1.3507E-08, found " + f, 1.3507E-08, f, 0.2e-9);
+
+  }
+
+
+
 }

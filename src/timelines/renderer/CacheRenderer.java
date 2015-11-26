@@ -18,7 +18,7 @@ public class CacheRenderer {
 
   private static final Logger logger = Logger.getLogger(DiagramAPI.class.getName());
 
-  public static final int CACHE_ZOOM_START = 17;
+  public static final int CACHE_ZOOM_START = 11;
   public static final int CACHE_ZOOM_END = 17;
 
   public static final String CACHE_FODLER = "cache";
