@@ -38,12 +38,14 @@ public class ImageLoader{
     this.image = image;
     this.serverBaseURLStr = serverBaseURLStr;
 
-    requestImages(date, zoomLevel, this.imgCount);
     this.imgCount = tileCount;
+    requestImages(date, zoomLevel, this.imgCount);
   }
 
   private void setImageCount(int tileWidth){
+    System.out.println(this.imgCount); //TODO: remove after testing
     this.imgCount = (this.image.getWindow().getWidth() / tileWidth)+1;
+    System.out.println(this.imgCount); //TODO: remove after testing
   }
 
   private void requestImages(Date date, int zoomLevel, int imgCount){
@@ -89,7 +91,7 @@ public class ImageLoader{
   }
 
   private URL createURL(Date date, int zoomLevel) throws MalformedURLException{
-    return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, zoomLevel, TimeUtils.toString(date, "yyyy-MM-dd:HH:mm:ss"))); //TODO: replace test date with date field when done testing
+    return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, zoomLevel, TimeUtils.toString(date, "yyyy-MM-dd:HH:mm:ss")));
   }
 
   private void buildBImage(){
@@ -99,7 +101,6 @@ public class ImageLoader{
         //metadata = new APIImageMetadata(bImageArr[0]);
         startDate = metadatas[0].getDateFrom();
         int tileWidth = bImageArr[0].getWidth();
-        setImageCount(tileWidth);
         int w = tileWidth * imgCount;
         int h = bImageArr[0].getHeight();
         BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
@@ -108,6 +109,7 @@ public class ImageLoader{
           g.drawImage(bImageArr[i], i*tileWidth, 0, null);
         }
         bImage = combined;
+        setImageCount(tileWidth);
         updateImage();
       }
     });
