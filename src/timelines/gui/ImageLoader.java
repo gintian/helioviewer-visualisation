@@ -33,6 +33,7 @@ public class ImageLoader{
   private Image image;
   private Date startDate;
   private int imgCount = 1;
+  private int tileWidth = 0;
 
   public ImageLoader(Image image, String serverBaseURLStr, Date date, int zoomLevel, int tileCount){
     this.image = image;
@@ -55,7 +56,7 @@ public class ImageLoader{
       metadatas = new APIImageMetadata[imgCount];
       for (int i = 0; i < imgCount; i++) {
         //TODO: change date for next request
-        getImageFromURL(createURL(date, zoomLevel), i);
+        getImageFromURL(createURL(date, zoomLevel, i), i);
       }
     }catch (MalformedURLException e){
       logger.log(Level.WARNING, "URL could not be created");
@@ -78,6 +79,7 @@ public class ImageLoader{
           BufferedImage bi = ImageIO.read(url); //TODO: make mor efficient
 
           cacheBufferedImage(i, bi);
+          tileWidth = bi.getWidth();
           if(i+1 == imgCount){
             buildBImage();
           }
@@ -90,8 +92,9 @@ public class ImageLoader{
     logger.log(Level.INFO, "ImageLoader new Thread started with following URL: {0}", url.toString());
   }
 
-  private URL createURL(Date date, int zoomLevel) throws MalformedURLException{
-    return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, zoomLevel, TimeUtils.toString(date, "yyyy-MM-dd:HH:mm:ss")));
+  private URL createURL(Date date, int zoomLevel, int i) throws MalformedURLException{
+    Date tempDate = TimeUtils.addTime(date, Image.pixelToTime(tileWidth * i, zoomLevel));
+    return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, zoomLevel, TimeUtils.toString(tempDate, "yyyy-MM-dd:HH:mm:ss")));
   }
 
   private void buildBImage(){

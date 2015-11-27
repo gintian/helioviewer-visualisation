@@ -43,11 +43,11 @@ public class Image extends JComponent {
 
   }
 
-  private int timeToPixel(long time, int zoomLevel){
+  public static int timeToPixel(long time, int zoomLevel){
     return (int)(time/Math.pow(2, zoomLevel));
   }
 
-  private long pixelToTime(int pixel, int zoomLevel){
+  public static long pixelToTime(int pixel, int zoomLevel){
     return (long)Math.pow(2, zoomLevel)*pixel;
   }
 
