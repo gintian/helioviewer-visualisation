@@ -1,11 +1,13 @@
 package timelines.gui;
 
-import timelines.utils.TimeUtils;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Date;
+
+import javax.swing.JComponent;
+
+import timelines.utils.TimeUtils;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
