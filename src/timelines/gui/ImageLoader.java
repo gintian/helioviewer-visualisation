@@ -33,17 +33,20 @@ public class ImageLoader{
   private Image image;
   private Date startDate;
   private int imgCount = 1;
+  private int tileWidth = 0;
 
   public ImageLoader(Image image, String serverBaseURLStr, Date date, int zoomLevel, int tileCount){
     this.image = image;
     this.serverBaseURLStr = serverBaseURLStr;
 
-    requestImages(date, zoomLevel, this.imgCount);
     this.imgCount = tileCount;
+    requestImages(date, zoomLevel, this.imgCount);
   }
 
   private void setImageCount(int tileWidth){
+    System.out.println(this.imgCount); //TODO: remove after testing
     this.imgCount = (this.image.getWindow().getWidth() / tileWidth)+1;
+    System.out.println(this.imgCount); //TODO: remove after testing
   }
 
   private void requestImages(Date date, int zoomLevel, int imgCount){
@@ -53,7 +56,7 @@ public class ImageLoader{
       metadatas = new APIImageMetadata[imgCount];
       for (int i = 0; i < imgCount; i++) {
         //TODO: change date for next request
-        getImageFromURL(createURL(date, zoomLevel), i);
+        getImageFromURL(createURL(date, zoomLevel, i), i);
       }
     }catch (MalformedURLException e){
       logger.log(Level.WARNING, "URL could not be created");
@@ -76,6 +79,7 @@ public class ImageLoader{
           BufferedImage bi = ImageIO.read(url); //TODO: make mor efficient
 
           cacheBufferedImage(i, bi);
+          tileWidth = bi.getWidth();
           if(i+1 == imgCount){
             buildBImage();
           }
@@ -88,8 +92,9 @@ public class ImageLoader{
     logger.log(Level.INFO, "ImageLoader new Thread started with following URL: {0}", url.toString());
   }
 
-  private URL createURL(Date date, int zoomLevel) throws MalformedURLException{
-    return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, zoomLevel, TimeUtils.toString(date, "yyyy-MM-dd:HH:mm:ss"))); //TODO: replace test date with date field when done testing
+  private URL createURL(Date date, int zoomLevel, int i) throws MalformedURLException{
+    Date tempDate = TimeUtils.addTime(date, Image.pixelToTime(tileWidth * i, zoomLevel));
+    return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, zoomLevel, TimeUtils.toString(tempDate, "yyyy-MM-dd:HH:mm:ss")));
   }
 
   private void buildBImage(){
@@ -99,7 +104,6 @@ public class ImageLoader{
         //metadata = new APIImageMetadata(bImageArr[0]);
         startDate = metadatas[0].getDateFrom();
         int tileWidth = bImageArr[0].getWidth();
-        setImageCount(tileWidth);
         int w = tileWidth * imgCount;
         int h = bImageArr[0].getHeight();
         BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
@@ -108,6 +112,7 @@ public class ImageLoader{
           g.drawImage(bImageArr[i], i*tileWidth, 0, null);
         }
         bImage = combined;
+        setImageCount(tileWidth);
         updateImage();
       }
     });
