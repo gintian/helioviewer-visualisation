@@ -19,11 +19,13 @@ public class ImageRunnable implements Runnable {
     @Override
     public void run() {
         try {
+            System.out.println("thread url: "+ url);//TODO:remove
             InputStream is = this.url.openStream();
-            //ImageInputStream iis = ImageIO.createImageInputStream(is);
-            //Diagram diagram = new Diagram(iis);
             byte[] bytes = sun.misc.IOUtils.readFully(is, -1, true);
             Diagram diagram = new Diagram(bytes);
+            System.out.println("thread diagram: "+ diagram.getStartDate());//TODO:remove
+            System.out.println("thread diagram: "+ diagram.getEndDate());//TODO:remove
+            System.out.println("thread diagram: "+ diagram.getZoomLevel());//TODO:remove
             this.imageLoader.tileBuffer.addToDiagramBuffer(diagram);
         }catch (IOException e){
 

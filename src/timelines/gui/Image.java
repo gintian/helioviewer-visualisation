@@ -22,10 +22,9 @@ public class Image extends JComponent {
   private int pixelFocus;
   private int pixelOriginToFocus; //difference betwene pixelFocus and pixelOrigin
   private Window window;
-  private int zoomLevel = 10;
-  private int maxZoomLevel = 1;
-  //private int minZoomLevel = 18;
-  private int minZoomLevel = 10;
+  private int zoomLevel = 10; //TODO:set via imageloader
+  private int maxZoomLevel = 1; //TODO:set via imageloader
+  private int minZoomLevel = 10; //TODO:set via imageloader
   private int rulerWidth = 20;
   private ImageLoader currentImageLoader;
   private Date dateOrigin; //current images start/leftmost date
@@ -44,11 +43,11 @@ public class Image extends JComponent {
   }
 
   public static int timeToPixel(long time, int zoomLevel){
-    return (int)(time/Math.pow(2, zoomLevel));
+    return (int)(time/(1000*Math.pow(2, zoomLevel)));
   }
 
   public static long pixelToTime(int pixel, int zoomLevel){
-    return (long)Math.pow(2, zoomLevel)*pixel;
+    return (long)Math.pow(2, zoomLevel)*pixel*1000;
   }
 
   private void setImageOffset(){

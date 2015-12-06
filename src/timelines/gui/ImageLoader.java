@@ -1,6 +1,5 @@
 package timelines.gui;
 
-import sun.misc.IOUtils;
 import timelines.utils.TimeUtils;
 
 import java.awt.*;
@@ -77,8 +76,10 @@ public class ImageLoader {
   }
   private URL makeUrl(Date date, int i) throws MalformedURLException{
     Date tempDate = TimeUtils.addTime(date, Image.pixelToTime(this.tileWidth * i, this.zoomLevel));
-    //return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, this.zoomLevel, TimeUtils.toString(tempDate, "yyyy-MM-dd:HH:mm:ss")));
-    return new URL("http://localhost:8080/api?zoomLevel=1&dateFrom=1981-07-01:00:00:00");
+    System.out.println("zl: "+zoomLevel);//TODO:remove
+    System.out.println("tw: "+tileWidth);
+    System.out.println("tm: "+Image.pixelToTime(this.tileWidth * i, this.zoomLevel));//TODO:remove
+    return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, this.zoomLevel, TimeUtils.toString(tempDate, "yyyy-MM-dd:HH:mm:ss")));
   }
 
   private void getImages(Date dateFrom) throws MalformedURLException{
@@ -109,6 +110,7 @@ public class ImageLoader {
 
   private void setTileCount(){
     this.tileCount = (this.image.getWindow().getWidth() / this.tileWidth)+1;
+    System.out.println("set tile count to: "+this.tileCount);//TODO:remove
   }
 
   public void processDiagramBuffer(){
@@ -130,6 +132,7 @@ public class ImageLoader {
     {
       g.drawImage(tm.get(key).getBufferedImage(), counter * this.tileWidth, 0, null);
       counter++;
+      System.out.println("making: "+counter);//TODO:remove
     }
     Date startDate = tm.firstEntry().getValue().getStartDate();
     Date endDateDate = tm.lastEntry().getValue().getEndDate();

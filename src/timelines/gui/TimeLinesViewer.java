@@ -16,7 +16,7 @@ public class TimeLinesViewer {
 
   public static void main(String[] args){
     try {
-      date = TimeUtils.fromString("1981-07-01:00:00:00", "yyyy-MM-dd:HH:mm:ss");
+      date = TimeUtils.fromString("1991-07-01:00:00:00", "yyyy-MM-dd:HH:mm:ss");
     }catch (ParseException e){
       //TODO: remove this try catch when done testing
     }
