@@ -1,13 +1,11 @@
 package timelines.gui;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import timelines.utils.TimeUtils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Date;
-
-import javax.swing.JComponent;
-
-import timelines.utils.TimeUtils;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
@@ -17,9 +15,9 @@ public class Image extends JComponent {
 
   private static final String serverBaseURLStr = "http://localhost:8080";
 
-  private BufferedImage image;
-  private int imageHeight;
-  private int imageWidth;
+  private BufferedImage bufferedImage;
+  private int bufferedImageHeight;
+  private int bufferedImageWidth;
   private int pixelOrigin;
   private int pixelFocus;
   private int pixelOriginToFocus; //difference betwene pixelFocus and pixelOrigin
@@ -32,7 +30,7 @@ public class Image extends JComponent {
   private ImageLoader currentImageLoader;
   private Date dateOrigin; //current images start/leftmost date
   private Date dateFocus; //date in middle of screen, date of interest focused
-  private int tileCount=1;
+  private Date dateLast;
   int imageOffset;
 
   public Image(Window window, Date dateFocus){
@@ -87,18 +85,18 @@ public class Image extends JComponent {
 
   public void updateImage(ImageLoader il){  //TODO: fix if becomes problem with multithreading
     if(this.currentImageLoader.equals(il)){
-      this.image = il.getbImage();
-      this.imageWidth = image.getWidth();
-      this.imageHeight = image.getHeight();
-      this.tileCount = il.getImgCount();
-      this.dateOrigin = il.getStartDate();
+      this.bufferedImage = il.getDiagram().getBufferedImage();
+      this.bufferedImageWidth = this.bufferedImage.getWidth();
+      this.bufferedImageHeight = this.bufferedImage.getHeight();
+      this.dateOrigin = il.getDiagram().getStartDate();
+      this.dateLast = il.getDiagram().getEndDate();
 
       repaint();  //TODO: point of interest
     }
   }
 
   private void setImage(){
-    this.currentImageLoader = new ImageLoader(this, this.serverBaseURLStr, getRequestDate(), this.zoomLevel, this.tileCount);
+    this.currentImageLoader = ImageLoader.loadNewSet(this, this.serverBaseURLStr, getRequestDate(), this.zoomLevel);
   }
 
   public Window getWindow() {
@@ -127,9 +125,9 @@ public class Image extends JComponent {
 
   public void stretchImage(int zoomLevelChange){
     if(zoomLevelChange < 0){
-      this.imageWidth *=2;
+      this.bufferedImageWidth *=2;
     }else{
-      this.imageWidth /= 2;
+      this.bufferedImageWidth /= 2;
     }
   }
   public void zoom(int levelChange, int pixelFocus){
@@ -168,7 +166,7 @@ public class Image extends JComponent {
     g.fillRect(rw,h-rw,w-rw,rw);
     g.setColor(scaleColor);
     int j = pixelOrigin;
-    while(j<= imageWidth + pixelOrigin){
+    while(j<= bufferedImageWidth + pixelOrigin){
       g.drawLine(j,h-sp,j,h-(rw-sp));
       j+=(10*zoomLevel);
     }
@@ -180,7 +178,7 @@ public class Image extends JComponent {
   public void paint(Graphics g){
     super.paintComponent(g);
     focusImage();
-    g.drawImage(this.image, this.imageOffset, 0, this.imageWidth, this.imageHeight, null);
+    g.drawImage(this.bufferedImage, this.imageOffset, 0, this.bufferedImageWidth, this.bufferedImageHeight, null);
     paintRulers(g);
   }
 }

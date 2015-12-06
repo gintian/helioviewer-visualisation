@@ -1,145 +1,152 @@
 package timelines.gui;
 
-import timelines.api.APIImageMetadata;
+import sun.misc.IOUtils;
 import timelines.utils.TimeUtils;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.TreeMap;
+
+import org.json.simple.*;
+
+
 /**
- * Project i4ds05-visualisieren-von-timelines
- * Created by Tobias Kohler on 19.11.2015.
+ * Created by Tobi on 05.12.2015.
  */
-public class ImageLoader{
-  private static final Logger logger = Logger.getLogger(ImageLoader.class.getName());
+public class ImageLoader {
 
-  private String serverBaseURLStr;
-  private BufferedImage bImage;
-  private BufferedImage[] bImageArr;
-  private Thread[] threads;
-  private APIImageMetadata metadata;
-  private APIImageMetadata[] metadatas;
-  private Thread imageBuilder;
   private Image image;
-  private Date startDate;
-  private int imgCount = 1;
-  private int tileWidth = 0;
+  private String serverBaseURLStr;
+  private int tileCount;
+  public DiagramBuffer tileBuffer;
+  private int tileWidth;
+  private int tileHeight;
+  private int minZoomLevel;
+  private int maxZoomLevel;
+  private int zoomLevel;
+  private Diagram diagram;
+  private int callType;
+  private static final int NEW_SET = 1;
+  private static final int EXTEND_SET = 2;
 
-  public ImageLoader(Image image, String serverBaseURLStr, Date date, int zoomLevel, int tileCount){
+  public static ImageLoader loadNewSet(Image image, String serverBaseURLStr, Date date, int zoomLevel){
+    try {
+      return new ImageLoader(image, serverBaseURLStr, date, zoomLevel);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    } catch (org.json.simple.parser.ParseException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+  private ImageLoader(Image image, String serverBaseURLStr, Date startDate, int zoomLevel) throws IOException, org.json.simple.parser.ParseException {
+    this.callType = NEW_SET;
+    this.serverBaseURLStr = serverBaseURLStr;
+    this.image = image;
+    this.zoomLevel = zoomLevel;
+    getApiInfo();
+    setTileCount();
+    getImages(startDate);
+  }
+
+  public static ImageLoader loadAdditional(Image image, Diagram diagram, String serverBaseURLStr, Date startDate, Date endDate, int zoomLevel){
+    return new ImageLoader(image, diagram, serverBaseURLStr, startDate, endDate, zoomLevel);
+  }
+  private ImageLoader(Image image, Diagram diagram, String serverBaseURLStr, Date startDate, Date endDate, int zoomLevel){
+    this.callType = EXTEND_SET;
     this.image = image;
     this.serverBaseURLStr = serverBaseURLStr;
-
-    this.imgCount = tileCount;
-    requestImages(date, zoomLevel, this.imgCount);
+    this.zoomLevel = zoomLevel;
+    this.diagram = diagram;
   }
 
-  private void setImageCount(int tileWidth){
-    System.out.println(this.imgCount); //TODO: remove after testing
-    this.imgCount = (this.image.getWindow().getWidth() / tileWidth)+1;
-    System.out.println(this.imgCount); //TODO: remove after testing
+  private URL[] setUrls(Date fromDate) throws MalformedURLException{
+    URL[] urlArray = new URL[tileCount];
+    for (int i = 0; i < tileCount; i++){
+      urlArray[i] = makeUrl(fromDate, i);
+    }
+    return urlArray;
+  }
+  private URL makeUrl(Date date, int i) throws MalformedURLException{
+    Date tempDate = TimeUtils.addTime(date, Image.pixelToTime(this.tileWidth * i, this.zoomLevel));
+    //return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, this.zoomLevel, TimeUtils.toString(tempDate, "yyyy-MM-dd:HH:mm:ss")));
+    return new URL("http://localhost:8080/api?zoomLevel=1&dateFrom=1981-07-01:00:00:00");
   }
 
-  private void requestImages(Date date, int zoomLevel, int imgCount){
-    try {
-      bImageArr = new BufferedImage[imgCount];
-      threads = new Thread[imgCount];
-      metadatas = new APIImageMetadata[imgCount];
-      for (int i = 0; i < imgCount; i++) {
-        //TODO: change date for next request
-        getImageFromURL(createURL(date, zoomLevel, i), i);
-      }
-    }catch (MalformedURLException e){
-      logger.log(Level.WARNING, "URL could not be created");
+  private void getImages(Date dateFrom) throws MalformedURLException{
+    URL[] urls = setUrls(dateFrom);
+    Thread[] threads = new Thread[this.tileCount];
+    this.tileBuffer = new DiagramBuffer(this, this.tileCount);
+    for (int i =0; i < this.tileCount; i++){
+      threads[i] = new Thread(new ImageRunnable(this, urls[i]));
+      threads[i].start();
     }
   }
 
-  private void getImageFromURL(URL url, int i){
+  private void getApiInfo() throws IOException, org.json.simple.parser.ParseException{
+    URL url = new URL(MessageFormat.format("{0}/apiInfo", this.serverBaseURLStr));
+    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+    String jsonString = "";
+    String inputLine;
+    while ((inputLine = in.readLine()) != null)
+      jsonString += inputLine;
+    in.close();
 
-    threads[i] = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          ImageReader imageReader = ImageIO.getImageReadersByFormatName("png").next();
-
-          InputStream is = new URL(url.toString()).openStream();
-          ImageInputStream iis = ImageIO.createImageInputStream(is);
-
-          cacheMetadata(i, new APIImageMetadata(iis));
-
-          BufferedImage bi = ImageIO.read(url); //TODO: make mor efficient
-
-          cacheBufferedImage(i, bi);
-          tileWidth = bi.getWidth();
-          if(i+1 == imgCount){
-            buildBImage();
-          }
-        }catch (IOException e){
-          logger.log(Level.WARNING, "ImageLoader Thread could not find the image under following URL: {0}", url.toString());
-        }
-      }
-    });
-    this.threads[i].start();
-    logger.log(Level.INFO, "ImageLoader new Thread started with following URL: {0}", url.toString());
+    JSONObject infoJsonObject = (JSONObject) JSONValue.parseWithException(jsonString);
+    this.tileHeight = (int)(long)infoJsonObject.get("height");
+    this.tileWidth = (int)(long)infoJsonObject.get("width");
+    this.minZoomLevel = (int)(long)infoJsonObject.get("zoomLevelTo");
+    this.maxZoomLevel = (int)(long)infoJsonObject.get("zoomLevelFrom");
   }
 
-  private URL createURL(Date date, int zoomLevel, int i) throws MalformedURLException{
-    Date tempDate = TimeUtils.addTime(date, Image.pixelToTime(tileWidth * i, zoomLevel));
-    return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, zoomLevel, TimeUtils.toString(tempDate, "yyyy-MM-dd:HH:mm:ss")));
+  private void setTileCount(){
+    this.tileCount = (this.image.getWindow().getWidth() / this.tileWidth)+1;
   }
 
-  private void buildBImage(){
-    this.imageBuilder = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        //metadata = new APIImageMetadata(bImageArr[0]);
-        startDate = metadatas[0].getDateFrom();
-        int tileWidth = bImageArr[0].getWidth();
-        int w = tileWidth * imgCount;
-        int h = bImageArr[0].getHeight();
-        BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = combined.getGraphics();
-        for(int i = 0; i < imgCount; i++) {
-          g.drawImage(bImageArr[i], i*tileWidth, 0, null);
-        }
-        bImage = combined;
-        setImageCount(tileWidth);
-        updateImage();
-      }
-    });
-    this.imageBuilder.start();
-  }
+  public void processDiagramBuffer(){
+    if(this.callType == NEW_SET){
+      makeNewSet();
+    }else if (this.callType == EXTEND_SET){
 
-  private void cacheBufferedImage(int index, BufferedImage bImage){
-    bImageArr[index] = bImage;
+    }
   }
-  private void cacheMetadata(int index, APIImageMetadata metadata){
-    metadatas[index] = metadata;
+  private void makeNewSet(){
+    TreeMap<Long, Diagram> tm = this.tileBuffer.getMap();
+    int w = this.tileCount * this.tileWidth;
+    int h = this.tileHeight;
+    BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    Graphics g = img.getGraphics();
+
+    int counter = 0;
+    for(Long key : tm.keySet())
+    {
+      g.drawImage(tm.get(key).getBufferedImage(), counter * this.tileWidth, 0, null);
+      counter++;
+    }
+    Date startDate = tm.firstEntry().getValue().getStartDate();
+    Date endDateDate = tm.lastEntry().getValue().getEndDate();
+
+    this.diagram = new Diagram(img, startDate, endDateDate, this.zoomLevel);
+    updateImage();
+  }
+  private void extendSet(){
+
   }
 
   private void updateImage(){
     this.image.updateImage(this);
   }
 
-
-  public BufferedImage getbImage() {
-    return bImage;
+  public Diagram getDiagram(){
+    return this.diagram;
   }
 
-  public Date getStartDate() {
-    return startDate;
-  }
-
-  public int getImgCount() {
-    return imgCount;
-  }
 }

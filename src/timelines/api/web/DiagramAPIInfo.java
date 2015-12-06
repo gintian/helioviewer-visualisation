@@ -54,10 +54,10 @@ public class DiagramAPIInfo extends HttpServlet {
     response.setContentType("application/json");
     PrintWriter printWriter = response.getWriter();
     printWriter.println("{");
-    printWriter.println("'width': " + DiagramRenderer.IMAGE_WIDTH + ",");
-    printWriter.println("'height': " + DiagramRenderer.IMAGE_HEIGHT + ",");
-    printWriter.println("'zoomLevelFrom': " + 1 + ","); // TODO define that somewhere properly
-    printWriter.println("'zoomLevelTo': " + 18 + ","); // TODO define that somewhere properly
+    printWriter.println("\"width\": " + DiagramRenderer.IMAGE_WIDTH + ",");
+    printWriter.println("\"height\": " + DiagramRenderer.IMAGE_HEIGHT + ",");
+    printWriter.println("\"zoomLevelFrom\": " + 1 + ","); // TODO define that somewhere properly
+    printWriter.println("\"zoomLevelTo\": " + 18 + ","); // TODO define that somewhere properly
     printWriter.println("}");
     printWriter.close();
 	}

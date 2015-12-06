@@ -42,6 +42,12 @@ public class APIImageMetadata {
         }
     }
 
+    public APIImageMetadata(Date dateFrom, Date dateTo, int zoomLevel){
+        this.dateFrom = dateFrom;
+        this.dateTo = dateTo;
+        this.zoomLevel = zoomLevel;
+    }
+
 
     public Date getDateFrom() {
         Date returnDate = dateFrom;
