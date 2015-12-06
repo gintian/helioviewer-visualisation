@@ -6,6 +6,7 @@ import timelines.api.APIImageMetadata;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 
@@ -27,8 +28,21 @@ public class Diagram {
 
     public Diagram(ImageInputStream imageInputStream) throws IOException{
         this.metadata = new APIImageMetadata(imageInputStream);
-        imageInputStream.reset();
         this.bufferedImage = ImageIO.read(imageInputStream);
+
+        /*try {
+            this.bufferedImage = ImageIO.read(new URL("http://localhost:8080/api?dateFrom=1981-07-01:00:00:00&zoomLevel=1"));
+        }catch (MalformedURLException e){}*/
+    }
+
+    public Diagram(byte[] bytes) throws IOException{
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        ImageInputStream iis = ImageIO.createImageInputStream(bais);
+        this.metadata = new APIImageMetadata(iis);
+
+        bais = new ByteArrayInputStream(bytes);
+        this.bufferedImage = ImageIO.read(bais);
+
         /*try {
             this.bufferedImage = ImageIO.read(new URL("http://localhost:8080/api?dateFrom=1981-07-01:00:00:00&zoomLevel=1"));
         }catch (MalformedURLException e){}*/
