@@ -15,6 +15,7 @@ import timelines.importer.downloader.GoesNewAvgDownloader;
 import timelines.importer.downloader.GoesNewFull3sDownloader;
 import timelines.importer.downloader.GoesNewFullDownloader;
 import timelines.importer.downloader.GoesOldFullDownloader;
+import timelines.utils.ImageUtils;
 
 public class DiagramRenderer {
 
@@ -48,22 +49,25 @@ public class DiagramRenderer {
 //    System.out.println("min: " + (int)(Math.abs(scaling * (Math.log10(rangeStart))) - offset));
 //    System.out.println("max: " + (int)(Math.abs(scaling * (Math.log10(rangeEnd))) - offset));
 
-    float widthOnePercent = bufferL.remaining() / Float.BYTES / 100;
+//    float widthOnePercent = bufferL.remaining() / Float.BYTES / 100;
 
-    int validValCount = 0;
-    while(bufferL.hasRemaining()) {
-      if(bufferL.getFloat() > 0) {
-        validValCount ++;
-      }
-    }
-    bufferL.position(0);
+//    int validValCount = 0;
+//    while(bufferL.hasRemaining()) {
+//      if(bufferL.getFloat() > 0) {
+//        validValCount ++;
+//      }
+//    }
+//    bufferL.position(0);
 //    System.out.println(validValCount);
-    int opacity =  (int) Math.max(2, 255f / (validValCount / 5f / IMAGE_WIDTH));
+//    int opacity =  (int) Math.max(2, 255f / (validValCount / 5f / IMAGE_WIDTH));
+//  opacity = Math.min(255, opacity);
+    int opacity = 255;
 //    opacity *= 2;
-    opacity = Math.min(255, opacity);
+
 //    System.out.println(opacity);
 
-    BufferedImage image = new BufferedImage(IMAGE_WIDTH * SUPER_SAMPLE, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+//    BufferedImage image = new BufferedImage(IMAGE_WIDTH * SUPER_SAMPLE, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+    BufferedImage image = new BufferedImage(bufferL.remaining() / Float.BYTES, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = image.createGraphics();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -76,8 +80,8 @@ public class DiagramRenderer {
       nextValL = bufferL.getFloat();
       float valH = nextValH;
       nextValH = bufferH.getFloat();
-      int posX = Math.min((int) (index / widthOnePercent * (IMAGE_WIDTH * SUPER_SAMPLE / 100)), IMAGE_WIDTH * SUPER_SAMPLE - 1);
-      int posXNext = Math.min((int) ((index + 1) / widthOnePercent * (IMAGE_WIDTH * SUPER_SAMPLE / 100)), IMAGE_WIDTH * SUPER_SAMPLE - 1);
+      int posX = index; //Math.min((int) (index / widthOnePercent * (IMAGE_WIDTH * SUPER_SAMPLE / 100)), IMAGE_WIDTH * SUPER_SAMPLE - 1);
+      int posXNext = index + 1; //Math.min((int) ((index + 1) / widthOnePercent * (IMAGE_WIDTH * SUPER_SAMPLE / 100)), IMAGE_WIDTH * SUPER_SAMPLE - 1);
 
       int posYL = getPosY(valL, scaling, offset);
       int nextPosYL = getPosY(nextValL, scaling, offset);
@@ -103,10 +107,11 @@ public class DiagramRenderer {
       }
       index ++;
     }
-
+    g.dispose();
 
     logger.log(Level.INFO, "Rendering completed in {0}ms", new Object[] {new Date().getTime() - startDate.getTime()});
-    return getScaledImage(image, IMAGE_WIDTH, IMAGE_HEIGHT);
+    return ImageUtils.multiplyAlpha(3, ImageUtils.getScaledInstance(image, IMAGE_WIDTH, IMAGE_HEIGHT, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true));
+//    return ImageUtils.scaleImage(image, IMAGE_WIDTH, IMAGE_HEIGHT);
 //    return image;
   }
 
@@ -152,20 +157,6 @@ public class DiagramRenderer {
 
   }
 
-  /**
-   * Resizes an image using a Graphics2D object backed by a BufferedImage.
-   * @param srcImg - source image to scale
-   * @param w - desired width
-   * @param h - desired height
-   * @return - the new resized image
-   */
-  private BufferedImage getScaledImage(BufferedImage srcImg, int w, int h){
-      BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TRANSLUCENT);
-      Graphics2D g2 = resizedImg.createGraphics();
-      g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-      g2.drawImage(srcImg, 0, 0, w, h, null);
-      g2.dispose();
-      return resizedImg;
-  }
+
 
 }
