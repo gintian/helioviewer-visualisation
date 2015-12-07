@@ -1,8 +1,6 @@
 package timelines.gui;
 
-import timelines.utils.TimeUtils;
-
-import java.awt.*;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +11,10 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.TreeMap;
 
-import org.json.simple.*;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import timelines.utils.TimeUtils;
 
 
 /**
