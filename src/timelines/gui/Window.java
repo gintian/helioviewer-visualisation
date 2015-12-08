@@ -6,8 +6,9 @@ package timelines.gui;
  */
 
 
-import javax.swing.*;
 import java.util.Date;
+
+import javax.swing.JFrame;
 
 public class Window extends JFrame {
   private Image image;
@@ -15,7 +16,7 @@ public class Window extends JFrame {
   public Window(Date date){
     super("i4ds05 - Time Lines Viewer");
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setSize(2000, 500);
+    setSize(1000, 500);
     setLocationRelativeTo(null);
     setVisible(true);
 

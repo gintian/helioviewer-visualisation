@@ -1,11 +1,15 @@
 package timelines.gui;
 
-import timelines.utils.TimeUtils;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Date;
+
+import javax.swing.JComponent;
+
+import timelines.database.TimelinesDB;
+import timelines.utils.TimeUtils;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
@@ -13,32 +17,38 @@ import java.util.Date;
  */
 public class Image extends JComponent {
 
-  private static final String serverBaseURLStr = "http://localhost:8080";
-
   private BufferedImage bufferedImage;
   private int bufferedImageHeight;
   private int bufferedImageWidth;
   private int pixelOrigin;
   private int pixelFocus;
-  private int pixelOriginToFocus; //difference betwene pixelFocus and pixelOrigin
+  private int pixelOriginToFocus; //difference between pixelFocus and pixelOrigin
   private Window window;
-  private int zoomLevel = 10; //TODO:set via imageloader
-  private int maxZoomLevel = 1; //TODO:set via imageloader
-  private int minZoomLevel = 10; //TODO:set via imageloader
+  private int zoomLevel = 10; //TODO:set via ImageLoader
+  private int maxZoomLevel = 1; //TODO:set via ImageLoader
+  private int minZoomLevel = 10; //TODO:set via ImageLoader
   private int rulerWidth = 20;
-  private ImageLoader currentImageLoader;
+//  private ImageLoader currentImageLoader;
+  private DiagramBuffer diagramBuffer;
   private Date dateOrigin; //current images start/leftmost date
   private Date dateFocus; //date in middle of screen, date of interest focused
   private Date dateLast;
   int imageOffset;
 
+  private static final Date DB_START_DATE = new Date(141865200000L); // 1974-07-01 TODO we should probably get this from the API
+
   public Image(Window window, Date dateFocus){
+
     this.window = window;
 
     this.dateFocus = dateFocus;
     this.dateOrigin = dateFocus;
 
-    setImage();
+    this.bufferedImage = new BufferedImage(this.window.getContentPane().getWidth(), this.window.getContentPane().getHeight(), bufferedImage.TYPE_INT_ARGB);
+
+    this.diagramBuffer = new DiagramBuffer(this);
+
+    update();
 
   }
 
@@ -82,20 +92,30 @@ public class Image extends JComponent {
     return  zoomLevel;
   }
 
-  public void updateImage(ImageLoader il){  //TODO: fix if becomes problem with multithreading
-    if(this.currentImageLoader.equals(il)){
-      this.bufferedImage = il.getDiagram().getBufferedImage();
-      this.bufferedImageWidth = this.bufferedImage.getWidth();
-      this.bufferedImageHeight = this.bufferedImage.getHeight();
-      this.dateOrigin = il.getDiagram().getStartDate();
-      this.dateLast = il.getDiagram().getEndDate();
+  /**
+   * Request all required images from the buffer and draw them
+   */
+  public void update(){
 
-      repaint();  //TODO: point of interest
+    // get the actual start date of the first required image
+    long dataPoints = (long) Math.pow(2, zoomLevel) * diagramBuffer.getAPIInfo().getTileWidth();
+    long imageOffset = (dateOrigin.getTime() - TimelinesDB.DB_START_DATE.getTime()) / 2000 / dataPoints;
+    Date actualStartDate = new Date(DB_START_DATE.getTime() + imageOffset * dataPoints * 2000);
+
+    // Get the needed images from the buffer
+    // TODO get all required images and not just the first one
+    Diagram d = diagramBuffer.getDiagram(actualStartDate, zoomLevel);
+
+    // if what we got is not null (otherwise a load has been initialized), draw what we got
+    if(d != null) {
+      Graphics2D g = bufferedImage.createGraphics();
+      g.setBackground(new Color(255, 255, 255, 0));
+      g.clearRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+      g.drawImage(d.getBufferedImage(), null, 0, 0); // TODO draw the image with the required offset based on its start time
+      g.dispose();
+
+      repaint();
     }
-  }
-
-  private void setImage(){
-    this.currentImageLoader = ImageLoader.loadNewSet(this, this.serverBaseURLStr, getRequestDate(), this.zoomLevel);
   }
 
   public Window getWindow() {
@@ -136,7 +156,7 @@ public class Image extends JComponent {
       this.zoomLevel += levelChange;
       setImageOffset();
       repaint();
-      setImage();
+      update();
     }
   }
 
@@ -165,7 +185,7 @@ public class Image extends JComponent {
     g.fillRect(rw,h-rw,w-rw,rw);
     g.setColor(scaleColor);
     int j = pixelOrigin;
-    while(j<= bufferedImageWidth + pixelOrigin){
+    while(j<= bufferedImage.getWidth() + pixelOrigin){
       g.drawLine(j,h-sp,j,h-(rw-sp));
       j+=(10*zoomLevel);
     }
@@ -177,7 +197,7 @@ public class Image extends JComponent {
   public void paint(Graphics g){
     super.paintComponent(g);
     focusImage();
-    g.drawImage(this.bufferedImage, this.imageOffset, 0, this.bufferedImageWidth, this.bufferedImageHeight, null);
+    g.drawImage(this.bufferedImage, this.imageOffset, 0, this.bufferedImage.getWidth(), this.bufferedImage.getHeight(), null);
     paintRulers(g);
   }
 }
