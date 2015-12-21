@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import timelines.config.Config;
 import timelines.database.TimelinesDB;
 import timelines.renderer.CacheRenderer;
 import timelines.renderer.DiagramRenderer;
@@ -40,12 +41,18 @@ public class DiagramAPI extends HttpServlet {
 
   private DiagramRenderer renderer;
 
+  private Config config;
+
   /**
    * @see HttpServlet#HttpServlet()
    */
   public DiagramAPI() {
     super();
-    // TODO Auto-generated constructor stub
+    try {
+      config = new Config();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -151,10 +158,9 @@ public class DiagramAPI extends HttpServlet {
 
     ServletContext context = getServletContext();
 
-    String path = "WEB-INF/classes/" + zoomLevel + "/" + date.getTime() + ".png";
-//    System.out.println("path: " + path);
-    File f = new File(context.getRealPath(path));
-//    System.out.println("File: " + f);
+    String path = "cache/" + zoomLevel + "/" + date.getTime() + ".png";
+//    File f = new File(context.getRealPath(path));
+    File f = new File(config.getCachePath() + zoomLevel + "/" + date.getTime() + ".png");
     BufferedImage img = null;
     try {
       img = ImageIO.read(f);

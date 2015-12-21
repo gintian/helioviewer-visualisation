@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import timelines.config.Config;
 import timelines.database.MemoryMappedFile;
 import timelines.database.TimelinesDB;
 import timelines.importer.csv.GoesSxrLeaf;
@@ -24,14 +25,16 @@ public class Importer {
   private MemoryMappedFile lowChannelDB;
   private MemoryMappedFile highChannelDB;
   private GoesNewFullDownloader downloader;
-
+  private Config config;
 
   public Importer() {
 
     try {
 
-      File fileLow = new File(this.getClass().getClassLoader().getResource(TimelinesDB.LOW_CHANNEL_DB_PATH).getPath());
-      File fileHigh = new File(this.getClass().getClassLoader().getResource(TimelinesDB.HIGH_CHANNEL_DB_PATH).getPath());
+      config = new Config();
+
+      File fileLow = new File(config.getDbPath() + TimelinesDB.LOW_CHANNEL_DB_FILE); //(this.getClass().getClassLoader().getResource(TimelinesDB.LOW_CHANNEL_DB_PATH).getPath());
+      File fileHigh = new File(config.getDbPath() + TimelinesDB.HIGH_CHANNEL_DB_FILE); //(this.getClass().getClassLoader().getResource(TimelinesDB.HIGH_CHANNEL_DB_PATH).getPath());
       if (!fileLow.exists()) {
         fileLow.createNewFile();
       }
@@ -39,8 +42,8 @@ public class Importer {
         fileHigh.createNewFile();
       }
 
-      lowChannelDB = new MemoryMappedFile(TimelinesDB.LOW_CHANNEL_DB_PATH);
-      highChannelDB = new MemoryMappedFile(TimelinesDB.HIGH_CHANNEL_DB_PATH);
+      lowChannelDB = new MemoryMappedFile(config.getDbPath() + TimelinesDB.LOW_CHANNEL_DB_FILE);
+      highChannelDB = new MemoryMappedFile(config.getDbPath() + TimelinesDB.HIGH_CHANNEL_DB_FILE);
 
     } catch (IOException e) {
       // TODO Auto-generated catch block
@@ -114,10 +117,10 @@ public class Importer {
    */
   public void initializeDatabase() throws Exception {
 
-//    getOldData();
+    getOldData();
 
     // new avg
-//    getData(new GoesNewAvgDownloader(), Calendar.MONTH, Calendar.DAY_OF_MONTH, 1, GoesNewAvgDownloader.START_DATE, GoesNewAvgDownloader.END_DATE);
+    getData(new GoesNewAvgDownloader(), Calendar.MONTH, Calendar.DAY_OF_MONTH, 1, GoesNewAvgDownloader.START_DATE, GoesNewAvgDownloader.END_DATE);
 
     // new 3s data
     getData(new GoesNewFull3sDownloader(0, 20), Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFull3sDownloader.START_DATE, GoesNewFull3sDownloader.END_DATE);
@@ -319,10 +322,6 @@ public class Importer {
 
     }
   }
-
-
-
-
 
   private void getData(IDownloader downloader, int calendarFieldToIncrement, int calendarFieldToReset, int resetValue, Date startDate, Date endDate) throws Exception {
 

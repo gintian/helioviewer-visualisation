@@ -116,10 +116,15 @@ public class DiagramRenderer {
   }
 
   private int getPosY(Float f, float scaling, float offset) {
-    if (f != Float.NaN && f != 0) {
-      return (int) Math.min(299, (Math.abs(scaling * (Math.log10(f))) - offset));
-    }
-    return 299;
+//    if (f == Float.NaN) {
+//      System.out.println(f);
+//    }
+//    if (f != Float.NaN && f != 0 && f!= Float.MIN_VALUE) {
+
+      return (int) Math.min(IMAGE_HEIGHT - 1, (Math.abs(scaling * (Math.log10(f))) - offset));
+//    }
+//    System.out.println(f);
+//    return IMAGE_HEIGHT - 1;
   }
 
   public static void main(String[] args) throws Exception {

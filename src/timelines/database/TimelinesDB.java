@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
+import timelines.config.Config;
 import timelines.importer.downloader.GoesOldFullDownloader;
 
 /**
@@ -14,20 +15,26 @@ import timelines.importer.downloader.GoesOldFullDownloader;
  */
 public class TimelinesDB {
 
-  public static final String LOW_CHANNEL_DB_PATH = "dbL";
-  public static final String HIGH_CHANNEL_DB_PATH = "dbH";
+//  public static final String LOW_CHANNEL_DB_PATH = "/home/stud1/timelines/res/dbL";
+//  public static final String HIGH_CHANNEL_DB_PATH = "/home/stud1/timelines/res/dbH";
+
+  public static final String LOW_CHANNEL_DB_FILE = "dbL"; // TODO move this to the config file
+  public static final String HIGH_CHANNEL_DB_FILE = "dbH";
 
   private MemoryMappedFile lowChannelDB;
   private MemoryMappedFile highChannelDB;
 
   public static final Date DB_START_DATE = GoesOldFullDownloader.START_DATE;
 
+  private Config config;
+
   public TimelinesDB() {
     try {
 
+      config = new Config();
 
-      File fileLow = new File(this.getClass().getClassLoader().getResource(LOW_CHANNEL_DB_PATH).getPath());
-      File fileHigh = new File(this.getClass().getClassLoader().getResource(HIGH_CHANNEL_DB_PATH).getPath());
+      File fileLow = new File(config.getDbPath() + LOW_CHANNEL_DB_FILE); //new File(this.getClass().getClassLoader().getResource(LOW_CHANNEL_DB_PATH).getPath());
+      File fileHigh = new File(config.getDbPath() + HIGH_CHANNEL_DB_FILE); //new File(this.getClass().getClassLoader().getResource(HIGH_CHANNEL_DB_PATH).getPath());
       if (!fileLow.exists()) {
         System.out.println(fileLow.getAbsolutePath());
         fileLow.createNewFile();
@@ -36,8 +43,8 @@ public class TimelinesDB {
         fileHigh.createNewFile();
       }
 
-      lowChannelDB = new MemoryMappedFile(LOW_CHANNEL_DB_PATH);
-      highChannelDB = new MemoryMappedFile(HIGH_CHANNEL_DB_PATH);
+      lowChannelDB = new MemoryMappedFile(config.getDbPath() + LOW_CHANNEL_DB_FILE);
+      highChannelDB = new MemoryMappedFile(config.getDbPath() + HIGH_CHANNEL_DB_FILE);
 
     } catch (IOException e) {
       // TODO Auto-generated catch block

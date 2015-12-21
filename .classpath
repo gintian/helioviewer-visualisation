@@ -2,8 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="src" path="res"/>
-	<classpathentry kind="src" path="cache"/>
+	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="lib" path="lib/opencsv-2.3.jar" sourcepath="C:/Users/Matthias/.m2/repository/net/sf/opencsv/opencsv/2.3/opencsv-2.3-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
