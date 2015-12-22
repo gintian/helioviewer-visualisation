@@ -232,4 +232,14 @@ public class MemoryMappedFile {
     return memoryMappedFile.length();
   }
 
+  /**
+   * Closes the file.
+   * A closed file cannot be reopened.
+   * See close() method in {@link RandomAccessFile}
+   * @throws IOException
+   */
+  public void close() throws IOException {
+    memoryMappedFile.close();
+  }
+
 }
