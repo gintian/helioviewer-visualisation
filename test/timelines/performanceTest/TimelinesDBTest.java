@@ -14,6 +14,10 @@ public class TimelinesDBTest {
 
   /**
    * Main method for running the timelinesDB performance tests
+   *
+   * IMPORTANT: This test uses the database file / directory specified in the configuration.
+   * Make sure to configure a database path that may be altered with test data before running this test
+   *
    * @param args
    */
   public static void main(String[] args) throws IOException, InterruptedException {
