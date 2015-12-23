@@ -157,12 +157,15 @@ public class CacheRenderer {
 //      File lastFile = null;
       long lastLong = Long.MIN_VALUE;
       for (File f : files) {
-        if (f.isFile() && Long.parseLong(f.getName()) > lastLong) {
-          lastLong = Long.parseLong(f.getName());
-          if (lastLong >= new Date().getTime()) {
-            break;
+        if (f.isFile()) {
+          long fileNr = Long.parseLong(f.getName().substring(0, f.getName().indexOf(".")));
+          if (fileNr > lastLong) {
+            lastLong = fileNr;
+            if (lastLong >= new Date().getTime()) {
+              break;
+            }
+//            lastFile = f;
           }
-//          lastFile = f;
         }
       }
 
@@ -176,7 +179,8 @@ public class CacheRenderer {
     try {
 
       CacheRenderer cacheRenderer = new CacheRenderer();
-      cacheRenderer.createCache();
+//      cacheRenderer.createCache();
+      cacheRenderer.updateCache();
 
     } catch (Exception e) {
       e.printStackTrace();

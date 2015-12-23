@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import timelines.config.Config;
 import timelines.database.TimelinesDB;
+import timelines.importer.Importer;
 import timelines.renderer.CacheRenderer;
 import timelines.renderer.DiagramRenderer;
 import timelines.utils.ImageUtils;
@@ -79,7 +80,6 @@ public class DiagramAPI extends HttpServlet {
 
     response.setContentType("text/html");
 
-
     DiagramAPIParameters parameters = new DiagramAPIParameters();
     try {
       parameters.setDateFrom(TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM), DiagramAPIParameters.DATE_FORMAT));
@@ -96,15 +96,14 @@ public class DiagramAPI extends HttpServlet {
     try {
       getImage(parameters, response);
     } catch (Exception e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
-//    PrintWriter printWriter = response.getWriter();
-//    printWriter.println("<h1>Diagram API</h1>");
-//    printWriter.print(parameters.toString());
-//    printWriter.close();
-
+    try {
+      updateResources();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   private void getImage(DiagramAPIParameters parameters, HttpServletResponse response) throws Exception {
@@ -186,5 +185,13 @@ public class DiagramAPI extends HttpServlet {
       result += entry.getKey() + ": " + Arrays.toString(entry.getValue()) + " ";
     }
     return result;
+  }
+
+  private void updateResources() throws Exception {
+    Importer importer = new Importer();
+    importer.importNewData();
+
+    CacheRenderer renderer = new CacheRenderer();
+    renderer.updateCache();
   }
 }

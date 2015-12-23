@@ -8,6 +8,8 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import timelines.config.Config;
 import timelines.database.MemoryMappedFile;
@@ -21,6 +23,8 @@ import timelines.importer.downloader.IDownloader;
 import timelines.utils.TimeUtils;
 
 public class Importer {
+
+  private static final Logger logger = Logger.getLogger(Importer.class.getName());
 
   private MemoryMappedFile lowChannelDB;
   private MemoryMappedFile highChannelDB;
@@ -57,14 +61,16 @@ public class Importer {
    * Used to update the database
    * @throws Exception
    */
-  public void importNewData() throws Exception { // TODO fix this bugger
+  public void importNewData() throws Exception {
+
+    logger.log(Level.INFO, "Updating the database", new Object[]{});
 
     // get timestamp of last entry available in the database
     Date lastAvailableDate = downloader.getStartDateMidnight();
     Date lastWrittenDate = lastAvailableDate;
     long lastTime = lastWrittenDate.getTime();
     if (lowChannelDB.getFileSize() != 0) {
-      lastAvailableDate = new Date(GoesOldFullDownloader.START_DATE.getTime() + lowChannelDB.getFileSize() * 2000);
+      lastAvailableDate = new Date(GoesOldFullDownloader.START_DATE.getTime() + lowChannelDB.getFileSize() / Float.BYTES * 2000);
     }
 
     Calendar cal = Calendar.getInstance();
@@ -74,12 +80,12 @@ public class Importer {
     ByteBuffer lowChannelBuffer;
     ByteBuffer highChannelBuffer;
 
-    while (!currentDay.equals(TimeUtils.setMidnight(new Date()))) {
+    // the noaa service seems to get updated once a day, so we only have to check for data before today
+    while (!TimeUtils.isSameDay(currentDay, new Date())) {
 
       List<GoesSxrLeaf> data = downloader.getGoesSxrLeafs(lastAvailableDate, currentDay);
 
       if (data == null) {
-//        throw new Exception("Data could not be retrieved");
         System.out.println("no data");
         continue;
       }
@@ -106,8 +112,8 @@ public class Importer {
 
       cal.add(Calendar.DAY_OF_YEAR, 1);
       currentDay = cal.getTime();
-
     }
+    logger.log(Level.INFO, "Database update complete", new Object[]{});
   }
 
   /**
@@ -446,17 +452,17 @@ public class Importer {
 
 //    Date date = TimeUtils.setMidnight(TimeUtils.fromString("2009-11-30", "yyyy-MM-dd"));
 //    System.out.println("avg end date" + date.getTime());
-    System.out.println("new average start date: " + GoesNewAvgDownloader.START_DATE);
-    System.out.println("old end date: " + GoesOldFullDownloader.END_DATE);
-
-    System.out.println("needed start date long: " + TimeUtils.fromString("1996-08-13 00:00:00", "yyyy-MM-dd hh:mm:ss").getTime());
+//    System.out.println("new average start date: " + GoesNewAvgDownloader.START_DATE);
+//    System.out.println("old end date: " + GoesOldFullDownloader.END_DATE);
+//
+//    System.out.println("needed start date long: " + TimeUtils.fromString("1996-08-13 00:00:00", "yyyy-MM-dd hh:mm:ss").getTime());
 
 //    Date date = TimeUtils.setMidnight(TimeUtils.fromString("2009-11-30", "yyyy-MM-dd"));
     Importer importer = new Importer();
 
     try {
-      importer.initializeDatabase();
-//      importer.importNewData();
+//      importer.initializeDatabase();
+      importer.importNewData();
      } catch (Exception e) {
 //      // TODO Auto-generated catch block
       e.printStackTrace();
