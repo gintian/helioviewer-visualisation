@@ -59,11 +59,13 @@ public class Importer {
 
   /**
    * Used to update the database
+   * @return true if the database changed
    * @throws Exception
    */
-  public void importNewData() throws Exception {
+  public boolean importNewData() throws Exception {
 
     logger.log(Level.INFO, "Updating the database", new Object[]{});
+    boolean changed = false;
 
     // get timestamp of last entry available in the database
     Date lastAvailableDate = downloader.getStartDateMidnight();
@@ -110,10 +112,17 @@ public class Importer {
       lowChannelDB.write(lowChannelBuffer.array(), lowChannelDB.getFileSize());
       highChannelDB.write(highChannelBuffer.array(), highChannelDB.getFileSize());
 
+      changed = true;
+
       cal.add(Calendar.DAY_OF_YEAR, 1);
       currentDay = cal.getTime();
     }
-    logger.log(Level.INFO, "Database update complete", new Object[]{});
+    if(changed) {
+      logger.log(Level.INFO, "Database update complete", new Object[]{});
+    } else {
+      logger.log(Level.INFO, "Database already up to date", new Object[]{});
+    }
+    return changed;
   }
 
   /**

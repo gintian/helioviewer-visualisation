@@ -189,9 +189,11 @@ public class DiagramAPI extends HttpServlet {
 
   private void updateResources() throws Exception {
     Importer importer = new Importer();
-    importer.importNewData();
+    boolean updated = importer.importNewData();
 
-    CacheRenderer renderer = new CacheRenderer();
-    renderer.updateCache();
+    if(updated) {
+      CacheRenderer renderer = new CacheRenderer();
+      renderer.updateCache();
+    }
   }
 }
