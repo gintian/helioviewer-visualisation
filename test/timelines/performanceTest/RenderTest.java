@@ -10,13 +10,17 @@ public class RenderTest {
 
   private static DiagramRenderer renderer;
 
+  /**
+   * Main method for running the render performance tests
+   * @param args
+   */
   public static void main(String[] args) throws Exception {
 
     renderer = new DiagramRenderer();
 
     //
     // Run these tests individually (comment all but one)
-    // to ensure that they all start with no data mapped into the RAM yet
+    // to ensure that they all start with no data mapped into the RAM
     //
 
     System.out.println("zoom level 1: " + render(CacheRenderer.getTimePerImage(1)) + "ms");
@@ -75,6 +79,12 @@ public class RenderTest {
 
   }
 
+  /**
+   * Renders a diagram starting at the database start date, covering the given timespan
+   * @param timespan the timespan to be covered by the diagram
+   * @return the time required for rendering
+   * @throws Exception on error
+   */
   private static long render(long timespan) throws Exception {
 
     Date start = new Date();
