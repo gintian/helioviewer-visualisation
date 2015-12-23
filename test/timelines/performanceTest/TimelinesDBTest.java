@@ -15,8 +15,10 @@ public class TimelinesDBTest {
   /**
    * Main method for running the timelinesDB performance tests
    *
-   * IMPORTANT: This test uses the database file / directory specified in the configuration.
-   * Make sure to configure a database path that may be altered with test data before running this test
+   * IMPORTANT: This test modifies (deletes and overwrites) the database file
+   * contained in the directory specified in the configuration.
+   * Make sure to configure a database path that may be altered
+   * with test data before running this test
    *
    * @param args
    */
@@ -96,7 +98,7 @@ public class TimelinesDBTest {
   }
 
   /**
-   * uUsed to reset the given {@link MemoryMappedFile} and delete the given file
+   * Used to set the given {@link MemoryMappedFile} to null and delete the given file
    * @param db the {@link MemoryMappedFile} to reset
    * @param f the file to delete
    * @throws IOException if an IO error occurs when closing the database

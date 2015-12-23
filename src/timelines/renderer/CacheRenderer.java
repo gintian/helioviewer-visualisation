@@ -46,7 +46,6 @@ public class CacheRenderer {
 
     logger.log(Level.INFO, "Creating cache");
 
-    long currentTimePerImage;
 //    Date now = new Date();
 
 //    BufferedImage img;
@@ -67,7 +66,7 @@ public class CacheRenderer {
       logger.log(Level.INFO, "Creating cache for zoom level {0}", new Object[]{i});
 
       customData.put("zoomLevel", "" + i);
-      currentTimePerImage = (long) (DiagramRenderer.IMAGE_WIDTH * Math.pow(2, i) * 1000);
+//      long currentTimePerImage = (long) (DiagramRenderer.IMAGE_WIDTH * Math.pow(2, i) * 1000);
 
       createCacheForZoomLevel(customData, i, TimelinesDB.DB_START_DATE);
 
@@ -75,7 +74,12 @@ public class CacheRenderer {
 
   }
 
-  private long getTimePerImage(int zoomLevel) {
+  /**
+   * Calculates the amount time represented by a diagram in ms on the given zoom level
+   * @param zoomLevel the zoom level
+   * @return the amount time represented by a diagram in ms on the given zoom level
+   */
+  public static long getTimePerImage(int zoomLevel) {
     return (long) (DiagramRenderer.IMAGE_WIDTH * Math.pow(2, zoomLevel) * 1000);
   }
 
