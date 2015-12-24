@@ -25,12 +25,9 @@ public class CacheRenderer {
   private static final Logger logger = Logger.getLogger(DiagramAPI.class.getName());
 
   public static final int CACHE_ZOOM_START = 8;
-  public static final int CACHE_ZOOM_END = 18;
+  public static final int CACHE_ZOOM_END = DiagramAPI.ZOOM_LEVEL_MAX;
 
   private Config config;
-
-//  public static final String CACHE_FODLER = "/home/stud1/timelines/cache";
-//  public static final String CACHE_FODLER = "C:/timelines/cache";
 
   private DiagramRenderer renderer;
 

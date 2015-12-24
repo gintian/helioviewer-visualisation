@@ -11,12 +11,8 @@ import timelines.importer.downloader.GoesOldFullDownloader;
 /**
  * Wrapper for the timelines database
  * Use this class to retrieve data from the timelines database
- * @author Matthias Hug
  */
 public class TimelinesDB {
-
-//  public static final String LOW_CHANNEL_DB_PATH = "/home/stud1/timelines/res/dbL";
-//  public static final String HIGH_CHANNEL_DB_PATH = "/home/stud1/timelines/res/dbH";
 
   public static final String LOW_CHANNEL_DB_FILE = "dbL"; // TODO move this to the config file
   public static final String HIGH_CHANNEL_DB_FILE = "dbH";
@@ -33,8 +29,8 @@ public class TimelinesDB {
 
       config = new Config();
 
-      File fileLow = new File(config.getDbPath() + LOW_CHANNEL_DB_FILE); //new File(this.getClass().getClassLoader().getResource(LOW_CHANNEL_DB_PATH).getPath());
-      File fileHigh = new File(config.getDbPath() + HIGH_CHANNEL_DB_FILE); //new File(this.getClass().getClassLoader().getResource(HIGH_CHANNEL_DB_PATH).getPath());
+      File fileLow = new File(config.getDbPath() + LOW_CHANNEL_DB_FILE);
+      File fileHigh = new File(config.getDbPath() + HIGH_CHANNEL_DB_FILE);
       if (!fileLow.exists()) {
         System.out.println(fileLow.getAbsolutePath());
         fileLow.createNewFile();
@@ -47,7 +43,6 @@ public class TimelinesDB {
       highChannelDB = new MemoryMappedFile(config.getDbPath() + HIGH_CHANNEL_DB_FILE);
 
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }

@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -31,12 +30,16 @@ import timelines.utils.ImageUtils;
 import timelines.utils.TimeUtils;
 
 /**
- * Servlet implementation class DiagramAPI
+ * The main timelines API
+ * Used as an access point to the timeline images
  */
 @WebServlet("/api")
 public class DiagramAPI extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger logger = Logger.getLogger(DiagramAPI.class.getName());
+
+  public static final int ZOOM_LEVEL_MIN = 1;
+  public static final int ZOOM_LEVEL_MAX = 18;
 
   private Map<String, String> imageMetadata = new HashMap<String, String>();
 
@@ -83,7 +86,6 @@ public class DiagramAPI extends HttpServlet {
     DiagramAPIParameters parameters = new DiagramAPIParameters();
     try {
       parameters.setDateFrom(TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM), DiagramAPIParameters.DATE_FORMAT));
-//      parameters.setDateTo(TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO), DiagramAPIParameters.DATE_FORMAT));
       parameters.setZoomLevel(Integer.parseInt(request.getParameter(DiagramAPIParameters.PARAM_ZOOM_LEVEL)));
 
     } catch (ParseException | NumberFormatException | NullPointerException e) {
@@ -106,6 +108,12 @@ public class DiagramAPI extends HttpServlet {
     }
   }
 
+  /**
+   * Used to get the image fitting the given parameters
+   * @param parameters the parameters
+   * @param response the response to write the image to
+   * @throws Exception on error
+   */
   private void getImage(DiagramAPIParameters parameters, HttpServletResponse response) throws Exception {
 
     renderer = new DiagramRenderer();
@@ -128,37 +136,26 @@ public class DiagramAPI extends HttpServlet {
       imageMetadata.put("dateTo", TimeUtils.toString(endDate, "yyyy-MM-dd:HH:mm:ss"));
       imageMetadata.put("zoomLevel", "" + parameters.getZoomLevel());
 
-//      ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
-
-  //    while (currentEndDate.before(parameters.getDateTo())) {
-        img = renderer.getDiagramForTimespan(actualStartDate, endDate);
-  //      currentStartDate = new Date(currentEndDate.getTime() + 2000);
-  //      currentEndDate = new Date(currentEndDate.getTime() + dataPoints * 2000);
-  //    }
-
-  //    BufferedImage img = renderer.getDiagramForTimespan(parameters.getDateFrom(), parameters.getDateTo());
+      img = renderer.getDiagramForTimespan(actualStartDate, endDate);
     }
 
     response.setContentType("image/png");
     OutputStream out = response.getOutputStream();
-//    for (BufferedImage img : images) {
     ImageUtils.writeWithCustomData(out, img, imageMetadata);
-//      ImageIO.write(img, "png", out);
-//      out.flush();
-//    }
     out.close();
-
   }
 
 
+  /**
+   * Retrieves an image from the cache
+   * @param date the start of the image to be retrieved
+   * @param zoomLevel the zoom level for which to retrieve the image
+   * @return the image fitting the given start date and zoom level or null if no fitting image could be found
+   */
   private BufferedImage getFromCache(Date date, int zoomLevel) {
 
     logger.log(Level.INFO, "Getting image from Cache. Zoom level: {0}, Date: {1}", new Object[] {zoomLevel, date});
 
-    ServletContext context = getServletContext();
-
-    String path = "cache/" + zoomLevel + "/" + date.getTime() + ".png";
-//    File f = new File(context.getRealPath(path));
     File f = new File(config.getCachePath() + zoomLevel + "/" + date.getTime() + ".png");
     BufferedImage img = null;
     try {
@@ -169,16 +166,25 @@ public class DiagramAPI extends HttpServlet {
     return img;
   }
 
+  /**
+   * Writes information about the API
+   * @param response the response to write the information to
+   * @throws IOException on error
+   */
   private void writeAPIDoc(HttpServletResponse response) throws IOException {
     PrintWriter printWriter = response.getWriter();
     printWriter.println("<h1>Diagram API</h1>");
     printWriter.println("<p>Required Parameters:</p>");
     printWriter.println("<ul><li>'" + DiagramAPIParameters.PARAM_DATE_FROM + "' (" + DiagramAPIParameters.DATE_FORMAT + ")</li>");
-//    printWriter.println("<li>'" + DiagramAPIParameters.PARAM_DATE_TO + "' (" + DiagramAPIParameters.DATE_FORMAT + ")</li>");
     printWriter.println("<li>'" + DiagramAPIParameters.PARAM_ZOOM_LEVEL + "' (int)</li></ul>");
     printWriter.close();
   }
 
+  /**
+   * Creates a String of the given parameter map
+   * @param map the map to create the String from
+   * @return a String of the given parameter map
+   */
   private String getParameterString(Map<String, String[]> map) {
     String result = "";
     for (Entry<String, String[]> entry : map.entrySet()) {
@@ -187,6 +193,10 @@ public class DiagramAPI extends HttpServlet {
     return result;
   }
 
+  /**
+   * Used to update the database and if needed the cache
+   * @throws Exception on error
+   */
   private void updateResources() throws Exception {
     Importer importer = new Importer();
     boolean updated = importer.importNewData();

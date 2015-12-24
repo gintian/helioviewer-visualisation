@@ -6,13 +6,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
-import timelines.importer.csv.GoesSxrLeaf;
-
 /**
- *
- * @author Matthias Hug
  * Instances of this class allow reading and writing from/to a file in a memory mapped fashion
- *
  */
 public class MemoryMappedFile {
 
@@ -21,13 +16,12 @@ public class MemoryMappedFile {
   private ArrayList<MappedByteBuffer> buffers = new ArrayList<>();
 
   /**
-   *
-   * @param file
-   * @throws IOException
+   * Creates a new MemoryMappedFile object
+   * @param file the file to be handled in a memory mapped fashion
+   * @throws IOException on error
    */
   public MemoryMappedFile (String file) throws IOException {
 
-    //memoryMappedFile = new RandomAccessFile(this.getClass().getClassLoader().getResource(file).getPath(), "rw");
     memoryMappedFile = new RandomAccessFile(file, "rw");
 
     // create buffers over the entire files size
@@ -45,9 +39,6 @@ public class MemoryMappedFile {
   }
 
 
-  // TODO figure out, what sort of read methods we really need and make sure they have high performance
-  // So far it looks like it's far more efficient to read an array instead of reading value by value
-
   /**
    * Read length bytes from the file starting at index
    * @param index from where to read
@@ -62,16 +53,21 @@ public class MemoryMappedFile {
       return result;
 
     } else if (index + length > getFileSize()) {
-//      System.out.println("length before adjusting: " + length);
       length = (int) (getFileSize() - index);
-//      System.out.println(getFileSize() - index);
-//      System.out.println("adjusted length: " + length);
     }
 
     read(index, result, 0, length);
     return result;
   }
 
+  /**
+   * Reads data starting at the given index
+   * @param index the index from where to start reading
+   * @param result an array to which the result will be written
+   * @param offset the offset within the result array at which the result has to be written to
+   * @param length amount of bytes to be read and written into the result array
+   * @throws IOException on error
+   */
   private void read(long index, byte[] result, int offset, int length) throws IOException {
 
     MappedByteBuffer buffer = getBufferForIndex(index);
@@ -90,7 +86,6 @@ public class MemoryMappedFile {
 
     // check whether we need to access multiple buffers
     if (length > buffer.remaining()) {
-//      System.out.println(buffer.remaining());
       read(index + buffer.remaining(), result, buffer.remaining(), result.length - buffer.remaining());
       buffer.get(result, 0, buffer.remaining());
 
@@ -100,39 +95,6 @@ public class MemoryMappedFile {
 
     buffer.position(originalPosition);
   }
-
-  //
-  // potentially rather inefficient reading methods, not suited for a large amount of calls
-  //
-
-  public GoesSxrLeaf readLeaf(long index) throws IOException {
-    // TODO
-    return null;
-  }
-
-  public float readFloat(long index) throws IOException {
-    MappedByteBuffer buffer = getBufferForIndex(index);
-    return buffer.getFloat((int) (index % Integer.MAX_VALUE));
-  }
-
-  public long readLong(long index) throws IOException {
-    MappedByteBuffer buffer = getBufferForIndex(index);
-    return buffer.getLong((int) (index % Integer.MAX_VALUE));
-  }
-
-  public int readInt(long index) throws IOException {
-    MappedByteBuffer buffer = getBufferForIndex(index);
-    return buffer.getInt((int) (index % Integer.MAX_VALUE));
-  }
-
-
-  // TODO
-  // make sure, that we "hop" to the next buffer
-  // once the end of the current one is reached.
-  // Should we reach the end of the last buffer,
-  // then this buffers size has to be increased.
-  // If its size reaches INTEGER.MAX_VALUE,
-  // create and add a new buffer
 
   /**
    * Writes the given byte array to the file, starting at index
@@ -188,7 +150,6 @@ public class MemoryMappedFile {
         byte[] newValue = new byte[value.length - buffer.remaining()];
         System.arraycopy(value, buffer.remaining(), newValue, 0, newValue.length);
 
-
         buffer.put(value, 0, buffer.remaining());
         long newIndex = index + value.length - newValue.length;
         buffer.position(p0);
@@ -202,16 +163,11 @@ public class MemoryMappedFile {
     }
   }
 
-  public void writeFloat(Float f, long index) throws IOException {
-    MappedByteBuffer buffer = getBufferForIndex(index);
-    buffer.putFloat((int) (index % Integer.MAX_VALUE), f);
-  }
-
   /**
    * Get the buffer that's needed to access the files given byte index
    * @param index the index from where the file has to be accessed.
    * @return the buffer needed to read from the file starting at the given index.<br>
-   * Null if the index is outside of the files size
+   *  Null if the index is outside of the files size
    * @throws IOException
    */
   private MappedByteBuffer getBufferForIndex(long index) throws IOException {
@@ -219,8 +175,6 @@ public class MemoryMappedFile {
     if (bufferIndex > buffers.size() - 1 || index > memoryMappedFile.length()) {
       return null;
     }
-//    System.out.println("bufferIndex: " + bufferIndex + " buffer count: " + buffers.size());
-//    System.out.println(buffers.get(1).capacity());
     return buffers.get(bufferIndex);
   }
 
@@ -235,7 +189,7 @@ public class MemoryMappedFile {
   /**
    * Closes the file.
    * A closed file cannot be reopened.
-   * See close() method in {@link RandomAccessFile}
+   * @see {@link RandomAccessFile#close()}
    * @throws IOException
    */
   public void close() throws IOException {

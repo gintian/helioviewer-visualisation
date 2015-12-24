@@ -1,10 +1,5 @@
 package timelines.api;
 
-import timelines.utils.ImageUtils;
-import timelines.utils.TimeUtils;
-
-import javax.imageio.stream.ImageInputStream;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -13,8 +8,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.stream.ImageInputStream;
+
+import timelines.utils.ImageUtils;
+import timelines.utils.TimeUtils;
+
 /**
- * Created by Tobi on 24.11.2015.
+ * Class used to read the metadata from an image sent by the API
  */
 public class APIImageMetadata {
     private static final Logger logger = Logger.getLogger(APIImageMetadata.class.getName());
@@ -26,6 +26,10 @@ public class APIImageMetadata {
     Map<String, String> imageMetadataMap;
     ArrayList<String> keys = new ArrayList<String>();
 
+    /**
+     * Used to read the metadata from an image
+     * @param iis the input stream to read from
+     */
     public APIImageMetadata(ImageInputStream iis){
         keys.add("dateFrom");
         keys.add("dateTo");
@@ -42,6 +46,12 @@ public class APIImageMetadata {
         }
     }
 
+    /**
+     * Creates a new metadata object using the given parameters
+     * @param dateFrom the start date of the timeframe covered by the image
+     * @param dateTo the end date of the timeframe covered by the image
+     * @param zoomLevel the zoom level of the image
+     */
     public APIImageMetadata(Date dateFrom, Date dateTo, int zoomLevel){
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;

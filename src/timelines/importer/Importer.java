@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -37,8 +36,8 @@ public class Importer {
 
       config = new Config();
 
-      File fileLow = new File(config.getDbPath() + TimelinesDB.LOW_CHANNEL_DB_FILE); //(this.getClass().getClassLoader().getResource(TimelinesDB.LOW_CHANNEL_DB_PATH).getPath());
-      File fileHigh = new File(config.getDbPath() + TimelinesDB.HIGH_CHANNEL_DB_FILE); //(this.getClass().getClassLoader().getResource(TimelinesDB.HIGH_CHANNEL_DB_PATH).getPath());
+      File fileLow = new File(config.getDbPath() + TimelinesDB.LOW_CHANNEL_DB_FILE);
+      File fileHigh = new File(config.getDbPath() + TimelinesDB.HIGH_CHANNEL_DB_FILE);
       if (!fileLow.exists()) {
         fileLow.createNewFile();
       }
@@ -50,7 +49,6 @@ public class Importer {
       highChannelDB = new MemoryMappedFile(config.getDbPath() + TimelinesDB.HIGH_CHANNEL_DB_FILE);
 
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
@@ -88,23 +86,19 @@ public class Importer {
       List<GoesSxrLeaf> data = downloader.getGoesSxrLeafs(lastAvailableDate, currentDay);
 
       if (data == null) {
-        System.out.println("no data");
         continue;
       }
 
       lowChannelBuffer = ByteBuffer.allocate(data.size() * Float.BYTES);
       highChannelBuffer = ByteBuffer.allocate(data.size() * Float.BYTES);
 
-      // TODO: try to get a byte array from the downloader, so we can skip this transformation crap
       for (GoesSxrLeaf leaf: data) {
         lowChannelBuffer.putFloat(leaf.getLowChannel()).array();
         highChannelBuffer.putFloat(leaf.getHighChannel()).array();
         lastTime = leaf.getTimestamp().getTime();
       }
 
-      // write to the end of the mem mapped file
-      System.out.println("writing data");
-
+      // write to the end of the mem. mapped file
       appendBufferToDb(lowChannelBuffer, lowChannelDB, lastWrittenDate.getTime());
       appendBufferToDb(highChannelBuffer, highChannelDB, lastWrittenDate.getTime());
       lastWrittenDate = new Date(lastTime);
@@ -146,94 +140,98 @@ public class Importer {
   }
 
 
-  private void getAverageData() throws Exception {
-    long lastTime = GoesNewAvgDownloader.START_DATE.getTime(); // TODO get last date in DB
+//  private void getAverageData() throws Exception {
+//    long lastTime = GoesNewAvgDownloader.START_DATE.getTime();
+//
+//    GoesNewAvgDownloader averageDownloader = new GoesNewAvgDownloader(0, 20);
+//
+//    Date lastWrittenDate = GoesNewAvgDownloader.START_DATE;
+//    System.out.println(lastWrittenDate);
+//    Calendar cal = Calendar.getInstance();
+//    cal.setTime(lastWrittenDate);
+//
+////    ArrayList<Float> highChannel = new ArrayList<>();
+////    ArrayList<Float> lowChannel = new ArrayList<>();
+//
+//
+//    while (cal.getTime().before(GoesNewAvgDownloader.END_DATE)) {
+//
+//      List<GoesSxrLeaf> leafs = averageDownloader.getGoesSxrLeafs(cal.getTime(), cal.getTime());
+//      System.out.println("got data");
+//
+//      if (leafs == null) {
+//        throw new Exception("Data could not be retrieved");
+//      }
+//
+//      ByteBuffer bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES * 30);
+//      ByteBuffer bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES * 30);
+//
+//
+//      for (GoesSxrLeaf leaf : leafs) {
+//        long currentTime = leaf.getTimestamp().getTime();
+////        System.out.println(leaf.getTimestamp());
+////        System.out.println(GoesNewAvgDownloader.START_DATE);
+////        System.out.println();
+//        int empty = 0;
+//        while (currentTime - lastTime > 2000) {
+////          System.out.println(currentTime);
+////          System.out.println(lastTime);
+////          System.out.println(currentTime - lastTime + "\n");
+//          // add empty entry
+//          bufferLow.putFloat(Float.NaN);
+//          bufferHigh.putFloat(Float.NaN);
+//          lastTime += 2000;
+//          empty ++;
+//
+//          if (!bufferHigh.hasRemaining()) {
+//            appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
+//            appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
+//            lastWrittenDate = new Date(lastTime);
+//            bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+//            bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+//          }
+//
+//        }
+////        System.out.println("adding value " + leaf + " empty values before: " + empty);
+//        bufferHigh.putFloat(leaf.getHighChannel());
+//        bufferLow.putFloat(leaf.getLowChannel());
+//        lastTime = leaf.getTimestamp().getTime();
+//
+//        if (!bufferHigh.hasRemaining()) {
+//          appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
+//          appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
+//          lastWrittenDate = new Date(lastTime);
+//          bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+//          bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+//        }
+//        // maybe write here already and empty the lists?
+//      }
+//      cal.add(Calendar.MONTH, 1);
+//      cal.set(Calendar.DAY_OF_MONTH, 1);
+//
+//      appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
+//      appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
+//      lastWrittenDate = new Date(lastTime);
+//      bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+//      bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
+//
+////      System.out.println(highChannel);
+//    }
+//
+//
+//
+//  }
 
-    GoesNewAvgDownloader averageDownloader = new GoesNewAvgDownloader(0, 20);
-
-    Date lastWrittenDate = GoesNewAvgDownloader.START_DATE;
-    System.out.println(lastWrittenDate);
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(lastWrittenDate);
-
-//    ArrayList<Float> highChannel = new ArrayList<>();
-//    ArrayList<Float> lowChannel = new ArrayList<>();
-
-
-    while (cal.getTime().before(GoesNewAvgDownloader.END_DATE)) {
-
-      List<GoesSxrLeaf> leafs = averageDownloader.getGoesSxrLeafs(cal.getTime(), cal.getTime());
-      System.out.println("got data");
-
-      if (leafs == null) {
-        throw new Exception("Data could not be retrieved");
-      }
-
-      ByteBuffer bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES * 30);
-      ByteBuffer bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES * 30);
-
-
-      for (GoesSxrLeaf leaf : leafs) {
-        long currentTime = leaf.getTimestamp().getTime();
-//        System.out.println(leaf.getTimestamp());
-//        System.out.println(GoesNewAvgDownloader.START_DATE);
-//        System.out.println();
-        int empty = 0;
-        while (currentTime - lastTime > 2000) {
-//          System.out.println(currentTime);
-//          System.out.println(lastTime);
-//          System.out.println(currentTime - lastTime + "\n");
-          // add empty entry
-          bufferLow.putFloat(Float.NaN);
-          bufferHigh.putFloat(Float.NaN);
-          lastTime += 2000;
-          empty ++;
-
-          if (!bufferHigh.hasRemaining()) {
-            appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
-            appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
-            lastWrittenDate = new Date(lastTime);
-            bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-            bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-          }
-
-        }
-//        System.out.println("adding value " + leaf + " empty values before: " + empty);
-        bufferHigh.putFloat(leaf.getHighChannel());
-        bufferLow.putFloat(leaf.getLowChannel());
-        lastTime = leaf.getTimestamp().getTime();
-
-        if (!bufferHigh.hasRemaining()) {
-          appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
-          appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
-          lastWrittenDate = new Date(lastTime);
-          bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-          bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-        }
-        // maybe write here already and empty the lists?
-      }
-      cal.add(Calendar.MONTH, 1);
-      cal.set(Calendar.DAY_OF_MONTH, 1);
-
-      appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
-      appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
-      lastWrittenDate = new Date(lastTime);
-      bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-      bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-
-//      System.out.println(highChannel);
-    }
-
-    // TODO write to DB
-
-  }
-
+  /**
+   * Used to import data from the old full service
+   * @throws Exception
+   */
   private void getOldData() throws Exception {
     long lastTime = GoesOldFullDownloader.START_DATE.getTime();
 
     GoesOldFullDownloader downloader = new GoesOldFullDownloader(1, 92);
 
-    Date lastAddedDate = GoesOldFullDownloader.START_DATE; // TODO if we want this to be capable of writing with some data available already, we need the start date from the DB
+    Date lastAddedDate = GoesOldFullDownloader.START_DATE;
     Calendar cal = Calendar.getInstance();
     cal.setTime(lastAddedDate);
 
@@ -248,25 +246,16 @@ public class Importer {
       System.out.println("got data.");
 
       if (leafs == null) {
-//        throw new Exception("Data could not be retrieved");
-        System.out.println("no data for month?!");
         continue;
       }
       if (leafs.size() == 0) {
-        System.out.println("no data?!");
         continue;
       }
-
-//      long start = lowChannelDB.getFileSize() == 0 ? GoesOldFullDownloader.START_DATE.getTime() : leafs.get(leafs.size() - 1).getTimestamp().getTime();
-//      long timespan = leafs.get(leafs.size() - 1).getTimestamp().getTime() - start;
-//      int bufferSize = (int) (timespan / 1000 / 2 * Float.BYTES);
-//      System.out.println("timespan: " + timespan + " buffer size: " + bufferSize);
 
       // we start with the expectation of perfectly valid files.
       // Should we have to insert placeholder values, the buffers are written to the db and newly initialized as soon as they are full
       ByteBuffer bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
       ByteBuffer bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-
 
       int c = 0;
       long prevTime = 0;
@@ -274,9 +263,7 @@ public class Importer {
         long currentTime = leaf.getTimestamp().getTime();
 
         if(currentTime < prevTime) {
-//          System.out.println("weird stuff with times not being ordered properly");
           continue;
-//          throw new Exception("weird stuff " + leaf.getTimestamp() + new Date(prevTime));
         }
         prevTime = currentTime;
 
@@ -313,7 +300,6 @@ public class Importer {
             bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
           }
 
-
         } catch (BufferOverflowException e) {
           System.out.println("buffer overflow: " + c + " total count: " + leafs.size());
         }
@@ -323,21 +309,26 @@ public class Importer {
       //
       // write
       //
-      System.out.println("writing data");
       appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
       appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
       lastWrittenDate = lastTime;
       bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
       bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-      //
-      // reset the lists
-      //
-//      highChannel = new ArrayList<Float>();
-//      lowChannel = new ArrayList<Float>();
-
     }
   }
 
+  /**
+   * Used to import data from the new average and new full services
+   * @param downloader the downloader to use
+   * @param calendarFieldToIncrement the calendar field to increment after every downloaded file.<br>
+   *  Specifies the time frame covered by a single CSV file in the used service
+   * @param calendarFieldToReset the calendar field to reset after downloading a CSV file.<br>
+   *  This specifies the start of the time frame a imported record has to match in order to be stored
+   * @param resetValue the value the reset calendar field has to be set to
+   * @param startDate the date starting at which data has to be imported
+   * @param endDate the date up to which data has to be imported
+   * @throws Exception on error
+   */
   private void getData(IDownloader downloader, int calendarFieldToIncrement, int calendarFieldToReset, int resetValue, Date startDate, Date endDate) throws Exception {
 
     long lastTime = startDate.getTime();
@@ -354,17 +345,18 @@ public class Importer {
 
       List<GoesSxrLeaf> leafs = downloader.getGoesSxrLeafs(lastAddedDate, cal.getTime());
 
-      System.out.println("got data.");
 
       if (leafs == null) {
-        System.out.println("no data?!");
+        // no data (no matching file found)
         continue;
       }
       if (leafs.size() == 0) {
-        System.out.println("no data?!");
+        // no data (found a file but no valid data is available)
+        // We try to find another file that hopefully contains valid data by resetting the goesNr
         downloader.resetGoesNr();
         leafs = downloader.getGoesSxrLeafs(lastAddedDate, cal.getTime());
 
+        // if we find another / the same file again that has no valid data stored, we skip to the next date
         if (leafs.size() == 0) {
           continue;
         }
@@ -380,14 +372,11 @@ public class Importer {
       long prevTime = 0;
       for (GoesSxrLeaf leaf : leafs) {
 
-        if (leaf.getTimestamp().equals(TimeUtils.fromString("1996-09-01 00:00:00.000", "yyyy-MM-dd hh:mm:ss"))) {
-          System.out.println("leaf: " + leaf);
-        }
-
         long currentTime = leaf.getTimestamp().getTime();
 
         if(currentTime < prevTime) {
-//          System.out.println("weird stuff with times not being ordered properly");
+          // the current entry is not in its proper chronological order
+          // skip it
           continue;
         }
         prevTime = currentTime;
@@ -425,30 +414,21 @@ public class Importer {
             bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
           }
 
-
         } catch (BufferOverflowException e) {
           System.out.println("buffer overflow: " + c + " total count: " + leafs.size());
         }
       }
 
-
       //
       // write
       //
-      System.out.println("writing data");
       appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
       appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
       lastWrittenDate = lastTime;
       bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
       bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-
     }
   }
-
-
-
-
-
 
   private void appendBufferToDb(ByteBuffer buffer, MemoryMappedFile db, long date) throws IOException {
     long index = (date - GoesOldFullDownloader.START_DATE.getTime()) / 1000 / 2 * Float.BYTES;
@@ -456,24 +436,17 @@ public class Importer {
   }
 
 
-  public static void main(String[] args) throws ParseException {
+  /**
+   * Use this main method to initialize the database
+   * @param args
+   */
+  public static void main(String[] args){
 
-
-//    Date date = TimeUtils.setMidnight(TimeUtils.fromString("2009-11-30", "yyyy-MM-dd"));
-//    System.out.println("avg end date" + date.getTime());
-//    System.out.println("new average start date: " + GoesNewAvgDownloader.START_DATE);
-//    System.out.println("old end date: " + GoesOldFullDownloader.END_DATE);
-//
-//    System.out.println("needed start date long: " + TimeUtils.fromString("1996-08-13 00:00:00", "yyyy-MM-dd hh:mm:ss").getTime());
-
-//    Date date = TimeUtils.setMidnight(TimeUtils.fromString("2009-11-30", "yyyy-MM-dd"));
     Importer importer = new Importer();
 
     try {
-//      importer.initializeDatabase();
-      importer.importNewData();
+      importer.initializeDatabase();
      } catch (Exception e) {
-//      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
