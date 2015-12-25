@@ -11,6 +11,10 @@ import timelines.importer.csv.CsvToGoesSxrLeafConverter;
 import timelines.utils.StringUtils;
 import timelines.utils.TimeUtils;
 
+/**
+ * Downloader for the new NOAA service
+ * Used to access the time frame in which data is available in a 2 second interval
+ */
 public class GoesNewFullDownloader extends AbstractGoesDownloader {
 
   private String templateUrl = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_full/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_2s_{date}_{date}.csv";
@@ -23,6 +27,11 @@ public class GoesNewFullDownloader extends AbstractGoesDownloader {
     public static final int B_FLUX = 6;
   }
 
+  /**
+   * Creates a new {@link GoesNewFullDownloader} using the given goes nr. range
+   * @param minGoesNr the minumum goes nr. to load data from
+   * @param maxGoesNr the maximum goes nr. to load data from
+   */
   public GoesNewFullDownloader(int minGoesNr, int maxGoesNr) {
     super(minGoesNr, maxGoesNr, createCsvToGoesSxrLeafConverter());
 
@@ -40,13 +49,11 @@ public class GoesNewFullDownloader extends AbstractGoesDownloader {
 
   @Override
   public Date getStartDateMidnight() {
-//    System.out.println("start date: " + goesNewFullStartDateMidnight);
     return START_DATE;
   }
 
   @Override
   public Date getEndDateMidnight() {
-//    System.out.println("end date: " + TimeUtils.setMidnight(new Date()));
     return TimeUtils.setMidnight(new Date());
   }
 
@@ -65,7 +72,6 @@ public class GoesNewFullDownloader extends AbstractGoesDownloader {
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
-    System.out.println(url); // TODO
     return url;
   }
 

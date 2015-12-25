@@ -43,32 +43,15 @@ public class CacheRenderer {
 
     logger.log(Level.INFO, "Creating cache");
 
-//    Date now = new Date();
-
-//    BufferedImage img;
-//    File f;
-
     Map<String, String> customData = new HashMap<String, String>();
 
-    // create lowest cache the "normal" way
-//    logger.log(Level.INFO, "Creating cache for zoom level {0}", new Object[]{CACHE_ZOOM_START});
-//    currentTimePerImage = (long) (DiagramRenderer.IMAGE_WIDTH * Math.pow(2, CACHE_ZOOM_START) * 1000);
-//    customData.put("zoomLevel", "" + CACHE_ZOOM_START);
-//    createCacheForZoomLevel(currentTimePerImage, customData, CACHE_ZOOM_START, TimelinesDB.DB_START_DATE);
-
-
-    // create higher zoom levels by merging images from lower levels
     for (int i = CACHE_ZOOM_START; i <= CACHE_ZOOM_END; i++) {
 
       logger.log(Level.INFO, "Creating cache for zoom level {0}", new Object[]{i});
 
       customData.put("zoomLevel", "" + i);
-//      long currentTimePerImage = (long) (DiagramRenderer.IMAGE_WIDTH * Math.pow(2, i) * 1000);
-
       createCacheForZoomLevel(customData, i, TimelinesDB.DB_START_DATE);
-
     }
-
   }
 
   /**
@@ -105,7 +88,6 @@ public class CacheRenderer {
 
             BufferedImage left = ImageIO.read(new File(getCacheImagePath(zoomLevel - 1, currentStartDate.getTime())));
             long previousTimePerImage = (long) (DiagramRenderer.IMAGE_WIDTH * Math.pow(2, (zoomLevel - 1)) * 1000);
-            System.out.println(getCacheImagePath(zoomLevel - 1, currentStartDate.getTime() + previousTimePerImage));
             BufferedImage right = new BufferedImage(DiagramRenderer.IMAGE_WIDTH, DiagramRenderer.IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             if (new Date(currentStartDate.getTime() + previousTimePerImage).before(new Date())) {
               right = ImageIO.read(new File(getCacheImagePath(zoomLevel - 1, currentStartDate.getTime() + previousTimePerImage)));
@@ -119,7 +101,7 @@ public class CacheRenderer {
 
           } catch (IIOException e) {
             // occurs when there's no images for the current time frame on lower zoom levels.
-            // can be ignored, simply results in the inexistence of images for the current zoom level as well
+            // can be ignored, simply results in the inexistence of images for the current zoom level
           }
         }
 
@@ -151,7 +133,6 @@ public class CacheRenderer {
       // get last diagram file in the lowest cache level
       File dir = new File(config.getCachePath() + i);
       File[] files = dir.listFiles();
-//      File lastFile = null;
       long lastLong = Long.MIN_VALUE;
       for (File f : files) {
         if (f.isFile()) {
@@ -161,7 +142,6 @@ public class CacheRenderer {
             if (lastLong >= new Date().getTime()) {
               break;
             }
-//            lastFile = f;
           }
         }
       }
@@ -171,13 +151,16 @@ public class CacheRenderer {
     }
   }
 
+  /**
+   * Use this to create an initial cache
+   * @param args
+   */
   public static void main(String[] args) {
 
     try {
 
       CacheRenderer cacheRenderer = new CacheRenderer();
-//      cacheRenderer.createCache();
-      cacheRenderer.updateCache();
+      cacheRenderer.createCache();
 
     } catch (Exception e) {
       e.printStackTrace();

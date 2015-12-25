@@ -21,6 +21,9 @@ import timelines.importer.downloader.GoesOldFullDownloader;
 import timelines.importer.downloader.IDownloader;
 import timelines.utils.TimeUtils;
 
+/**
+ * Class used to import data from the NOAA CSV Services into the timelines database
+ */
 public class Importer {
 
   private static final Logger logger = Logger.getLogger(Importer.class.getName());
@@ -30,6 +33,11 @@ public class Importer {
   private GoesNewFullDownloader downloader;
   private Config config;
 
+  /**
+   * Creates a new Importer object.
+   * If the database files do not exist already on the path
+   * defined in the configuration, they will be created here.
+   */
   public Importer() {
 
     try {
@@ -56,9 +64,11 @@ public class Importer {
   }
 
   /**
-   * Used to update the database
-   * @return true if the database changed
-   * @throws Exception
+   * Used to update the database.
+   * Data between the last record in the database and the current date will be imported.
+   *
+   * @return true if any records were imported
+   * @throws Exception on error
    */
   public boolean importNewData() throws Exception {
 
@@ -121,8 +131,8 @@ public class Importer {
 
   /**
    * Used to initialize the database.
-   * Downloads all available data from the older services
-   * @throws Exception
+   * Downloads all available data from the older as well as the new services
+   * @throws Exception on error
    */
   public void initializeDatabase() throws Exception {
 
@@ -139,88 +149,6 @@ public class Importer {
 
   }
 
-
-//  private void getAverageData() throws Exception {
-//    long lastTime = GoesNewAvgDownloader.START_DATE.getTime();
-//
-//    GoesNewAvgDownloader averageDownloader = new GoesNewAvgDownloader(0, 20);
-//
-//    Date lastWrittenDate = GoesNewAvgDownloader.START_DATE;
-//    System.out.println(lastWrittenDate);
-//    Calendar cal = Calendar.getInstance();
-//    cal.setTime(lastWrittenDate);
-//
-////    ArrayList<Float> highChannel = new ArrayList<>();
-////    ArrayList<Float> lowChannel = new ArrayList<>();
-//
-//
-//    while (cal.getTime().before(GoesNewAvgDownloader.END_DATE)) {
-//
-//      List<GoesSxrLeaf> leafs = averageDownloader.getGoesSxrLeafs(cal.getTime(), cal.getTime());
-//      System.out.println("got data");
-//
-//      if (leafs == null) {
-//        throw new Exception("Data could not be retrieved");
-//      }
-//
-//      ByteBuffer bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES * 30);
-//      ByteBuffer bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES * 30);
-//
-//
-//      for (GoesSxrLeaf leaf : leafs) {
-//        long currentTime = leaf.getTimestamp().getTime();
-////        System.out.println(leaf.getTimestamp());
-////        System.out.println(GoesNewAvgDownloader.START_DATE);
-////        System.out.println();
-//        int empty = 0;
-//        while (currentTime - lastTime > 2000) {
-////          System.out.println(currentTime);
-////          System.out.println(lastTime);
-////          System.out.println(currentTime - lastTime + "\n");
-//          // add empty entry
-//          bufferLow.putFloat(Float.NaN);
-//          bufferHigh.putFloat(Float.NaN);
-//          lastTime += 2000;
-//          empty ++;
-//
-//          if (!bufferHigh.hasRemaining()) {
-//            appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
-//            appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
-//            lastWrittenDate = new Date(lastTime);
-//            bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-//            bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-//          }
-//
-//        }
-////        System.out.println("adding value " + leaf + " empty values before: " + empty);
-//        bufferHigh.putFloat(leaf.getHighChannel());
-//        bufferLow.putFloat(leaf.getLowChannel());
-//        lastTime = leaf.getTimestamp().getTime();
-//
-//        if (!bufferHigh.hasRemaining()) {
-//          appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
-//          appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
-//          lastWrittenDate = new Date(lastTime);
-//          bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-//          bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-//        }
-//        // maybe write here already and empty the lists?
-//      }
-//      cal.add(Calendar.MONTH, 1);
-//      cal.set(Calendar.DAY_OF_MONTH, 1);
-//
-//      appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate.getTime());
-//      appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate.getTime());
-//      lastWrittenDate = new Date(lastTime);
-//      bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-//      bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-//
-////      System.out.println(highChannel);
-//    }
-//
-//
-//
-//  }
 
   /**
    * Used to import data from the old full service

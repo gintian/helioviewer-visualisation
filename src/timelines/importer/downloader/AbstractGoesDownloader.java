@@ -13,8 +13,11 @@ import timelines.importer.csv.CsvToGoesSxrLeafConverter;
 import timelines.importer.csv.GoesSxrLeaf;
 import timelines.utils.TimeUtils;
 
+/**
+ * Abstract downloader class defining the base structure for all downloaders
+ */
 abstract class AbstractGoesDownloader implements IDownloader {
-  //	protected final Logger logger = LoggerFactory.getLogger(getClass());
+
   private static final Logger logger = Logger.getLogger(AbstractGoesDownloader.class.getName());
 
   protected int currentGoesNr;
@@ -41,6 +44,14 @@ abstract class AbstractGoesDownloader implements IDownloader {
     this.skipToData = skipToData;
   }
 
+
+  /**
+   * Creates a new downloader which will skip to data by default
+   * @see AbstractGoesDownloader#AbstractGoesDownloader(int, int, CsvToGoesSxrLeafConverter, boolean)
+   * @param minGoesNr
+   * @param maxGoesNr
+   * @param csvToGoesSxrLeafConverter
+   */
   public AbstractGoesDownloader(int minGoesNr, int maxGoesNr, CsvToGoesSxrLeafConverter csvToGoesSxrLeafConverter) {
     this(minGoesNr, maxGoesNr, csvToGoesSxrLeafConverter, true);
   }
@@ -61,7 +72,7 @@ abstract class AbstractGoesDownloader implements IDownloader {
         List<GoesSxrLeaf> goesSxrLeafs = downloadGoesSxrLeafs(url, maxStartTimestamp, endTimestamp);
         return goesSxrLeafs;
       } catch (IOException e) {
-        //				logger.warn(e.toString());
+        logger.log(Level.WARNING, e.toString());
 
         downloadTrials++;
         currentGoesNr++;
@@ -70,7 +81,7 @@ abstract class AbstractGoesDownloader implements IDownloader {
         }
       } catch (Exception e) {
         e.printStackTrace();
-        //				logger.warn(e.toString());
+        logger.log(Level.WARNING, e.toString());
       }
     }
 
@@ -107,18 +118,15 @@ abstract class AbstractGoesDownloader implements IDownloader {
     try {
 
       if(skipToData) {
-        System.out.println("skipping to data"); // TODO
         skipToData(dataReader);
       }
       parsedLeafs = csvParser.parseFile(startTimestamp, endTimestamp, dataReader);
 
     } catch (IOException e) {
-      // TODO: handle exception
       e.printStackTrace();
 
     } finally {
       dataReader.close();
-//      IOUtils.closeQuietly(dataReader);
     }
     return parsedLeafs;
   }
@@ -140,6 +148,7 @@ abstract class AbstractGoesDownloader implements IDownloader {
     }
   }
 
+  @Override
   public void resetGoesNr() {
     currentGoesNr = MIN_GOESNR;
   }

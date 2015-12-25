@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,8 +28,18 @@ import org.w3c.dom.NodeList;
 
 import com.sun.imageio.plugins.png.PNGMetadata;
 
+/**
+ * Class containing general utility methods for handling image data
+ */
 public class ImageUtils {
 
+  /**
+   * Writes an image with metadata information
+   * @param out the OutputStream to write the image to
+   * @param buffImg the image to be written
+   * @param customData a key-value mapping of the metadata information to be written
+   * @throws Exception if the writing goes wrong
+   */
   public static void writeWithCustomData(OutputStream out, BufferedImage buffImg, Map<String, String> customData) throws Exception {
     ImageWriter writer = ImageIO.getImageWritersByFormatName("png").next();
 
@@ -61,6 +70,13 @@ public class ImageUtils {
     stream.close();
   }
 
+  /**
+   * Reads the metadata information from an image
+   * @param iis the stream to read the image from
+   * @param keys the metadata keys for which to read the values
+   * @return a key-value mapping of the metadata found
+   * @throws IOException if an error occurs while reading
+   */
   public static Map<String, String> readCustomData(ImageInputStream iis, ArrayList<String> keys) throws IOException{
     ImageReader imageReader = ImageIO.getImageReadersByFormatName("png").next();
 
@@ -86,8 +102,32 @@ public class ImageUtils {
     return result;
   }
 
+  /**
+   * Convenience method that returns a scaled instance of the
+   * provided {@code BufferedImage}.
+   *
+   * @author Chris Campbell
+   * (https://web.archive.org/web/20080516181120/http://today.java.net/pub/a/today/2007/04/03/perils-of-image-getscaledinstance.html)
+   *
+   * @param img the original image to be scaled
+   * @param targetWidth the desired width of the scaled instance,
+   *    in pixels
+   * @param targetHeight the desired height of the scaled instance,
+   *    in pixels
+   * @param hint one of the rendering hints that corresponds to
+   *    {@code RenderingHints.KEY_INTERPOLATION} (e.g.
+   *    {@code RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR},
+   *    {@code RenderingHints.VALUE_INTERPOLATION_BILINEAR},
+   *    {@code RenderingHints.VALUE_INTERPOLATION_BICUBIC})
+   * @param higherQuality if true, this method will use a multi-step
+   *    scaling technique that provides higher quality than the usual
+   *    one-step technique (only useful in down-scaling cases, where
+   *    {@code targetWidth} or {@code targetHeight} is
+   *    smaller than the original dimensions, and generally only when
+   *    the {@code BILINEAR} hint is specified)
+   * @return a scaled version of the original {@code BufferedImage}
+   */
   public static BufferedImage getScaledInstance(BufferedImage img, int targetWidth, int targetHeight, Object hint, boolean higherQuality) {
-    Date date = new Date();
     int type = (img.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
     BufferedImage ret = img;
     int w, h;
@@ -128,12 +168,16 @@ public class ImageUtils {
       ret = tmp;
     } while (w != targetWidth || h != targetHeight);
 
-    System.out.println("scaling done in " + new Date(new Date().getTime() - date.getTime()).getTime() + "ms");
     return ret;
   }
 
+  /**
+   * Multiplies the alpha value of an images pixels by the given value
+   * @param val the value to multiply the alpha channel with
+   * @param img the image to multiply the alpha channel on
+   * @return the image with multiplied alpha channel values
+   */
   public static BufferedImage multiplyAlpha(int val, BufferedImage img) {
-    Date date = new Date();
     Color color;
     for(int x = 0; x < img.getWidth(); x++) {
       for(int y = 0; y < img.getHeight(); y++) {
@@ -144,7 +188,6 @@ public class ImageUtils {
         }
       }
     }
-    System.out.println("increased transparency in " + new Date(new Date().getTime() - date.getTime()).getTime() + "ms");
     return img;
   }
 

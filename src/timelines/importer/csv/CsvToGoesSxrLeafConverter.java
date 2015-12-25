@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -12,15 +11,23 @@ import timelines.utils.TimeUtils;
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 
+/**
+ * Used to parse NOAA CSV files
+ */
 public class CsvToGoesSxrLeafConverter {
-
-  //	private static final Logger LOGGER = LoggerFactory.getLogger(CsvToGoesSxrLeafConverter.class);
 
   private final int timestampColumn;
   private final int lowChannelColumn;
   private final int highChannelColumn;
   private final SimpleDateFormat dateTimeFormatter;
 
+  /**
+   * Creates a new {@link CsvToGoesSxrLeafConverter}.
+   * @param timestampColumn the timestamps column index in the file to be parsed
+   * @param lowChannelColumn the low channels column index in the file to be parsed
+   * @param highChannelColumn the high channels column index in the file to be parsed
+   * @param dateTimeFormatter the formatter to parse the timestamps with
+   */
   public CsvToGoesSxrLeafConverter(int timestampColumn, int lowChannelColumn, int highChannelColumn, SimpleDateFormat dateTimeFormatter) {
     this.timestampColumn = timestampColumn;
     this.lowChannelColumn = lowChannelColumn;
@@ -28,37 +35,29 @@ public class CsvToGoesSxrLeafConverter {
     this.dateTimeFormatter = dateTimeFormatter;
   }
 
+  /**
+   * Parses the given file and returns a list of {@link GoesSxrLeaf}s
+   * @param startTimestamp the date a records timestamp has to be after in order to be deemed valid
+   * @param endTimestamp the date a records timestamp has to be before in order to be deemed valid
+   * @param fileReader the reader for the CSV file
+   * @return a list of all valid {@link GoesSxrLeaf}s contained in the file
+   * @throws IOException on error
+   */
   public List<GoesSxrLeaf> parseFile(Date startTimestamp, Date endTimestamp, Reader fileReader) throws IOException {
     List<GoesSxrLeaf> goesSxrLeafs = new ArrayList<GoesSxrLeaf>();
     String[] nextLine;
     CSVReader csvReader = new CSVReader(fileReader, CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
 
     try {
-      boolean foundValid = false;
-      System.out.println("reading");
       while ((nextLine = csvReader.readNext()) != null) {
         GoesSxrLeaf goesSxrLeaf = parseDataRow(nextLine);
 
-
-        if(!foundValid) {
-          foundValid = true;
-          System.out.println("first line in file: " + Arrays.toString(nextLine));
-          System.out.println("valid: " + isValid(goesSxrLeaf));
-          System.out.println("fitting in interval " + startTimestamp + " to " + endTimestamp + ": " + TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp));
-          // TODO remove debugging stuff
-        }
-
         if (isValid(goesSxrLeaf) && TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp)) {
           goesSxrLeafs.add(goesSxrLeaf);
-
-        } else {
-//          System.out.println(goesSxrLeaf.getTimestamp() + " " + startTimestamp + " " + endTimestamp);
-//          System.out.println(TimeUtils.isFittingInInterval(goesSxrLeaf.getTimestamp(), startTimestamp, endTimestamp));
         }
       }
     } finally {
       csvReader.close();
-//      IOUtils.closeQuietly(csvReader);
     }
 
     return goesSxrLeafs;
@@ -69,7 +68,6 @@ public class CsvToGoesSxrLeafConverter {
       GoesSxrLeaf goesSxrLeaf = new GoesSxrLeaf();
 
       Date timestamp = dateTimeFormatter.parse(line[timestampColumn]);
-//      Date timestamp = Date. (line[timestampColumn], dateTimeFormatter);
       float lowChannel = Float.parseFloat(line[lowChannelColumn]);
       float highChannel = Float.parseFloat(line[highChannelColumn]);
 
@@ -88,7 +86,6 @@ public class CsvToGoesSxrLeafConverter {
       return goesSxrLeaf;
     } catch (Exception e) {
       e.printStackTrace();
-      //LOGGER.info(e.toString() + " at line: " + Arrays.toString(line));
       return null;
     }
   }

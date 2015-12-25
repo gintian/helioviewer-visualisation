@@ -2,6 +2,9 @@ package timelines.importer.csv;
 
 import java.util.Date;
 
+/**
+ * Contains the data to a single record
+ */
 public class GoesSxrLeaf implements Comparable<GoesSxrLeaf> {
 
 

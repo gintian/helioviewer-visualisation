@@ -11,6 +11,10 @@ import timelines.importer.csv.CsvToGoesSxrLeafConverter;
 import timelines.utils.StringUtils;
 import timelines.utils.TimeUtils;
 
+/**
+ * Downloader for the new NOAA service
+ * Used to access the time frame in which data is available in a 1 minute interval as average values
+ */
 public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
 
   private String urlTemplate = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_avg/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_1m_{startdate}_{enddate}.csv";
@@ -18,7 +22,8 @@ public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
   public static final Date START_DATE= new Date(839961316000L); // 1996-08-13 20:35:16
   public static final Date END_DATE= new Date(983401198000L); // the full downloader starts after this
 
-//  private Date goesNewAvgEndDateMidnight;
+  public static final int DEFAULT_GOES_NR_MIN = 0;
+  public static final int DEFAULT_GOES_NR_MAX = 20;
 
   static class Columns {
     public static final int TIME_TAG = 0;
@@ -26,16 +31,23 @@ public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
     public static final int XL = 2;
   }
 
+  /**
+   * Creates a new {@link GoesNewAvgDownloader} using the given goes nr. range
+   * @param minGoesNr the minumum goes nr. to load data from
+   * @param maxGoesNr the maximum goes nr. to load data from
+   */
   public GoesNewAvgDownloader(int minGoesNr, int maxGoesNr) {
     super(minGoesNr, maxGoesNr, createCsvToGoesSxrLeafConverter());
   }
 
+  /**
+   * Creates a new {@link GoesNewAvgDownloader} using the default goes nr. range
+   */
   public GoesNewAvgDownloader() {
-    super(0, 20, createCsvToGoesSxrLeafConverter()); // TODO make numbers public static final
+    super(DEFAULT_GOES_NR_MIN, DEFAULT_GOES_NR_MIN, createCsvToGoesSxrLeafConverter());
   }
 
   private static CsvToGoesSxrLeafConverter createCsvToGoesSxrLeafConverter() {
-//    final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZoneUTC();
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     return new CsvToGoesSxrLeafConverter(Columns.TIME_TAG, Columns.XS, Columns.XL, format);
   }
@@ -62,7 +74,6 @@ public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
     } catch (MalformedURLException e) {
       e.printStackTrace();
     }
-//    System.out.println(url); // TODO
     return url;
   }
 

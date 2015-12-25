@@ -2,6 +2,9 @@ package timelines.utils;
 
 import java.util.Map;
 
+/**
+ * Class containing general utility methods for handling Strings
+ */
 public class StringUtils {
   /**
    * Replace the keys (written as: "{key}") with the value in format string with params map.

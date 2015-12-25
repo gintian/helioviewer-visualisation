@@ -17,7 +17,7 @@ public interface IDownloader {
   public List<GoesSxrLeaf> getGoesSxrLeafs(Date minTimestamp, Date csvFileDate);
 
   /**
-   * Compares the two DateMidnight and checks if it would use another download
+   * Compares the two dates and checks if it would use another download
    * url.
    *
    * @param thisDateMidnight
@@ -40,6 +40,9 @@ public interface IDownloader {
    */
   public Date getEndDateMidnight();
 
+  /**
+   * Reset the goes nr. at which we start our download attempts
+   */
   public void resetGoesNr();
 
 }

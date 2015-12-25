@@ -2,7 +2,6 @@ package timelines.importer.downloader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,11 +12,8 @@ import timelines.utils.StringUtils;
 import timelines.utils.TimeUtils;
 
 /**
- * @author Matthias Hug
- *
  * Used to download goes data from the old service.
  * GoesNr range of the available data: 1-7 and 91-92
- *
  */
 public class GoesOldFullDownloader extends AbstractGoesDownloader {
 
@@ -32,6 +28,11 @@ public class GoesOldFullDownloader extends AbstractGoesDownloader {
     public static final int XL = 4;
   }
 
+  /**
+   * Creates a new {@link GoesOldFullDownloader} using the given goes nr. range
+   * @param minGoesNr the minumum goes nr. to load data from
+   * @param maxGoesNr the maximum goes nr. to load data from
+   */
   public GoesOldFullDownloader(int minGoesNr, int maxGoesNr) {
     super(minGoesNr, maxGoesNr, createCsvToGoesSxrLeafConverter(), false);
   }
@@ -72,11 +73,4 @@ public class GoesOldFullDownloader extends AbstractGoesDownloader {
     }
     return url;
   }
-
-  public static void main(String[] args) throws ParseException {
-    Date date = TimeUtils.fromString("1974-07-01", "yyyy-MM-dd");
-//    System.out.println(date.getTime());
-    System.out.println((END_DATE.getTime() - START_DATE.getTime()) / 1000 / 2 * Float.BYTES / 1024 / 1024 );
-  }
-
 }
