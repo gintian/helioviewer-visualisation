@@ -118,11 +118,13 @@ public class DiagramAPI extends HttpServlet {
 
     renderer = new DiagramRenderer();
 
+    long currentTimePerImage = CacheRenderer.getTimePerImage(parameters.getZoomLevel());
+
     long dataPoints = (long) Math.pow(2, parameters.getZoomLevel()) * DiagramRenderer.IMAGE_WIDTH;
     Date currentStartDate = parameters.getDateFrom();
 
-    long imageOffset = (currentStartDate.getTime() - TimelinesDB.DB_START_DATE.getTime()) / 2000 / dataPoints;
-    Date actualStartDate = new Date(TimelinesDB.DB_START_DATE.getTime() + imageOffset * dataPoints * 2000);
+    long imageOffset = (currentStartDate.getTime() - TimelinesDB.DB_START_DATE.getTime()) / currentTimePerImage;
+    Date actualStartDate = new Date(TimelinesDB.DB_START_DATE.getTime() + imageOffset * currentTimePerImage);
 
     BufferedImage img;
 
