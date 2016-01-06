@@ -34,15 +34,6 @@ public class DiagramBuffer {
 
     private void reportIfFull(){
         if (this.currentCount == this.tileCount){
-            try {//TODO:remove
-                for (int i = 0; i<list.size();i++){
-                    BufferedImage bi = list.get(i).getBufferedImage();
-                    File outputfile = new File("C:/Users/Tobi/Pictures/saved"+i+".png");
-                    ImageIO.write(bi, "png", outputfile);
-                }
-            } catch (IOException e) {//TODO:remove
-
-            }//TODO:remove
             this.imageLoader.processDiagramBuffer();
         }
     }

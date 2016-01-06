@@ -1,5 +1,6 @@
 package timelines.gui;
 
+import timelines.api.APIImageMetadata;
 import timelines.utils.TimeUtils;
 
 import java.awt.*;
@@ -11,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.json.simple.*;
@@ -32,8 +34,11 @@ public class ImageLoader {
   private int zoomLevel;
   private Diagram diagram;
   private int callType;
-  private static final int NEW_SET = 1;
-  private static final int EXTEND_SET = 2;
+  private int sideToExpand;
+  public static final int NEW_SET = 1;
+  public static final int EXTEND_SET = 2;
+  public static final int LEFT = 3;
+  public static final int RIGHT = 4;
 
   public static ImageLoader loadNewSet(Image image, String serverBaseURLStr, Date date, int zoomLevel){
     try {
@@ -56,15 +61,32 @@ public class ImageLoader {
     getImages(startDate);
   }
 
-  public static ImageLoader loadAdditional(Image image, Diagram diagram, String serverBaseURLStr, Date startDate, Date endDate, int zoomLevel){
-    return new ImageLoader(image, diagram, serverBaseURLStr, startDate, endDate, zoomLevel);
+  public static ImageLoader loadAdditional(Image image, BufferedImage bufferedImage, String serverBaseURLStr, Date startDate, Date endDate, int zoomLevel, long timeOffset, int sideToExpand){
+    try {
+      return new ImageLoader(image, bufferedImage, serverBaseURLStr, startDate, endDate, zoomLevel, timeOffset, sideToExpand);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    } catch (org.json.simple.parser.ParseException e) {
+      e.printStackTrace();
+      return null;
+    }
   }
-  private ImageLoader(Image image, Diagram diagram, String serverBaseURLStr, Date startDate, Date endDate, int zoomLevel){
+  private ImageLoader(Image image, BufferedImage bufferedImage, String serverBaseURLStr, Date startDate, Date endDate, int zoomLevel, long timeOffset, int sideToExpand) throws IOException, org.json.simple.parser.ParseException {
     this.callType = EXTEND_SET;
     this.image = image;
     this.serverBaseURLStr = serverBaseURLStr;
     this.zoomLevel = zoomLevel;
-    this.diagram = diagram;
+    this.diagram = new Diagram(bufferedImage, new APIImageMetadata(startDate, endDate, zoomLevel));
+    this.sideToExpand = sideToExpand;
+    getApiInfo();
+    setTileCount(1);
+    if (sideToExpand == LEFT) {
+      getImages(TimeUtils.addTime(startDate, -timeOffset));
+    } else if (sideToExpand == RIGHT){
+      getImages(TimeUtils.addTime(endDate, timeOffset));
+    }
+
   }
 
   private URL[] setUrls(Date fromDate) throws MalformedURLException{
@@ -114,14 +136,17 @@ public class ImageLoader {
 
   private void setTileCount(){
     this.tileCount = (this.image.getWindow().getWidth() / this.tileWidth)+1;
-    System.out.println("set tile count to: "+this.tileCount);//TODO:remove
+  }
+
+  private void setTileCount(int tileCount){
+    this.tileCount = tileCount;
   }
 
   public void processDiagramBuffer(){
     if(this.callType == NEW_SET){
       makeNewSet();
     }else if (this.callType == EXTEND_SET){
-
+      extendSet();
     }
   }
   private void makeNewSet(){
@@ -139,13 +164,42 @@ public class ImageLoader {
       System.out.println("making: "+counter);//TODO:remove
     }
     Date startDate = tm.firstEntry().getValue().getStartDate();
-    Date endDateDate = tm.lastEntry().getValue().getEndDate();
+    System.out.println(startDate);
+    Date endDate = tm.lastEntry().getValue().getEndDate();
+    System.out.println(endDate);
 
-    this.diagram = new Diagram(img, startDate, endDateDate, this.zoomLevel);
+    this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);
     updateImage();
   }
+
   private void extendSet(){
 
+    Map.Entry<Long, Diagram> te = this.tileBuffer.getMap().firstEntry();
+    int w = this.diagram.getBufferedImage().getWidth();
+    int h = this.tileHeight;
+    BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    Graphics g = img.getGraphics();
+
+    Date startDate;
+    Date endDate;
+
+    if (this.sideToExpand == LEFT) {
+      g.drawImage(te.getValue().getBufferedImage(), 0, 0, null);
+      g.drawImage(this.diagram.getBufferedImage(), this.tileWidth, 0, null);
+      startDate = te.getValue().getStartDate();
+      endDate = TimeUtils.addTime(this.diagram.getEndDate(),Image.pixelToTime(this.tileWidth,this.zoomLevel));
+    } else {
+      startDate = TimeUtils.addTime(this.diagram.getStartDate(), Image.pixelToTime(this.tileWidth, this.zoomLevel));
+      endDate = te.getValue().getEndDate();
+
+      g.drawImage(this.diagram.getBufferedImage(), -this.tileWidth, 0, null);
+      g.drawImage(te.getValue().getBufferedImage(), w-this.tileWidth, 0, null);
+    }
+    System.out.println("making");//TODO:remove
+
+
+    this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);
+    updateImage();
   }
 
   private void updateImage(){
@@ -154,6 +208,18 @@ public class ImageLoader {
 
   public Diagram getDiagram(){
     return this.diagram;
+  }
+
+  public int getCallType(){
+    return this.callType;
+  }
+
+  public int getTileWidth(){
+    return this.tileWidth;
+  }
+
+  public int getSideToExpand(){
+    return this.sideToExpand;
   }
 
 }

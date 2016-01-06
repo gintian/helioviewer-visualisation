@@ -31,6 +31,7 @@ public class Image extends JComponent {
   private Date dateFocus; //date in middle of screen, date of interest focused
   private Date dateLast; //current images end/rightmost date
   int imageOffset;
+  public boolean loadingNext = false;
 
   public Image(Window window, Date dateFocus){
     this.window = window;
@@ -89,8 +90,12 @@ public class Image extends JComponent {
       this.bufferedImageHeight = this.bufferedImage.getHeight();
       this.dateOrigin = il.getDiagram().getStartDate();
       this.dateLast = il.getDiagram().getEndDate();
+      if (il.getCallType() == ImageLoader.EXTEND_SET){
+        setImageOffset();
+      }
 
       repaint();  //TODO: point of interest
+      this.loadingNext = false;
     }
   }
 
@@ -147,6 +152,14 @@ public class Image extends JComponent {
   }
 
   private void checkBounds(){
+    long boundsDistance = pixelToTime(this.window.getContentPane().getWidth(), this.zoomLevel)/2;
+    if ((this.dateFocus.getTime()-boundsDistance)<this.dateOrigin.getTime() && !this.loadingNext){
+      loadingNext = true;
+      this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage,this.serverBaseURLStr, this.dateOrigin, this.dateLast, this.zoomLevel, boundsDistance, ImageLoader.LEFT);
+    }else if ((this.dateFocus.getTime()+boundsDistance)>this.dateLast.getTime() && !this.loadingNext){
+      loadingNext = true;
+      this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage,this.serverBaseURLStr, this.dateOrigin, this.dateLast, this.zoomLevel, boundsDistance, ImageLoader.RIGHT);
+    }
 
   }
 

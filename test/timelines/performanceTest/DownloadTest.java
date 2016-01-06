@@ -2,6 +2,7 @@ package timelines.performanceTest;
 
 import timelines.api.APIImageMetadata;
 import timelines.gui.Diagram;
+import timelines.gui.Image;
 import timelines.utils.TimeUtils;
 
 import javax.imageio.ImageIO;
@@ -12,6 +13,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.text.ParseException;
+import java.util.Date;
 
 /**
  * Created by Tobi on 06.01.2016.
@@ -42,8 +45,9 @@ public class DownloadTest {
             Diagram diagram = new Diagram(img,metadata);
             System.out.println("diagram generated: " + (System.nanoTime()-start) + " ns");
 
-        } catch (IOException e) {
 
+        } catch (IOException e) {
+            System.out.println("hello");
         }
     }
 }
