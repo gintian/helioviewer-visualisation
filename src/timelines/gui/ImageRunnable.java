@@ -20,9 +20,7 @@ public class ImageRunnable implements Runnable {
     public void run() {
         try {
             System.out.println("thread url: "+ url);//TODO:remove
-            InputStream is = this.url.openStream();
-            byte[] bytes = sun.misc.IOUtils.readFully(is, -1, true);
-            Diagram diagram = new Diagram(bytes);
+            Diagram diagram = new Diagram(this.imageLoader.getBytes(url));
             System.out.println("thread url: "+ url + " ## thread diagram: " + diagram.getStartDate() + " | " + diagram.getEndDate() + " | " + diagram.getZoomLevel());//TODO:remove
             this.imageLoader.tileBuffer.addToDiagramBuffer(diagram);
         }catch (IOException e){

@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -105,17 +106,17 @@ public class ImageLoader {
   }
 
   private void getImages(Date dateFrom) throws MalformedURLException{
-    /*URL[] urls = setUrls(dateFrom);
+    URL[] urls = setUrls(dateFrom);
     Thread[] threads = new Thread[this.tileCount];
     this.tileBuffer = new DiagramBuffer(this, this.tileCount);
     for (int i =0; i < this.tileCount; i++){
       threads[i] = new Thread(new ImageRunnable(this, urls[i]));
       threads[i].start();
-    }*/
+    }/*
     URL[] urls = setUrls(dateFrom);
     this.tileBuffer = new DiagramBuffer(this, this.tileCount);
     Thread t = new Thread(new test2Runnable(this, urls));
-    t.start();
+    t.start();*/
   }
 
   private void getApiInfo() throws IOException, org.json.simple.parser.ParseException{
@@ -220,6 +221,17 @@ public class ImageLoader {
 
   public int getSideToExpand(){
     return this.sideToExpand;
+  }
+
+  public synchronized byte[] getBytes(URL url){
+    byte[] bytes = new byte[0];
+    try {
+      InputStream is = url.openStream();
+      bytes = sun.misc.IOUtils.readFully(is, -1, true);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return bytes;
   }
 
 }

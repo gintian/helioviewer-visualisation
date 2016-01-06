@@ -15,9 +15,6 @@ public class DiagramBuffer {
     private int tileCount;
     private int currentCount = 0;
 
-    private ArrayList<Diagram> list = new ArrayList<>();//TODO:remove
-
-
     public DiagramBuffer(ImageLoader imageLoader, int tileCount){
         this.imageLoader = imageLoader;
         this.tileCount = tileCount;
@@ -26,7 +23,6 @@ public class DiagramBuffer {
     public synchronized void addToDiagramBuffer(Diagram diagram) throws IOException{
         Long date = diagram.getStartDate().getTime();
         treeMap.put(date, diagram);
-        list.add(diagram);//TODO:remove
 
         this.currentCount++;
         reportIfFull();
