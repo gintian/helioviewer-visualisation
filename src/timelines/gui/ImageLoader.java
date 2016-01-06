@@ -184,10 +184,10 @@ public class ImageLoader {
     Date endDate;
 
     if (this.sideToExpand == LEFT) {
+      startDate = te.getValue().getStartDate();
+      endDate = TimeUtils.addTime(this.diagram.getEndDate(),-Image.pixelToTime(this.tileWidth,this.zoomLevel));
       g.drawImage(te.getValue().getBufferedImage(), 0, 0, null);
       g.drawImage(this.diagram.getBufferedImage(), this.tileWidth, 0, null);
-      startDate = te.getValue().getStartDate();
-      endDate = TimeUtils.addTime(this.diagram.getEndDate(),Image.pixelToTime(this.tileWidth,this.zoomLevel));
     } else {
       startDate = TimeUtils.addTime(this.diagram.getStartDate(), Image.pixelToTime(this.tileWidth, this.zoomLevel));
       endDate = te.getValue().getEndDate();

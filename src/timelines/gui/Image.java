@@ -181,13 +181,13 @@ public class Image extends JComponent {
 
     g.setColor(rulerColor);
     g.fillRect(rw,h-rw,w-rw,rw);
-    g.setColor(scaleColor);
+    /*g.setColor(scaleColor);
     int j = pixelOrigin;
     while(j<= bufferedImageWidth + pixelOrigin){
       g.drawLine(j,h-sp,j,h-(rw-sp));
       j+=(10*zoomLevel);
     }
-    g.setColor(rulerColor);
+    g.setColor(rulerColor);*/
     g.fillRect(0, h - rw, rw, rw);
   }
 
