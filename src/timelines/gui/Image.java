@@ -22,14 +22,14 @@ public class Image extends JComponent {
   private int pixelFocus;
   private int pixelOriginToFocus; //difference betwene pixelFocus and pixelOrigin
   private Window window;
-  private int zoomLevel = 10; //TODO:set via imageloader
+  private int zoomLevel = 7; //TODO:set via imageloader
   private int maxZoomLevel = 1; //TODO:set via imageloader
   private int minZoomLevel = 10; //TODO:set via imageloader
   private int rulerWidth = 20;
   private ImageLoader currentImageLoader;
   private Date dateOrigin; //current images start/leftmost date
   private Date dateFocus; //date in middle of screen, date of interest focused
-  private Date dateLast;
+  private Date dateLast; //current images end/rightmost date
   int imageOffset;
 
   public Image(Window window, Date dateFocus){
@@ -142,7 +142,12 @@ public class Image extends JComponent {
 
   public void dragged(int change) {
     moveDateFocusBy(change);
+    checkBounds();
     repaint();
+  }
+
+  private void checkBounds(){
+
   }
 
   private void paintRulers(Graphics g){

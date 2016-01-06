@@ -1,7 +1,8 @@
 package timelines.gui;
 
-import javax.imageio.stream.ImageInputStream;
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -14,6 +15,8 @@ public class DiagramBuffer {
     private int tileCount;
     private int currentCount = 0;
 
+    private ArrayList<Diagram> list = new ArrayList<>();//TODO:remove
+
 
     public DiagramBuffer(ImageLoader imageLoader, int tileCount){
         this.imageLoader = imageLoader;
@@ -23,6 +26,7 @@ public class DiagramBuffer {
     public synchronized void addToDiagramBuffer(Diagram diagram) throws IOException{
         Long date = diagram.getStartDate().getTime();
         treeMap.put(date, diagram);
+        list.add(diagram);//TODO:remove
 
         this.currentCount++;
         reportIfFull();
@@ -30,6 +34,15 @@ public class DiagramBuffer {
 
     private void reportIfFull(){
         if (this.currentCount == this.tileCount){
+            try {//TODO:remove
+                for (int i = 0; i<list.size();i++){
+                    BufferedImage bi = list.get(i).getBufferedImage();
+                    File outputfile = new File("C:/Users/Tobi/Pictures/saved"+i+".png");
+                    ImageIO.write(bi, "png", outputfile);
+                }
+            } catch (IOException e) {//TODO:remove
+
+            }//TODO:remove
             this.imageLoader.processDiagramBuffer();
         }
     }

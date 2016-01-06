@@ -23,7 +23,7 @@ public class ImageRunnable implements Runnable {
             InputStream is = this.url.openStream();
             byte[] bytes = sun.misc.IOUtils.readFully(is, -1, true);
             Diagram diagram = new Diagram(bytes);
-            System.out.println("thread url: "+ url + " ## thread diagram: " + diagram.getBufferedImage() + diagram.getStartDate() + " | " + diagram.getEndDate() + " | " + diagram.getZoomLevel());//TODO:remove
+            System.out.println("thread url: "+ url + " ## thread diagram: " + diagram.getStartDate() + " | " + diagram.getEndDate() + " | " + diagram.getZoomLevel());//TODO:remove
             this.imageLoader.tileBuffer.addToDiagramBuffer(diagram);
         }catch (IOException e){
 

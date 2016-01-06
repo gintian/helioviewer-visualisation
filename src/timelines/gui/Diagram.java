@@ -29,10 +29,6 @@ public class Diagram {
     public Diagram(ImageInputStream imageInputStream) throws IOException{
         this.metadata = new APIImageMetadata(imageInputStream);
         this.bufferedImage = ImageIO.read(imageInputStream);
-
-        /*try {
-            this.bufferedImage = ImageIO.read(new URL("http://localhost:8080/api?dateFrom=1981-07-01:00:00:00&zoomLevel=1"));
-        }catch (MalformedURLException e){}*/
     }
 
     public Diagram(byte[] bytes) throws IOException{
@@ -42,10 +38,6 @@ public class Diagram {
 
         bais = new ByteArrayInputStream(bytes);
         this.bufferedImage = ImageIO.read(bais);
-
-        /*try {
-            this.bufferedImage = ImageIO.read(new URL("http://localhost:8080/api?dateFrom=1981-07-01:00:00:00&zoomLevel=1"));
-        }catch (MalformedURLException e){}*/
     }
 
     @NotNull

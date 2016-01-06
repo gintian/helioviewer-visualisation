@@ -83,13 +83,17 @@ public class ImageLoader {
   }
 
   private void getImages(Date dateFrom) throws MalformedURLException{
-    URL[] urls = setUrls(dateFrom);
+    /*URL[] urls = setUrls(dateFrom);
     Thread[] threads = new Thread[this.tileCount];
     this.tileBuffer = new DiagramBuffer(this, this.tileCount);
     for (int i =0; i < this.tileCount; i++){
       threads[i] = new Thread(new ImageRunnable(this, urls[i]));
       threads[i].start();
-    }
+    }*/
+    URL[] urls = setUrls(dateFrom);
+    this.tileBuffer = new DiagramBuffer(this, this.tileCount);
+    Thread t = new Thread(new test2Runnable(this, urls));
+    t.start();
   }
 
   private void getApiInfo() throws IOException, org.json.simple.parser.ParseException{
