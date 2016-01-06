@@ -1,4 +1,4 @@
-package timelines.gui;
+package timelines.gui.variant5;
 
 public class APIInfo {
 
