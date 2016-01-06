@@ -74,6 +74,7 @@ public class Image extends JComponent {
   }
 
   private Date getRequestDate(){
+    System.out.println("dateFocus: "+dateFocus);
     return  TimeUtils.addTime(dateFocus, pixelToTime(-getWindowWidthHalf(), this.zoomLevel));
   }
 
@@ -90,9 +91,8 @@ public class Image extends JComponent {
       this.bufferedImageHeight = this.bufferedImage.getHeight();
       this.dateOrigin = il.getDiagram().getStartDate();
       this.dateLast = il.getDiagram().getEndDate();
-      if (il.getCallType() == ImageLoader.EXTEND_SET){
-        setImageOffset();
-      }
+
+      setImageOffset();
 
       repaint();  //TODO: point of interest
       this.loadingNext = false;
