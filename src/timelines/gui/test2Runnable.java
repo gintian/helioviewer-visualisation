@@ -25,15 +25,9 @@ public class test2Runnable implements Runnable {
         for(URL url : urls) {
             try {
                 System.out.println("thread url: " + url);//TODO:remove
-                long start = System.nanoTime();//TODO:remove
                 BufferedImage img = ImageIO.read(url);
-                System.out.println("thread url: " + url + "buff image: " + (System.nanoTime()-start));//TODO:remove
-                start = System.nanoTime();
                 APIImageMetadata metadata = new APIImageMetadata(ImageIO.createImageInputStream(url.openStream()));
-                System.out.println("thread url: " + url + "metadata: " + (System.nanoTime()-start));//TODO:remove
-                start = System.nanoTime();
                 Diagram diagram = new Diagram(img,metadata);
-                System.out.println("thread url: " + url + "make diagram: " + (System.nanoTime()-start));//TODO:remove
                 System.out.println("thread url: " + url + " ## thread diagram: " + diagram.getStartDate() + " | " + diagram.getEndDate() + " | " + diagram.getZoomLevel());//TODO:remove
                 this.imageLoader.tileBuffer.addToDiagramBuffer(diagram);
             } catch (IOException e) {
