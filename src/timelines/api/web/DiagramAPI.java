@@ -102,7 +102,7 @@ public class DiagramAPI extends HttpServlet {
     }
 
     try {
-      updateResources();
+      //updateResources();
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -132,7 +132,7 @@ public class DiagramAPI extends HttpServlet {
        img = getFromCache(actualStartDate, parameters.getZoomLevel());
     } else {
 
-      Date endDate = new Date(actualStartDate.getTime() + dataPoints * 2000);
+      Date endDate = new Date(actualStartDate.getTime() + currentTimePerImage);
 
       imageMetadata.put("dateFrom", TimeUtils.toString(actualStartDate, "yyyy-MM-dd:HH:mm:ss"));
       imageMetadata.put("dateTo", TimeUtils.toString(endDate, "yyyy-MM-dd:HH:mm:ss"));
