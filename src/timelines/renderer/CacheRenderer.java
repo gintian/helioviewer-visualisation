@@ -126,6 +126,8 @@ public class CacheRenderer {
    */
   public void updateCache() {
 
+    logger.log(Level.INFO, "Updating the cache", new Object[]{});
+
     Map<String, String> customData = new HashMap<String, String>();
 
     for(int i = CACHE_ZOOM_START; i <= CACHE_ZOOM_END; i++) {

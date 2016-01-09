@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import timelines.config.Config;
 import timelines.database.TimelinesDB;
-import timelines.importer.Importer;
 import timelines.renderer.CacheRenderer;
 import timelines.renderer.DiagramRenderer;
 import timelines.utils.ImageUtils;
@@ -97,12 +96,6 @@ public class DiagramAPI extends HttpServlet {
 
     try {
       getImage(parameters, response);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    try {
-      //updateResources();
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -193,19 +186,5 @@ public class DiagramAPI extends HttpServlet {
       result += entry.getKey() + ": " + Arrays.toString(entry.getValue()) + " ";
     }
     return result;
-  }
-
-  /**
-   * Used to update the database and if needed the cache
-   * @throws Exception on error
-   */
-  private void updateResources() throws Exception {
-    Importer importer = new Importer();
-    boolean updated = importer.importNewData();
-
-    if(updated) {
-      CacheRenderer renderer = new CacheRenderer();
-      renderer.updateCache();
-    }
   }
 }
