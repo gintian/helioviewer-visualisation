@@ -98,4 +98,15 @@ public class TimelinesDB {
     return (to.getTime() - from.getTime()) / 1000 / 2 * Float.BYTES;
   }
 
+
+  /**
+   * Closes the database files
+   * Once closed they cannot be reopened
+   * @throws IOException
+   */
+  public void close() throws IOException {
+     lowChannelDB.close();
+     highChannelDB.close();
+  }
+
 }

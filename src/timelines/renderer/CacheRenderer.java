@@ -67,7 +67,7 @@ public class CacheRenderer {
   private void createCacheForZoomLevel(Map<String, String> customData, int zoomLevel, Date currentStartDate) {
     BufferedImage img = null;
     File f;
-    int alphaFactor = 1 + 1 / (CACHE_ZOOM_END - CACHE_ZOOM_START);
+    float alphaFactor = 1.2f;
     long currentTimePerImage = getTimePerImage(zoomLevel);
 
     while (currentStartDate.before(new Date())) {
@@ -86,6 +86,7 @@ public class CacheRenderer {
         } else {
           try {
 
+            logger.log(Level.INFO, "Creating diagram for level {0} for {1} to {2} by merging from the next lower zoomLevel", new Object[]{zoomLevel, currentStartDate, endDate});
             BufferedImage left = ImageIO.read(new File(getCacheImagePath(zoomLevel - 1, currentStartDate.getTime())));
             long previousTimePerImage = (long) (DiagramRenderer.IMAGE_WIDTH * Math.pow(2, (zoomLevel - 1)) * 1000);
             BufferedImage right = new BufferedImage(DiagramRenderer.IMAGE_WIDTH, DiagramRenderer.IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB);

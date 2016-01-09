@@ -177,13 +177,13 @@ public class ImageUtils {
    * @param img the image to multiply the alpha channel on
    * @return the image with multiplied alpha channel values
    */
-  public static BufferedImage multiplyAlpha(int val, BufferedImage img) {
+  public static BufferedImage multiplyAlpha(float val, BufferedImage img) {
     Color color;
     for(int x = 0; x < img.getWidth(); x++) {
       for(int y = 0; y < img.getHeight(); y++) {
         color = new Color(img.getRGB(x, y), true);
         if(color.getAlpha() != 0 && color.getAlpha() < 255) {
-          color = new Color(color.getRed(), color.getGreen(), color.getBlue(), Math.min(255, color.getAlpha() * val));
+          color = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int)Math.min(255, color.getAlpha() * val));
           img.setRGB(x, y, color.getRGB());
         }
       }

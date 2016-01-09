@@ -108,4 +108,8 @@ public class DiagramRenderer {
       return (int) Math.min(IMAGE_HEIGHT - 1, (Math.abs(scaling * (Math.log10(f))) - offset));
   }
 
+  public void close() throws IOException {
+    timelinesDB.close();
+  }
+
 }

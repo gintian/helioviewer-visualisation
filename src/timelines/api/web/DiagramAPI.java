@@ -38,7 +38,7 @@ public class DiagramAPI extends HttpServlet {
   private static final Logger logger = Logger.getLogger(DiagramAPI.class.getName());
 
   public static final int ZOOM_LEVEL_MIN = 1;
-  public static final int ZOOM_LEVEL_MAX = 18;
+  public static final int ZOOM_LEVEL_MAX = 21;
 
   private Map<String, String> imageMetadata = new HashMap<String, String>();
 
@@ -138,6 +138,7 @@ public class DiagramAPI extends HttpServlet {
     OutputStream out = response.getOutputStream();
     ImageUtils.writeWithCustomData(out, img, imageMetadata);
     out.close();
+    renderer.close();
   }
 
 
