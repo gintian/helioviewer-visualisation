@@ -200,10 +200,16 @@ public class Image extends JComponent {
     //g.drawString(TimeUtils.toString(rightMost, "dd-MM-yyyy"), window.getWidth() - dateLabelWidth, window.getHeight() - 50);
 
     int labelPos = dateLabelWidth + 20;
+
+    String dateFormat = "dd-MM-yyyy";
+    if (pixelToTime(labelPos, zoomLevel) < 24 * 60 * 60 * 1000) {
+      dateFormat = "dd-MM-yy HH:mm";
+    }
+
     while (labelPos < window.getWidth() - dateLabelWidth) {
       Date current = TimeUtils.addTime(leftMost,pixelToTime(labelPos, zoomLevel));
       g.setColor(Color.BLACK);
-      g.drawString(TimeUtils.toString(current, "dd-MM-yyyy"), labelPos, window.getHeight() - 50);
+      g.drawString(TimeUtils.toString(current, dateFormat), labelPos, window.getHeight() - 50);
 
       g.setColor(scaleColor);
       g.drawLine(labelPos, h - rw + 3, labelPos, h - rw + rulerWidth - 6);
