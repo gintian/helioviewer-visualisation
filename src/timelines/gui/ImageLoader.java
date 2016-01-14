@@ -176,46 +176,33 @@ public class ImageLoader {
   private void extendSet(){
 
     Map.Entry<Long, Diagram> te = this.tileBuffer.getMap().firstEntry();
-    int w = this.diagram.getBufferedImage().getWidth();
-    int h = this.tileHeight;
-    BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-    Graphics g = img.getGraphics();
+    if (!te.getValue().isEmpty()) {
+      int w = this.diagram.getBufferedImage().getWidth();
+      int h = this.tileHeight;
+      BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+      Graphics g = img.getGraphics();
 
-    Date startDate;
-    Date endDate;
+      Date startDate;
+      Date endDate;
 
-    if (this.sideToExpand == LEFT) {
-
-      BufferedImage bimg;
-      if (te.getValue().isEmpty()) {
-        startDate = TimeUtils.addTime(this.diagram.getStartDate(), -Image.pixelToTime(this.tileWidth,this.zoomLevel));
-        bimg = new BufferedImage(this.tileWidth, this.tileHeight, BufferedImage.TYPE_INT_ARGB);
-      }else {
+      if (this.sideToExpand == LEFT) {
         startDate = te.getValue().getStartDate();
-        bimg = te.getValue().getBufferedImage();
-      }
-      endDate = TimeUtils.addTime(this.diagram.getEndDate(), -Image.pixelToTime(this.tileWidth, this.zoomLevel));
-      g.drawImage(bimg, 0, 0, null);
-      g.drawImage(this.diagram.getBufferedImage(), this.tileWidth, 0, null);
-
-    } else {
-      BufferedImage bimg;
-      if (te.getValue().isEmpty()) {
-        endDate = TimeUtils.addTime(this.diagram.getEndDate(), Image.pixelToTime(this.tileWidth, this.zoomLevel));
-        bimg = new BufferedImage(this.tileWidth, this.tileHeight, BufferedImage.TYPE_INT_ARGB);
-      }else {
+        endDate = TimeUtils.addTime(this.diagram.getEndDate(), -Image.pixelToTime(this.tileWidth, this.zoomLevel));
+        g.drawImage(te.getValue().getBufferedImage(), 0, 0, null);
+        g.drawImage(this.diagram.getBufferedImage(), this.tileWidth, 0, null);
+      } else {
+        startDate = TimeUtils.addTime(this.diagram.getStartDate(), Image.pixelToTime(this.tileWidth, this.zoomLevel));
         endDate = te.getValue().getEndDate();
-        bimg = te.getValue().getBufferedImage();
+
+        g.drawImage(this.diagram.getBufferedImage(), -this.tileWidth, 0, null);
+        g.drawImage(te.getValue().getBufferedImage(), w - this.tileWidth, 0, null);
       }
-      startDate = TimeUtils.addTime(this.diagram.getStartDate(), Image.pixelToTime(this.tileWidth, this.zoomLevel));
-      g.drawImage(this.diagram.getBufferedImage(), -this.tileWidth, 0, null);
-      g.drawImage(bimg, w - this.tileWidth, 0, null);
+      System.out.println("making");//TODO:remove
+
+
+      this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);
+      updateImage();
     }
-    System.out.println("making");//TODO:remove
-
-
-    this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);
-    updateImage();
   }
 
   private void updateImage(){

@@ -47,7 +47,7 @@ public class Diagram {
         this.empty = true;
         Date date;
         try {
-            date = TimeUtils.fromString(url.substring(url.lastIndexOf("=")),"yyyy-MM-dd:HH:mm:ss");
+            date = TimeUtils.fromString(url.substring(url.lastIndexOf("=")+1),"yyyy-MM-dd:HH:mm:ss");
         }catch (ParseException e){
             date = null;
             e.printStackTrace();
