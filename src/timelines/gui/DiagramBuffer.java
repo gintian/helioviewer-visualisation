@@ -28,6 +28,11 @@ public class DiagramBuffer {
         reportIfFull();
     }
 
+    public synchronized void addEmpty(){
+        this.currentCount++;
+        reportIfFull();
+    }
+
     private void reportIfFull(){
         if (this.currentCount == this.tileCount){
             this.imageLoader.processDiagramBuffer();
@@ -36,17 +41,6 @@ public class DiagramBuffer {
 
     public TreeMap<Long, Diagram> getMap(){
         return this.treeMap;
-    }
-
-    public BufferedImage[] getSortedBufferedImageArray(){
-        BufferedImage[] buffImgArr = new BufferedImage[this.tileCount];
-        int i = 0;
-        for(Long key : this.treeMap.keySet())
-        {
-            buffImgArr[i] = this.treeMap.get(key).getBufferedImage();
-            i++;
-        }
-        return buffImgArr;
     }
 
 }

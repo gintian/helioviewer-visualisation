@@ -152,31 +152,33 @@ public class ImageLoader {
   }
   private void makeNewSet(){
     TreeMap<Long, Diagram> tm = this.tileBuffer.getMap();
-    int w = this.tileCount * this.tileWidth;
-    int h = this.tileHeight;
-    BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-    Graphics g = img.getGraphics();
+    if (!tm.isEmpty()) {
+      tm.size();
+      int w = tm.size() * this.tileWidth;
+      int h = this.tileHeight;
+      BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+      Graphics g = img.getGraphics();
 
-    int counter = 0;
-    for(Long key : tm.keySet())
-    {
-      g.drawImage(tm.get(key).getBufferedImage(), counter * this.tileWidth, 0, null);
-      counter++;
-      System.out.println("making: "+counter);//TODO:remove
+      int counter = 0;
+      for (Long key : tm.keySet()) {
+        g.drawImage(tm.get(key).getBufferedImage(), counter * this.tileWidth, 0, null);
+        counter++;
+        System.out.println("making: " + counter);//TODO:remove
+      }
+      Date startDate = tm.firstEntry().getValue().getStartDate();
+      System.out.println(startDate);
+      Date endDate = tm.lastEntry().getValue().getEndDate();
+      System.out.println(endDate);
+
+      this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);
+      updateImage();
     }
-    Date startDate = tm.firstEntry().getValue().getStartDate();
-    System.out.println(startDate);
-    Date endDate = tm.lastEntry().getValue().getEndDate();
-    System.out.println(endDate);
-
-    this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);
-    updateImage();
   }
 
   private void extendSet(){
 
-    Map.Entry<Long, Diagram> te = this.tileBuffer.getMap().firstEntry();
-    if (!te.getValue().isEmpty()) {
+    if (!this.tileBuffer.getMap().isEmpty()) {
+      Map.Entry<Long, Diagram> te = this.tileBuffer.getMap().firstEntry();
       int w = this.diagram.getBufferedImage().getWidth();
       int h = this.tileHeight;
       BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);

@@ -25,10 +25,10 @@ public class ImageRunnable implements Runnable {
             if (bytes.length!=0) {
                 diagram = new Diagram(bytes);
                 System.out.println("thread url: " + url + " ## thread diagram: " + diagram.getStartDate() + " | " + diagram.getEndDate() + " | " + diagram.getZoomLevel());//TODO:remove
+                this.imageLoader.tileBuffer.addToDiagramBuffer(diagram);
             }else{
-                diagram = new Diagram(this.url.toString());
+                this.imageLoader.tileBuffer.addEmpty();
             }
-            this.imageLoader.tileBuffer.addToDiagramBuffer(diagram);
         }catch (IOException e){
 
         }

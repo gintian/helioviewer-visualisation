@@ -22,7 +22,7 @@ public class Image extends JComponent {
   private int pixelFocus;
   private int pixelOriginToFocus; //difference betwene pixelFocus and pixelOrigin
   private Window window;
-  private int zoomLevel = 1; //TODO:set via imageloader
+  private int zoomLevel = 21; //TODO:set via imageloader
   private int maxZoomLevel = 1; //TODO:set via imageloader
   private int minZoomLevel = 21; //TODO:set via imageloader
   private int rulerWidth = 20;

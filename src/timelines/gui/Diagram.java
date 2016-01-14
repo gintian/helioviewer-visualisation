@@ -43,19 +43,6 @@ public class Diagram {
         this.bufferedImage = ImageIO.read(bais);
     }
 
-    public Diagram(String url){
-        this.empty = true;
-        Date date;
-        try {
-            date = TimeUtils.fromString(url.substring(url.lastIndexOf("=")+1),"yyyy-MM-dd:HH:mm:ss");
-        }catch (ParseException e){
-            date = null;
-            e.printStackTrace();
-        }
-        this.metadata = new APIImageMetadata(date,null,0);
-        this.bufferedImage = null;
-    }
-
     @NotNull
     public BufferedImage getBufferedImage(){
         return this.bufferedImage;
