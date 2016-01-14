@@ -113,11 +113,7 @@ public class ImageLoader {
     for (int i =0; i < this.tileCount; i++){
       threads[i] = new Thread(new ImageRunnable(this, urls[i]));
       threads[i].start();
-    }/*
-    URL[] urls = setUrls(dateFrom);
-    this.tileBuffer = new DiagramBuffer(this, this.tileCount);
-    Thread t = new Thread(new test2Runnable(this, urls));
-    t.start();*/
+    }
   }
 
   private void getApiInfo() throws IOException, org.json.simple.parser.ParseException{
@@ -206,6 +202,7 @@ public class ImageLoader {
       this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);
       updateImage();
     }
+    this.image.loadingNext = false;
   }
 
   private void updateImage(){

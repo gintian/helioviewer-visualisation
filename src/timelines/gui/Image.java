@@ -20,7 +20,6 @@ public class Image extends JComponent {
   private BufferedImage bufferedImage;
   private int bufferedImageHeight;
   private int bufferedImageWidth;
-  private int pixelOrigin;
   private int pixelFocus;
   private int pixelOriginToFocus; //difference between pixelFocus and pixelOrigin
   private Window window;
@@ -41,6 +40,8 @@ public class Image extends JComponent {
     this.dateFocus = dateFocus;
     this.dateOrigin = dateFocus;
 
+    this.pixelFocus = getWindowCenter();
+
     setImage();
 
   }
@@ -55,20 +56,19 @@ public class Image extends JComponent {
 
   private void setImageOffset(){
     int dtp = timeToPixel(TimeUtils.difference(this.dateFocus, this.dateOrigin), this.zoomLevel); //time difference between image start date (dateOrigin) and date in middle of screen (dazeFocus) converted to pixel
-    int c = getWindowCenter();
-    this.imageOffset = c-dtp;
+    this.imageOffset = this.pixelFocus-dtp;
+    //this.imageOffset = getWindowCenter()-dtp;
   }
 
   private void moveDateFocusBy(int change){
     adjustImageOffset(change);
-    long dt = pixelToTime(getWindowCenter() - this.imageOffset, this.zoomLevel);
+    long dt = pixelToTime(pixelFocus - this.imageOffset, this.zoomLevel);
     this.dateFocus = TimeUtils.addTime(this.dateOrigin, dt);
   }
 
   private void moveDateFocusTo(int pixelFocus){
     long dt = pixelToTime(pixelFocus - this.imageOffset, this.zoomLevel);
     this.dateFocus = TimeUtils.addTime(this.dateOrigin, dt);
-    setImageOffset();
   }
 
   private void adjustImageOffset(int change){
@@ -78,12 +78,6 @@ public class Image extends JComponent {
   private Date getRequestDate(){
     System.out.println("dateFocus: "+dateFocus);
     return  TimeUtils.addTime(dateFocus, pixelToTime(-getWindowWidthHalf(), this.zoomLevel));
-  }
-
-
-
-  public int getZoomLevel(){
-    return  zoomLevel;
   }
 
   public void updateImage(ImageLoader il){  //TODO: fix if becomes problem with multithreading
@@ -116,19 +110,6 @@ public class Image extends JComponent {
     return (this.window.getContentPane().getWidth()/2);
   }
 
-  private void setFocusPointCenter(){
-    setFocusPoint(getWindowCenter());
-  }
-
-  public void setFocusPoint(int x){
-    this.pixelFocus = x;
-    pixelOriginToFocus = pixelFocus - pixelOrigin;
-  }
-
-  private void focusImage(){
-    this.pixelOrigin = getWindowCenter()-this.pixelOriginToFocus;
-  }
-
   public void stretchImage(int zoomLevelChange){
     if(zoomLevelChange < 0){
       this.bufferedImageWidth *=2;
@@ -138,6 +119,7 @@ public class Image extends JComponent {
   }
   public void zoom(int levelChange, int pixelFocus){
     if(!(((zoomLevel+levelChange) < maxZoomLevel)||((zoomLevel+levelChange) > minZoomLevel))||(levelChange == 0)){
+      this.pixelFocus = pixelFocus;
       moveDateFocusTo(pixelFocus);
       stretchImage(levelChange);
       this.zoomLevel += levelChange;
@@ -155,10 +137,10 @@ public class Image extends JComponent {
 
   private void checkBounds(){
     long boundsDistance = pixelToTime(this.window.getContentPane().getWidth(), this.zoomLevel)/2;
-    if ((this.dateFocus.getTime()-boundsDistance)<this.dateOrigin.getTime() && !this.loadingNext){
+    if (!(imageOffset < 0) && !this.loadingNext){
       loadingNext = true;
       this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage,this.serverBaseURLStr, this.dateOrigin, this.dateLast, this.zoomLevel, boundsDistance, ImageLoader.LEFT);
-    }else if ((this.dateFocus.getTime()+boundsDistance)>this.dateLast.getTime() && !this.loadingNext){
+    }else if (this.window.getContentPane().getWidth()-imageOffset>this.bufferedImage.getWidth() && !this.loadingNext){
       loadingNext = true;
       this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage,this.serverBaseURLStr, this.dateOrigin, this.dateLast, this.zoomLevel, boundsDistance, ImageLoader.RIGHT);
     }
@@ -233,7 +215,6 @@ public class Image extends JComponent {
   @Override
   public void paint(Graphics g){
     super.paintComponent(g);
-    focusImage();
     Color temp = g.getColor();
     g.setColor(Color.WHITE);
     g.drawRect(0,0,getWidth(),getHeight());
