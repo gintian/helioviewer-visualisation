@@ -100,7 +100,7 @@ public class TimelinesDB {
 
 
   /**
-   * Closes the database files
+   * Closes the database files.
    * Once closed they cannot be reopened
    * @throws IOException
    */
