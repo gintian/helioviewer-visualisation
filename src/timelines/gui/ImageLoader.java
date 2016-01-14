@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -58,7 +59,7 @@ public class ImageLoader {
     this.serverBaseURLStr = serverBaseURLStr;
     this.image = image;
     this.zoomLevel = zoomLevel;
-    getApiInfo();
+    setApiInfo(getApiInfo(serverBaseURLStr));
     setTileCount();
     getImages(startDate);
   }
@@ -81,7 +82,7 @@ public class ImageLoader {
     this.zoomLevel = zoomLevel;
     this.diagram = new Diagram(bufferedImage, new APIImageMetadata(startDate, endDate, zoomLevel));
     this.sideToExpand = sideToExpand;
-    getApiInfo();
+    setApiInfo(getApiInfo(serverBaseURLStr));
     setTileCount(1);
     if (sideToExpand == LEFT) {
       getImages(TimeUtils.addTime(startDate, -Image.pixelToTime(this.tileWidth/2, zoomLevel)));
@@ -116,8 +117,8 @@ public class ImageLoader {
     }
   }
 
-  private void getApiInfo() throws IOException, org.json.simple.parser.ParseException{
-    URL url = new URL(MessageFormat.format("{0}/apiInfo", this.serverBaseURLStr));
+  public static HashMap<String, Integer> getApiInfo(String serverBaseURLStr) throws IOException, org.json.simple.parser.ParseException{
+    URL url = new URL(MessageFormat.format("{0}/apiInfo", serverBaseURLStr));
     BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
     String jsonString = "";
     String inputLine;
@@ -125,11 +126,21 @@ public class ImageLoader {
       jsonString += inputLine;
     in.close();
 
+    HashMap<String, Integer> infos = new HashMap<>();
     JSONObject infoJsonObject = (JSONObject) JSONValue.parseWithException(jsonString);
-    this.tileHeight = (int)(long)infoJsonObject.get("height");
-    this.tileWidth = (int)(long)infoJsonObject.get("width");
-    this.minZoomLevel = (int)(long)infoJsonObject.get("zoomLevelTo");
-    this.maxZoomLevel = (int)(long)infoJsonObject.get("zoomLevelFrom");
+    infos.put("height",(int)(long)infoJsonObject.get("height"));
+    infos.put("width",(int)(long)infoJsonObject.get("width"));
+    infos.put("zoomLevelTo",(int)(long)infoJsonObject.get("zoomLevelTo"));
+    infos.put("zoomLevelFrom",(int)(long)infoJsonObject.get("zoomLevelFrom"));
+
+    return infos;
+  }
+
+  private void setApiInfo(HashMap<String,Integer> infos){
+    this.tileHeight = infos.get("height");
+    this.tileWidth = infos.get("width");
+    this.minZoomLevel = infos.get("zoomLevelTo");
+    this.maxZoomLevel = infos.get("zoomLevelFrom");
   }
 
   private void setTileCount(){
