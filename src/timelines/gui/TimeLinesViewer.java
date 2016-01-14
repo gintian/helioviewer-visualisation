@@ -11,15 +11,15 @@ import java.util.Date;
  */
 public class TimeLinesViewer {
 
-  //private static final Date date = new Date(); //TODO: ... when done testing
   private static Date date = new Date();
 
   public static void main(String[] args){
     try {
       date = TimeUtils.fromString("1991-07-01:00:00:00", "yyyy-MM-dd:HH:mm:ss");
     }catch (ParseException e){
-      //TODO: remove this try catch when done testing
+      e.printStackTrace();
     }
     Window tLVWindow = new Window(date);
+    tLVWindow.setResizable(false);
   }
 }

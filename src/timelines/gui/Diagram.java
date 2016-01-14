@@ -2,12 +2,14 @@ package timelines.gui;
 
 import com.sun.istack.internal.NotNull;
 import timelines.api.APIImageMetadata;
+import timelines.utils.TimeUtils;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -16,6 +18,7 @@ import java.util.Date;
 public class Diagram {
     private BufferedImage bufferedImage;
     private APIImageMetadata metadata;
+    private boolean empty = false;
 
     public Diagram(BufferedImage bufferedImage, APIImageMetadata metadata){
         this.bufferedImage = bufferedImage;
@@ -40,6 +43,19 @@ public class Diagram {
         this.bufferedImage = ImageIO.read(bais);
     }
 
+    public Diagram(String url){
+        this.empty = true;
+        Date date;
+        try {
+            date = TimeUtils.fromString(url.substring(url.lastIndexOf("=")),"yyyy-MM-dd:HH:mm:ss");
+        }catch (ParseException e){
+            date = null;
+            e.printStackTrace();
+        }
+        this.metadata = new APIImageMetadata(date,null,0);
+        this.bufferedImage = null;
+    }
+
     @NotNull
     public BufferedImage getBufferedImage(){
         return this.bufferedImage;
@@ -58,5 +74,8 @@ public class Diagram {
     }
     public int getZoomLevel(){
         return this.metadata.getZoomLevel();
+    }
+    public boolean isEmpty(){
+        return this.empty;
     }
 }

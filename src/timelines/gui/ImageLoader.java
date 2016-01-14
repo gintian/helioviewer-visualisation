@@ -136,7 +136,7 @@ public class ImageLoader {
   }
 
   private void setTileCount(){
-    this.tileCount = (this.image.getWindow().getWidth() / this.tileWidth)+1;
+    this.tileCount = (this.image.getWindow().getWidth() / this.tileWidth)+2;
   }
 
   private void setTileCount(int tileCount){
@@ -185,16 +185,31 @@ public class ImageLoader {
     Date endDate;
 
     if (this.sideToExpand == LEFT) {
-      startDate = te.getValue().getStartDate();
-      endDate = TimeUtils.addTime(this.diagram.getEndDate(),-Image.pixelToTime(this.tileWidth,this.zoomLevel));
-      g.drawImage(te.getValue().getBufferedImage(), 0, 0, null);
-      g.drawImage(this.diagram.getBufferedImage(), this.tileWidth, 0, null);
-    } else {
-      startDate = TimeUtils.addTime(this.diagram.getStartDate(), Image.pixelToTime(this.tileWidth, this.zoomLevel));
-      endDate = te.getValue().getEndDate();
 
+      BufferedImage bimg;
+      if (te.getValue().isEmpty()) {
+        startDate = TimeUtils.addTime(this.diagram.getStartDate(), -Image.pixelToTime(this.tileWidth,this.zoomLevel));
+        bimg = new BufferedImage(this.tileWidth, this.tileHeight, BufferedImage.TYPE_INT_ARGB);
+      }else {
+        startDate = te.getValue().getStartDate();
+        bimg = te.getValue().getBufferedImage();
+      }
+      endDate = TimeUtils.addTime(this.diagram.getEndDate(), -Image.pixelToTime(this.tileWidth, this.zoomLevel));
+      g.drawImage(bimg, 0, 0, null);
+      g.drawImage(this.diagram.getBufferedImage(), this.tileWidth, 0, null);
+
+    } else {
+      BufferedImage bimg;
+      if (te.getValue().isEmpty()) {
+        endDate = TimeUtils.addTime(this.diagram.getEndDate(), Image.pixelToTime(this.tileWidth, this.zoomLevel));
+        bimg = new BufferedImage(this.tileWidth, this.tileHeight, BufferedImage.TYPE_INT_ARGB);
+      }else {
+        endDate = te.getValue().getEndDate();
+        bimg = te.getValue().getBufferedImage();
+      }
+      startDate = TimeUtils.addTime(this.diagram.getStartDate(), Image.pixelToTime(this.tileWidth, this.zoomLevel));
       g.drawImage(this.diagram.getBufferedImage(), -this.tileWidth, 0, null);
-      g.drawImage(te.getValue().getBufferedImage(), w-this.tileWidth, 0, null);
+      g.drawImage(bimg, w - this.tileWidth, 0, null);
     }
     System.out.println("making");//TODO:remove
 
