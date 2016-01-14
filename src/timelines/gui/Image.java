@@ -57,11 +57,12 @@ public class Image extends JComponent {
   private void setImageOffset(){
     int dtp = timeToPixel(TimeUtils.difference(this.dateFocus, this.dateOrigin), this.zoomLevel); //time difference between image start date (dateOrigin) and date in middle of screen (dazeFocus) converted to pixel
     this.imageOffset = this.pixelFocus-dtp;
+    //this.imageOffset = getWindowCenter()-dtp;
   }
 
   private void moveDateFocusBy(int change){
     adjustImageOffset(change);
-    long dt = pixelToTime(getWindowCenter() - this.imageOffset, this.zoomLevel);
+    long dt = pixelToTime(pixelFocus - this.imageOffset, this.zoomLevel);
     this.dateFocus = TimeUtils.addTime(this.dateOrigin, dt);
   }
 
@@ -136,10 +137,10 @@ public class Image extends JComponent {
 
   private void checkBounds(){
     long boundsDistance = pixelToTime(this.window.getContentPane().getWidth(), this.zoomLevel)/2;
-    if ((this.dateFocus.getTime()-boundsDistance)<this.dateOrigin.getTime() && !this.loadingNext){
+    if (!(imageOffset < 0) && !this.loadingNext){
       loadingNext = true;
       this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage,this.serverBaseURLStr, this.dateOrigin, this.dateLast, this.zoomLevel, boundsDistance, ImageLoader.LEFT);
-    }else if ((this.dateFocus.getTime()+boundsDistance)>this.dateLast.getTime() && !this.loadingNext){
+    }else if (this.window.getContentPane().getWidth()-imageOffset>this.bufferedImage.getWidth() && !this.loadingNext){
       loadingNext = true;
       this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage,this.serverBaseURLStr, this.dateOrigin, this.dateLast, this.zoomLevel, boundsDistance, ImageLoader.RIGHT);
     }
