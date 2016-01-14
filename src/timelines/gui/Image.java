@@ -18,9 +18,7 @@ public class Image extends JComponent {
   private BufferedImage bufferedImage;
   private int bufferedImageHeight;
   private int bufferedImageWidth;
-  private int pixelOrigin;
   private int pixelFocus;
-  private int pixelOriginToFocus; //difference betwene pixelFocus and pixelOrigin
   private Window window;
   private int zoomLevel = 21; //TODO:set via imageloader
   private int maxZoomLevel = 1; //TODO:set via imageloader
@@ -39,6 +37,8 @@ public class Image extends JComponent {
     this.dateFocus = dateFocus;
     this.dateOrigin = dateFocus;
 
+    this.pixelFocus = getWindowCenter();
+
     setImage();
 
   }
@@ -53,8 +53,7 @@ public class Image extends JComponent {
 
   private void setImageOffset(){
     int dtp = timeToPixel(TimeUtils.difference(this.dateFocus, this.dateOrigin), this.zoomLevel); //time difference between image start date (dateOrigin) and date in middle of screen (dazeFocus) converted to pixel
-    int c = getWindowCenter();
-    this.imageOffset = c-dtp;
+    this.imageOffset = this.pixelFocus-dtp;
   }
 
   private void moveDateFocusBy(int change){
@@ -66,7 +65,6 @@ public class Image extends JComponent {
   private void moveDateFocusTo(int pixelFocus){
     long dt = pixelToTime(pixelFocus - this.imageOffset, this.zoomLevel);
     this.dateFocus = TimeUtils.addTime(this.dateOrigin, dt);
-    setImageOffset();
   }
 
   private void adjustImageOffset(int change){
@@ -76,12 +74,6 @@ public class Image extends JComponent {
   private Date getRequestDate(){
     System.out.println("dateFocus: "+dateFocus);
     return  TimeUtils.addTime(dateFocus, pixelToTime(-getWindowWidthHalf(), this.zoomLevel));
-  }
-
-
-
-  public int getZoomLevel(){
-    return  zoomLevel;
   }
 
   public void updateImage(ImageLoader il){  //TODO: fix if becomes problem with multithreading
@@ -114,19 +106,6 @@ public class Image extends JComponent {
     return (this.window.getContentPane().getWidth()/2);
   }
 
-  private void setFocusPointCenter(){
-    setFocusPoint(getWindowCenter());
-  }
-
-  public void setFocusPoint(int x){
-    this.pixelFocus = x;
-    pixelOriginToFocus = pixelFocus - pixelOrigin;
-  }
-
-  private void focusImage(){
-    this.pixelOrigin = getWindowCenter()-this.pixelOriginToFocus;
-  }
-
   public void stretchImage(int zoomLevelChange){
     if(zoomLevelChange < 0){
       this.bufferedImageWidth *=2;
@@ -136,6 +115,7 @@ public class Image extends JComponent {
   }
   public void zoom(int levelChange, int pixelFocus){
     if(!(((zoomLevel+levelChange) < maxZoomLevel)||((zoomLevel+levelChange) > minZoomLevel))||(levelChange == 0)){
+      this.pixelFocus = pixelFocus;
       moveDateFocusTo(pixelFocus);
       stretchImage(levelChange);
       this.zoomLevel += levelChange;
@@ -181,20 +161,19 @@ public class Image extends JComponent {
 
     g.setColor(rulerColor);
     g.fillRect(rw,h-rw,w-rw,rw);
-    /*g.setColor(scaleColor);
-    int j = pixelOrigin;
-    while(j<= bufferedImageWidth + pixelOrigin){
+    g.setColor(scaleColor);
+    int j = imageOffset;
+    while(j<= bufferedImageWidth + imageOffset){
       g.drawLine(j,h-sp,j,h-(rw-sp));
       j+=(10*zoomLevel);
     }
-    g.setColor(rulerColor);*/
+    g.setColor(rulerColor);
     g.fillRect(0, h - rw, rw, rw);
   }
 
   @Override
   public void paint(Graphics g){
     super.paintComponent(g);
-    focusImage();
     Color temp = g.getColor();
     g.setColor(Color.WHITE);
     g.drawRect(0,0,getWidth(),getHeight());
