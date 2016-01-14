@@ -1,11 +1,13 @@
 package timelines.gui;
 
-import timelines.utils.TimeUtils;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Date;
+
+import javax.swing.JComponent;
+
+import timelines.utils.TimeUtils;
 
 /**
  * Project i4ds05-visualisieren-von-timelines
@@ -20,7 +22,7 @@ public class Image extends JComponent {
   private int bufferedImageWidth;
   private int pixelOrigin;
   private int pixelFocus;
-  private int pixelOriginToFocus; //difference betwene pixelFocus and pixelOrigin
+  private int pixelOriginToFocus; //difference between pixelFocus and pixelOrigin
   private Window window;
   private int zoomLevel = 21; //TODO:set via imageloader
   private int maxZoomLevel = 1; //TODO:set via imageloader
@@ -173,11 +175,25 @@ public class Image extends JComponent {
 
     g.fillRect(0,0,rw,h-rw);
     g.setColor(scaleColor);
-    int i = h-rw-1;
-    while(i>=0){
-      g.drawLine(sp,i,rw-sp,i);
-      i-=(10);
+//    int i = h-rw-1;
+//    while(i>=0){
+//      g.drawLine(sp,i,rw-sp,i);
+//      i-=(10);
+//    }
+
+    int spacing = currentImageLoader.getTileHeight() / 6;
+
+    for (int j = 3; j < 10; j++) {
+      g.drawLine(sp, (j-3) * spacing , rw - sp, (j-3) * spacing);
     }
+
+
+    g.setColor(Color.BLACK);
+    g.drawString("10e-3", 20, 10);
+    for (int i = 1; i < 6; i++) {
+      g.drawString("10e-" + (i + 3), 20, i * spacing);
+    }
+    g.drawString("10e-9", 20, currentImageLoader.getTileHeight());
 
     g.setColor(rulerColor);
     g.fillRect(rw,h-rw,w-rw,rw);
@@ -189,6 +205,13 @@ public class Image extends JComponent {
     }
     g.setColor(rulerColor);*/
     g.fillRect(0, h - rw, rw, rw);
+
+    g.setColor(Color.BLACK);
+    g.drawString(TimeUtils.toString(dateOrigin, "dd-MM-yy"), 20, window.getHeight() - 50);
+    for (int i = 1; i < 6; i++) {
+//      g.drawString("10e-" + (i + 3), 20, i * spacing);
+    }
+//    g.drawString("10e-9", 20, currentImageLoader.getTileHeight());
   }
 
   @Override
