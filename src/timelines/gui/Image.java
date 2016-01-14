@@ -153,9 +153,9 @@ public class Image extends JComponent {
         //this.bufferedImageWidth /= 2;
 
         int stepCount = 10;
-        int increasePerStep = bufferedImageWidth / stepCount / 2;
+        int decreasePerStep = bufferedImageWidth / stepCount / 2;
         System.out.println("width before: " + bufferedImageWidth);
-        System.out.println("width after: " + (bufferedImageWidth + (10* increasePerStep)));
+        System.out.println("width after: " + (bufferedImageWidth + (10* decreasePerStep)));
         float percentage = bufferedImageWidth / 100;
         float percentageLeft = (cursorPosX - imageOffset) / percentage;
         System.out.println("percentage left: " + percentageLeft + "");
@@ -166,7 +166,7 @@ public class Image extends JComponent {
         System.out.println("calculated offset:" + (-(testLeft - cursorPosX)));
 
         for (int i = 0; i < stepCount; i++) {
-          this.bufferedImageWidth -= increasePerStep;
+          this.bufferedImageWidth -= decreasePerStep;
           int pixelsLeftOfFocus = (int) (bufferedImageWidth / 100f * percentageLeft);
           System.out.println("pixels left " + pixelsLeftOfFocus + " mouseX: " + cursorPosX + " image width: " + bufferedImageWidth);
           imageOffset = -(pixelsLeftOfFocus - cursorPosX);
