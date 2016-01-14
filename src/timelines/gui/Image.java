@@ -120,18 +120,73 @@ public class Image extends JComponent {
     return (this.window.getContentPane().getWidth()/2);
   }
 
-  public void stretchImage(int zoomLevelChange){
-    if(zoomLevelChange < 0){
-      this.bufferedImageWidth *=2;
-    }else{
-      this.bufferedImageWidth /= 2;
+  public void stretchImage(int zoomLevelChange, int cursorPosX){
+    try {
+      if(zoomLevelChange < 0){
+//        this.bufferedImageWidth *=2;
+
+        int stepCount = 10;
+        int increasePerStep = bufferedImageWidth / stepCount;
+        System.out.println("width before: " + bufferedImageWidth);
+        System.out.println("width after: " + (bufferedImageWidth + (10* increasePerStep)));
+        float percentage = bufferedImageWidth / 100;
+        float percentageLeft = (cursorPosX - imageOffset) / percentage;
+        System.out.println("percentage left: " + percentageLeft + "");
+        System.out.println("offset: " + imageOffset);
+
+        // test
+        int testLeft = (int) (bufferedImageWidth / 100f * percentageLeft);
+        System.out.println("calculated offset:" + (-(testLeft - cursorPosX)));
+
+        for (int i = 0; i < stepCount; i++) {
+          this.bufferedImageWidth += increasePerStep;
+          int pixelsLeftOfFocus = (int) (bufferedImageWidth / 100f * percentageLeft);
+          System.out.println("pixels left " + pixelsLeftOfFocus + " mouseX: " + cursorPosX + " image width: " + bufferedImageWidth);
+          imageOffset = -(pixelsLeftOfFocus - cursorPosX);
+          System.out.println("offset: " + imageOffset);
+          paintImmediately(0, 0, window.getWidth(), window.getHeight());
+
+          Thread.sleep(5);
+        }
+
+      }else{
+        //this.bufferedImageWidth /= 2;
+
+        int stepCount = 10;
+        int increasePerStep = bufferedImageWidth / stepCount / 2;
+        System.out.println("width before: " + bufferedImageWidth);
+        System.out.println("width after: " + (bufferedImageWidth + (10* increasePerStep)));
+        float percentage = bufferedImageWidth / 100;
+        float percentageLeft = (cursorPosX - imageOffset) / percentage;
+        System.out.println("percentage left: " + percentageLeft + "");
+        System.out.println("offset: " + imageOffset);
+
+        // test
+        int testLeft = (int) (bufferedImageWidth / 100f * percentageLeft);
+        System.out.println("calculated offset:" + (-(testLeft - cursorPosX)));
+
+        for (int i = 0; i < stepCount; i++) {
+          this.bufferedImageWidth -= increasePerStep;
+          int pixelsLeftOfFocus = (int) (bufferedImageWidth / 100f * percentageLeft);
+          System.out.println("pixels left " + pixelsLeftOfFocus + " mouseX: " + cursorPosX + " image width: " + bufferedImageWidth);
+          imageOffset = -(pixelsLeftOfFocus - cursorPosX);
+          System.out.println("offset: " + imageOffset);
+          paintImmediately(0, 0, window.getWidth(), window.getHeight());
+
+          Thread.sleep(5);
+        }
+
+      }
+    } catch (InterruptedException e) {
+//       TODO Auto-generated catch block
+      e.printStackTrace();
     }
   }
   public void zoom(int levelChange, int pixelFocus){
     if(!(((zoomLevel+levelChange) < maxZoomLevel)||((zoomLevel+levelChange) > minZoomLevel))||(levelChange == 0)){
       this.pixelFocus = pixelFocus;
       moveDateFocusTo(pixelFocus);
-      stretchImage(levelChange);
+      stretchImage(levelChange, pixelFocus);
       this.zoomLevel += levelChange;
       setImageOffset();
       repaint();
