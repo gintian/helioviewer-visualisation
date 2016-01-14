@@ -191,9 +191,9 @@ public class Image extends JComponent {
     g.setColor(Color.BLACK);
     g.drawString("10e-3", 20, 10);
     for (int i = 1; i < 6; i++) {
-      g.drawString("10e-" + (i + 3), 20, i * spacing);
+      g.drawString("10e-" + (i + 3), rulerWidth, i * spacing);
     }
-    g.drawString("10e-9", 20, currentImageLoader.getTileHeight());
+    g.drawString("10e-9", rulerWidth, currentImageLoader.getTileHeight());
 
     g.setColor(rulerColor);
     g.fillRect(rw,h-rw,w-rw,rw);
@@ -207,11 +207,27 @@ public class Image extends JComponent {
     g.fillRect(0, h - rw, rw, rw);
 
     g.setColor(Color.BLACK);
-    g.drawString(TimeUtils.toString(dateOrigin, "dd-MM-yy"), 20, window.getHeight() - 50);
-    for (int i = 1; i < 6; i++) {
-//      g.drawString("10e-" + (i + 3), 20, i * spacing);
+    int dateLabelWidth = 95;
+    Date leftMost = TimeUtils.addTime(dateOrigin,pixelToTime(-imageOffset, zoomLevel));
+    Date rightMost = TimeUtils.addTime(leftMost,pixelToTime(window.getWidth() - rulerWidth, zoomLevel));
+
+    g.drawString(TimeUtils.toString(leftMost, "dd-MM-yyyy"), rulerWidth, window.getHeight() - 50);
+
+    g.setColor(scaleColor);
+    g.drawLine(rulerWidth, h - rw + 3, rulerWidth, h - rw + rulerWidth - 6);
+    //g.drawString(TimeUtils.toString(rightMost, "dd-MM-yyyy"), window.getWidth() - dateLabelWidth, window.getHeight() - 50);
+
+    int labelPos = dateLabelWidth + 20;
+    while (labelPos < window.getWidth() - dateLabelWidth) {
+      Date current = TimeUtils.addTime(leftMost,pixelToTime(labelPos, zoomLevel));
+      g.setColor(Color.BLACK);
+      g.drawString(TimeUtils.toString(current, "dd-MM-yyyy"), labelPos, window.getHeight() - 50);
+
+      g.setColor(scaleColor);
+      g.drawLine(labelPos, h - rw + 3, labelPos, h - rw + rulerWidth - 6);
+
+      labelPos += dateLabelWidth;
     }
-//    g.drawString("10e-9", 20, currentImageLoader.getTileHeight());
   }
 
   @Override
