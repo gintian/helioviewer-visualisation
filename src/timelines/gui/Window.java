@@ -6,6 +6,9 @@ package timelines.gui;
  */
 
 
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
 import java.util.Date;
 
 import javax.swing.JFrame;
@@ -20,7 +23,13 @@ public class Window extends JFrame {
     setLocationRelativeTo(null);
     setVisible(true);
 
-    image = new Image(this, date);
+    try {
+      image = new Image(this, date);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
     add(image);
 
     ZoomListener zoom = new ZoomListener();

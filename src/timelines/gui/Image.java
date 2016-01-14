@@ -3,10 +3,13 @@ package timelines.gui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.swing.JComponent;
 
+import org.json.simple.parser.ParseException;
 import timelines.utils.TimeUtils;
 
 /**
@@ -21,11 +24,10 @@ public class Image extends JComponent {
   private int bufferedImageHeight;
   private int bufferedImageWidth;
   private int pixelFocus;
-  private int pixelOriginToFocus; //difference between pixelFocus and pixelOrigin
   private Window window;
-  private int zoomLevel = 21; //TODO:set via imageloader
-  private int maxZoomLevel = 1; //TODO:set via imageloader
-  private int minZoomLevel = 21; //TODO:set via imageloader
+  private int maxZoomLevel;
+  private int minZoomLevel;
+  private int zoomLevel;
   private int rulerWidth = 20;
   private ImageLoader currentImageLoader;
   private Date dateOrigin; //current images start/leftmost date
@@ -34,16 +36,24 @@ public class Image extends JComponent {
   int imageOffset;
   public boolean loadingNext = false;
 
-  public Image(Window window, Date dateFocus){
+  public Image(Window window, Date dateFocus) throws IOException, ParseException {
     this.window = window;
 
     this.dateFocus = dateFocus;
     this.dateOrigin = dateFocus;
 
     this.pixelFocus = getWindowCenter();
+    setZoomLevelBoundries();
 
     setImage();
 
+  }
+
+  private void setZoomLevelBoundries() throws IOException, ParseException {
+    HashMap<String, Integer> hm = ImageLoader.getApiInfo(this.serverBaseURLStr);
+    this.minZoomLevel = hm.get("zoomLevelTo");
+    this.maxZoomLevel = hm.get("zoomLevelFrom");
+    this.zoomLevel = this.minZoomLevel;
   }
 
   public static int timeToPixel(long time, int zoomLevel){
@@ -80,7 +90,7 @@ public class Image extends JComponent {
     return  TimeUtils.addTime(dateFocus, pixelToTime(-getWindowWidthHalf(), this.zoomLevel));
   }
 
-  public void updateImage(ImageLoader il){  //TODO: fix if becomes problem with multithreading
+  public void updateImage(ImageLoader il){
     if(this.currentImageLoader.equals(il)){
       this.bufferedImage = il.getDiagram().getBufferedImage();
       this.bufferedImageWidth = this.bufferedImage.getWidth();
@@ -90,7 +100,7 @@ public class Image extends JComponent {
 
       setImageOffset();
 
-      repaint();  //TODO: point of interest
+      repaint();
       this.loadingNext = false;
     }
   }
