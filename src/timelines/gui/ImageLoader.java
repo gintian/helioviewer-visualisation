@@ -63,9 +63,9 @@ public class ImageLoader {
     getImages(startDate);
   }
 
-  public static ImageLoader loadAdditional(Image image, BufferedImage bufferedImage, String serverBaseURLStr, Date startDate, Date endDate, int zoomLevel, long timeOffset, int sideToExpand){
+  public static ImageLoader loadAdditional(Image image, BufferedImage bufferedImage, String serverBaseURLStr, Date startDate, Date endDate, int zoomLevel, int sideToExpand){
     try {
-      return new ImageLoader(image, bufferedImage, serverBaseURLStr, startDate, endDate, zoomLevel, timeOffset, sideToExpand);
+      return new ImageLoader(image, bufferedImage, serverBaseURLStr, startDate, endDate, zoomLevel, sideToExpand);
     } catch (IOException e) {
       e.printStackTrace();
       return null;
@@ -74,7 +74,7 @@ public class ImageLoader {
       return null;
     }
   }
-  private ImageLoader(Image image, BufferedImage bufferedImage, String serverBaseURLStr, Date startDate, Date endDate, int zoomLevel, long timeOffset, int sideToExpand) throws IOException, org.json.simple.parser.ParseException {
+  private ImageLoader(Image image, BufferedImage bufferedImage, String serverBaseURLStr, Date startDate, Date endDate, int zoomLevel, int sideToExpand) throws IOException, org.json.simple.parser.ParseException {
     this.callType = EXTEND_SET;
     this.image = image;
     this.serverBaseURLStr = serverBaseURLStr;
@@ -84,9 +84,9 @@ public class ImageLoader {
     getApiInfo();
     setTileCount(1);
     if (sideToExpand == LEFT) {
-      getImages(TimeUtils.addTime(startDate, -timeOffset));
+      getImages(TimeUtils.addTime(startDate, -Image.pixelToTime(this.tileWidth/2, zoomLevel)));
     } else if (sideToExpand == RIGHT){
-      getImages(TimeUtils.addTime(endDate, timeOffset));
+      getImages(endDate);
     }
 
   }
@@ -176,31 +176,33 @@ public class ImageLoader {
 
     if (!this.tileBuffer.getMap().isEmpty()) {
       Map.Entry<Long, Diagram> te = this.tileBuffer.getMap().firstEntry();
-      int w = this.diagram.getBufferedImage().getWidth();
-      int h = this.tileHeight;
-      BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-      Graphics g = img.getGraphics();
+      if (te.getValue().getStartDate().getTime() < this.diagram.getStartDate().getTime() || te.getValue().getEndDate().getTime() > this.diagram.getEndDate().getTime()) {
+        int w = this.diagram.getBufferedImage().getWidth();
+        int h = this.tileHeight;
+        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = img.getGraphics();
 
-      Date startDate;
-      Date endDate;
+        Date startDate;
+        Date endDate;
 
-      if (this.sideToExpand == LEFT) {
-        startDate = te.getValue().getStartDate();
-        endDate = TimeUtils.addTime(this.diagram.getEndDate(), -Image.pixelToTime(this.tileWidth, this.zoomLevel));
-        g.drawImage(te.getValue().getBufferedImage(), 0, 0, null);
-        g.drawImage(this.diagram.getBufferedImage(), this.tileWidth, 0, null);
-      } else {
-        startDate = TimeUtils.addTime(this.diagram.getStartDate(), Image.pixelToTime(this.tileWidth, this.zoomLevel));
-        endDate = te.getValue().getEndDate();
+        if (this.sideToExpand == LEFT) {
+          startDate = te.getValue().getStartDate();
+          endDate = TimeUtils.addTime(this.diagram.getEndDate(), -Image.pixelToTime(this.tileWidth, this.zoomLevel));
+          g.drawImage(te.getValue().getBufferedImage(), 0, 0, null);
+          g.drawImage(this.diagram.getBufferedImage(), this.tileWidth, 0, null);
+        } else {
+          startDate = TimeUtils.addTime(this.diagram.getStartDate(), Image.pixelToTime(this.tileWidth, this.zoomLevel));
+          endDate = te.getValue().getEndDate();
 
-        g.drawImage(this.diagram.getBufferedImage(), -this.tileWidth, 0, null);
-        g.drawImage(te.getValue().getBufferedImage(), w - this.tileWidth, 0, null);
+          g.drawImage(this.diagram.getBufferedImage(), -this.tileWidth, 0, null);
+          g.drawImage(te.getValue().getBufferedImage(), w - this.tileWidth, 0, null);
+        }
+        System.out.println("making");//TODO:remove
+
+
+        this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);
+        updateImage();
       }
-      System.out.println("making");//TODO:remove
-
-
-      this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);
-      updateImage();
     }
     this.image.loadingNext = false;
   }

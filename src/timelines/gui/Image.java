@@ -131,20 +131,18 @@ public class Image extends JComponent {
 
   public void dragged(int change) {
     moveDateFocusBy(change);
-    checkBounds();
+    checkBounds(change);
     repaint();
   }
 
-  private void checkBounds(){
-    long boundsDistance = pixelToTime(this.window.getContentPane().getWidth(), this.zoomLevel)/2;
-    if (!(imageOffset < 0) && !this.loadingNext){
+  private void checkBounds(int change){
+    if ((change > 0) && !(imageOffset < 0) && !this.loadingNext){
       loadingNext = true;
-      this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage,this.serverBaseURLStr, this.dateOrigin, this.dateLast, this.zoomLevel, boundsDistance, ImageLoader.LEFT);
-    }else if (this.window.getContentPane().getWidth()-imageOffset>this.bufferedImage.getWidth() && !this.loadingNext){
+      this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage,this.serverBaseURLStr, this.dateOrigin, this.dateLast, this.zoomLevel, ImageLoader.LEFT);
+    }else if ((change < 0) && this.window.getContentPane().getWidth()-imageOffset>this.bufferedImage.getWidth() && !this.loadingNext){
       loadingNext = true;
-      this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage,this.serverBaseURLStr, this.dateOrigin, this.dateLast, this.zoomLevel, boundsDistance, ImageLoader.RIGHT);
+      this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage,this.serverBaseURLStr, this.dateOrigin, this.dateLast, this.zoomLevel, ImageLoader.RIGHT);
     }
-
   }
 
   private void paintRulers(Graphics g){
