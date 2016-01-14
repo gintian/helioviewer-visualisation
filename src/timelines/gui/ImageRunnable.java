@@ -20,8 +20,14 @@ public class ImageRunnable implements Runnable {
     public void run() {
         try {
             System.out.println("thread url: "+ url);//TODO:remove
-            Diagram diagram = new Diagram(this.imageLoader.getBytes(url));
-            System.out.println("thread url: "+ url + " ## thread diagram: " + diagram.getStartDate() + " | " + diagram.getEndDate() + " | " + diagram.getZoomLevel());//TODO:remove
+            byte[] bytes = this.imageLoader.getBytes(url);
+            Diagram diagram;
+            if (bytes.length!=0) {
+                diagram = new Diagram(bytes);
+                System.out.println("thread url: " + url + " ## thread diagram: " + diagram.getStartDate() + " | " + diagram.getEndDate() + " | " + diagram.getZoomLevel());//TODO:remove
+            }else{
+                diagram = new Diagram(this.url.toString());
+            }
             this.imageLoader.tileBuffer.addToDiagramBuffer(diagram);
         }catch (IOException e){
 

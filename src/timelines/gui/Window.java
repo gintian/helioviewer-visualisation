@@ -15,7 +15,7 @@ public class Window extends JFrame {
   public Window(Date date){
     super("i4ds05 - Time Lines Viewer");
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setSize(2000, 500);
+    setSize(1200, 500);
     setLocationRelativeTo(null);
     setVisible(true);
 
