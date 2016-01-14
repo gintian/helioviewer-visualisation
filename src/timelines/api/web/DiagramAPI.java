@@ -94,11 +94,15 @@ public class DiagramAPI extends HttpServlet {
       return;
     }
 
-    try {
-      getImage(parameters, response);
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (parameters.getDateFrom().after(TimelinesDB.DB_START_DATE)) {
+      try {
+        getImage(parameters, response);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
+
+
   }
 
   /**
@@ -134,10 +138,12 @@ public class DiagramAPI extends HttpServlet {
       img = renderer.getDiagramForTimespan(actualStartDate, endDate);
     }
 
-    response.setContentType("image/png");
-    OutputStream out = response.getOutputStream();
-    ImageUtils.writeWithCustomData(out, img, imageMetadata);
-    out.close();
+    if (img != null) {
+      response.setContentType("image/png");
+      OutputStream out = response.getOutputStream();
+      ImageUtils.writeWithCustomData(out, img, imageMetadata);
+      out.close();
+    }
     renderer.close();
   }
 
