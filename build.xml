@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="initCache" name="Create Runnable Jar for Project timelines with Jar-in-Jar Loader">
+    <!--ANT 1.7 is required                                        -->
+    
+    <target name="initDB">
+        <jar destfile="build/initDB.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="timelines.importer.Importer"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="build/classes"/>
+            <zipfileset dir="lib" includes="json-simple-1.1.1.jar"/>
+            <zipfileset dir="lib" includes="opencsv-2.3.jar"/>
+        </jar>
+    </target>
+    
+    <target name="initCache">
+        <jar destfile="build/initCache.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="timelines.renderer.CacheRenderer"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="build/classes"/>
+            <zipfileset dir="lib" includes="json-simple-1.1.1.jar"/>
+            <zipfileset dir="lib" includes="opencsv-2.3.jar"/>
+        </jar>
+    </target>
+    
+    <target name="updater">
+        <jar destfile="build/updater.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="timelines.importer.Updater"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="build/classes"/>
+            <zipfileset dir="lib" includes="json-simple-1.1.1.jar"/>
+            <zipfileset dir="lib" includes="opencsv-2.3.jar"/>
+        </jar>
+    </target>
+    
+    <target name="client">
+        <jar destfile="build/client.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="timelines.gui.TimeLinesViewer"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="build/classes"/>
+            <zipfileset dir="lib" includes="json-simple-1.1.1.jar"/>
+            <zipfileset dir="lib" includes="opencsv-2.3.jar"/>
+        </jar>
+    </target>
+    
+    
+</project>

@@ -121,15 +121,15 @@ public class DiagramAPI extends HttpServlet {
 
     BufferedImage img;
 
+    Date endDate = new Date(actualStartDate.getTime() + currentTimePerImage);
+
+    imageMetadata.put("dateFrom", TimeUtils.toString(actualStartDate, "yyyy-MM-dd:HH:mm:ss"));
+    imageMetadata.put("dateTo", TimeUtils.toString(endDate, "yyyy-MM-dd:HH:mm:ss"));
+    imageMetadata.put("zoomLevel", "" + parameters.getZoomLevel());
+
     if (parameters.getZoomLevel() >= CacheRenderer.CACHE_ZOOM_START) {
-       img = getFromCache(actualStartDate, parameters.getZoomLevel());
+      img = getFromCache(actualStartDate, parameters.getZoomLevel());
     } else {
-
-      Date endDate = new Date(actualStartDate.getTime() + currentTimePerImage);
-
-      imageMetadata.put("dateFrom", TimeUtils.toString(actualStartDate, "yyyy-MM-dd:HH:mm:ss"));
-      imageMetadata.put("dateTo", TimeUtils.toString(endDate, "yyyy-MM-dd:HH:mm:ss"));
-      imageMetadata.put("zoomLevel", "" + parameters.getZoomLevel());
 
       img = renderer.getDiagramForTimespan(actualStartDate, endDate);
     }
