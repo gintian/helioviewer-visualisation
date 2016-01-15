@@ -22,7 +22,8 @@ import timelines.utils.TimeUtils;
 
 
 /**
- * Created by Tobi on 05.12.2015.
+ * Project i4ds05-visualisieren-von-timelines
+ * Created by Tobias Kohler on 05.12.2015.
  */
 public class ImageLoader {
 
@@ -101,9 +102,6 @@ public class ImageLoader {
   }
   private URL makeUrl(Date date, int i) throws MalformedURLException{
     Date tempDate = TimeUtils.addTime(date, Image.pixelToTime(this.tileWidth * i, this.zoomLevel));
-    System.out.println("zl: "+zoomLevel);//TODO:remove
-    System.out.println("tw: "+tileWidth);
-    System.out.println("tm: "+Image.pixelToTime(this.tileWidth * i, this.zoomLevel));//TODO:remove
     return new URL(MessageFormat.format("{0}/api?zoomLevel={1}&dateFrom={2}", this.serverBaseURLStr, this.zoomLevel, TimeUtils.toString(tempDate, "yyyy-MM-dd:HH:mm:ss")));
   }
 
@@ -171,12 +169,9 @@ public class ImageLoader {
       for (Long key : tm.keySet()) {
         g.drawImage(tm.get(key).getBufferedImage(), counter * this.tileWidth, 0, null);
         counter++;
-        System.out.println("making: " + counter);//TODO:remove
       }
       Date startDate = tm.firstEntry().getValue().getStartDate();
-      System.out.println(startDate);
       Date endDate = tm.lastEntry().getValue().getEndDate();
-      System.out.println(endDate);
 
       this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);
       updateImage();
@@ -208,7 +203,6 @@ public class ImageLoader {
           g.drawImage(this.diagram.getBufferedImage(), -this.tileWidth, 0, null);
           g.drawImage(te.getValue().getBufferedImage(), w - this.tileWidth, 0, null);
         }
-        System.out.println("making");//TODO:remove
 
 
         this.diagram = new Diagram(img, startDate, endDate, this.zoomLevel);

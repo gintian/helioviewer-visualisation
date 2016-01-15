@@ -1,11 +1,11 @@
 package timelines.gui;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 /**
- * Created by Tobi on 05.12.2015.
+ * Project i4ds05-visualisieren-von-timelines
+ * Created by Tobias Kohler on 05.12.2015.
  */
 public class ImageRunnable implements Runnable {
     private URL url;
@@ -19,12 +19,10 @@ public class ImageRunnable implements Runnable {
     @Override
     public void run() {
         try {
-            System.out.println("thread url: "+ url);//TODO:remove
             byte[] bytes = this.imageLoader.getBytes(url);
             Diagram diagram;
             if (bytes.length!=0) {
                 diagram = new Diagram(bytes);
-                System.out.println("thread url: " + url + " ## thread diagram: " + diagram.getStartDate() + " | " + diagram.getEndDate() + " | " + diagram.getZoomLevel());//TODO:remove
                 this.imageLoader.tileBuffer.addToDiagramBuffer(diagram);
             }else{
                 this.imageLoader.tileBuffer.addEmpty();

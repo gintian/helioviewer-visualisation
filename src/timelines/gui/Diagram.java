@@ -13,12 +13,12 @@ import java.text.ParseException;
 import java.util.Date;
 
 /**
- * Created by Tobi on 05.12.2015.
+ * Project i4ds05-visualisieren-von-timelines
+ * Created by Tobias Kohler on 05.12.2015.
  */
 public class Diagram {
     private BufferedImage bufferedImage;
     private APIImageMetadata metadata;
-    private boolean empty = false;
 
     public Diagram(BufferedImage bufferedImage, APIImageMetadata metadata){
         this.bufferedImage = bufferedImage;
@@ -61,8 +61,5 @@ public class Diagram {
     }
     public int getZoomLevel(){
         return this.metadata.getZoomLevel();
-    }
-    public boolean isEmpty(){
-        return this.empty;
     }
 }

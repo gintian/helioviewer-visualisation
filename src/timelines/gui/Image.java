@@ -67,7 +67,6 @@ public class Image extends JComponent {
   private void setImageOffset(){
     int dtp = timeToPixel(TimeUtils.difference(this.dateFocus, this.dateOrigin), this.zoomLevel); //time difference between image start date (dateOrigin) and date in middle of screen (dazeFocus) converted to pixel
     this.imageOffset = this.pixelFocus-dtp;
-    //this.imageOffset = getWindowCenter()-dtp;
   }
 
   private void moveDateFocusBy(int change){
@@ -86,7 +85,6 @@ public class Image extends JComponent {
   }
 
   private Date getRequestDate(){
-    System.out.println("dateFocus: "+dateFocus);
     return  TimeUtils.addTime(dateFocus, pixelToTime(-getWindowWidthHalf(), this.zoomLevel));
   }
 
@@ -123,54 +121,33 @@ public class Image extends JComponent {
   public void stretchImage(int zoomLevelChange, int cursorPosX){
     try {
       if(zoomLevelChange < 0){
-//        this.bufferedImageWidth *=2;
 
         int stepCount = 10;
         int increasePerStep = bufferedImageWidth / stepCount;
-        System.out.println("width before: " + bufferedImageWidth);
-        System.out.println("width after: " + (bufferedImageWidth + (10* increasePerStep)));
         float percentage = bufferedImageWidth / 100;
         float percentageLeft = (cursorPosX - imageOffset) / percentage;
-        System.out.println("percentage left: " + percentageLeft + "");
-        System.out.println("offset: " + imageOffset);
-
-        // test
-        int testLeft = (int) (bufferedImageWidth / 100f * percentageLeft);
-        System.out.println("calculated offset:" + (-(testLeft - cursorPosX)));
 
         for (int i = 0; i < stepCount; i++) {
           this.bufferedImageWidth += increasePerStep;
           int pixelsLeftOfFocus = (int) (bufferedImageWidth / 100f * percentageLeft);
-          System.out.println("pixels left " + pixelsLeftOfFocus + " mouseX: " + cursorPosX + " image width: " + bufferedImageWidth);
           imageOffset = -(pixelsLeftOfFocus - cursorPosX);
-          System.out.println("offset: " + imageOffset);
           paintImmediately(0, 0, window.getWidth(), window.getHeight());
 
           Thread.sleep(5);
         }
 
       }else{
-        //this.bufferedImageWidth /= 2;
 
         int stepCount = 10;
         int decreasePerStep = bufferedImageWidth / stepCount / 2;
-        System.out.println("width before: " + bufferedImageWidth);
-        System.out.println("width after: " + (bufferedImageWidth + (10* decreasePerStep)));
         float percentage = bufferedImageWidth / 100;
         float percentageLeft = (cursorPosX - imageOffset) / percentage;
-        System.out.println("percentage left: " + percentageLeft + "");
-        System.out.println("offset: " + imageOffset);
 
-        // test
-        int testLeft = (int) (bufferedImageWidth / 100f * percentageLeft);
-        System.out.println("calculated offset:" + (-(testLeft - cursorPosX)));
 
         for (int i = 0; i < stepCount; i++) {
           this.bufferedImageWidth -= decreasePerStep;
           int pixelsLeftOfFocus = (int) (bufferedImageWidth / 100f * percentageLeft);
-          System.out.println("pixels left " + pixelsLeftOfFocus + " mouseX: " + cursorPosX + " image width: " + bufferedImageWidth);
           imageOffset = -(pixelsLeftOfFocus - cursorPosX);
-          System.out.println("offset: " + imageOffset);
           paintImmediately(0, 0, window.getWidth(), window.getHeight());
 
           Thread.sleep(5);
@@ -178,7 +155,6 @@ public class Image extends JComponent {
 
       }
     } catch (InterruptedException e) {
-//       TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
@@ -220,11 +196,6 @@ public class Image extends JComponent {
 
     g.fillRect(0,0,rw,h-rw);
     g.setColor(scaleColor);
-//    int i = h-rw-1;
-//    while(i>=0){
-//      g.drawLine(sp,i,rw-sp,i);
-//      i-=(10);
-//    }
 
     int spacing = currentImageLoader.getTileHeight() / 6;
 
@@ -242,25 +213,16 @@ public class Image extends JComponent {
 
     g.setColor(rulerColor);
     g.fillRect(rw,h-rw,w-rw,rw);
-    /*g.setColor(scaleColor);
-    int j = pixelOrigin;
-    while(j<= bufferedImageWidth + pixelOrigin){
-      g.drawLine(j,h-sp,j,h-(rw-sp));
-      j+=(10*zoomLevel);
-    }
-    g.setColor(rulerColor);*/
     g.fillRect(0, h - rw, rw, rw);
 
     g.setColor(Color.BLACK);
     int dateLabelWidth = 95;
     Date leftMost = TimeUtils.addTime(dateOrigin,pixelToTime(-imageOffset, zoomLevel));
-    Date rightMost = TimeUtils.addTime(leftMost,pixelToTime(window.getWidth() - rulerWidth, zoomLevel));
 
     g.drawString(TimeUtils.toString(leftMost, "dd-MM-yyyy"), rulerWidth, window.getHeight() - 50);
 
     g.setColor(scaleColor);
     g.drawLine(rulerWidth, h - rw + 3, rulerWidth, h - rw + rulerWidth - 6);
-    //g.drawString(TimeUtils.toString(rightMost, "dd-MM-yyyy"), window.getWidth() - dateLabelWidth, window.getHeight() - 50);
 
     int labelPos = dateLabelWidth + 20;
 

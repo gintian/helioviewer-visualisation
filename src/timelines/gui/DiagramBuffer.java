@@ -1,13 +1,11 @@
 package timelines.gui;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 /**
- * Created by Tobi on 05.12.2015.
+ * Project i4ds05-visualisieren-von-timelines
+ * Created by Tobias Kohler on 05.12.2015.
  */
 public class DiagramBuffer {
     private ImageLoader imageLoader;

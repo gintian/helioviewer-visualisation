@@ -80,7 +80,7 @@ public class ImageUtils {
   public static Map<String, String> readCustomData(ImageInputStream iis, ArrayList<String> keys) throws IOException{
     ImageReader imageReader = ImageIO.getImageReadersByFormatName("png").next();
 
-    imageReader.setInput(iis); // ImageIO.createImageInputStream(new ByteArrayInputStream(imageData)), true);
+    imageReader.setInput(iis);
 
     // read metadata of first image
     IIOMetadata metadata = imageReader.getImageMetadata(0);
