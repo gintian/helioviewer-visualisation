@@ -240,7 +240,7 @@ public class ImageLoader {
     byte[] bytes = new byte[0];
     try {
       InputStream is = url.openStream();
-      bytes = sun.misc.IOUtils.readFully(is, -1, true);
+      bytes = is.readAllBytes();
     } catch (IOException e) {
       e.printStackTrace();
     }

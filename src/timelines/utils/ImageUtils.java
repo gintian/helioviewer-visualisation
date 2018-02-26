@@ -26,7 +26,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.imageio.plugins.png.PNGMetadata;
+//import com.sun.imageio.plugins.png.PNGMetadata;
 
 /**
  * Class containing general utility methods for handling image data
@@ -86,19 +86,25 @@ public class ImageUtils {
     IIOMetadata metadata = imageReader.getImageMetadata(0);
 
     //this cast helps getting the contents
-    PNGMetadata pngmeta = (PNGMetadata) metadata;
-    NodeList childNodes = pngmeta.getStandardTextNode().getChildNodes();
+//    PNGMetadata pngmeta = (PNGMetadata) metadata;
+//    NodeList childNodes = pngmeta.getStandardTextNode().getChildNodes();
+    String[] names = metadata.getMetadataFormatNames();
 
     Map<String, String> result = new HashMap<String, String>();
 
-    for (int i = 0; i < childNodes.getLength(); i++) {
-        Node node = childNodes.item(i);
-        String keyword = node.getAttributes().getNamedItem("keyword").getNodeValue();
-        String value = node.getAttributes().getNamedItem("value").getNodeValue();
-        if(keys.contains(keyword)){
-          result.put(keyword, value);
-        }
+    for(String name : names) {
+        metadata.getAsTree(name);
+        // TODO sth. sth. meta
     }
+
+//    for (int i = 0; i < childNodes.getLength(); i++) {
+//        Node node = childNodes.item(i);
+//        String keyword = node.getAttributes().getNamedItem("keyword").getNodeValue();
+//        String value = node.getAttributes().getNamedItem("value").getNodeValue();
+//        if(keys.contains(keyword)){
+//          result.put(keyword, value);
+//        }
+//    }
     return result;
   }
 

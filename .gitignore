@@ -137,7 +137,7 @@ fabric.properties
 .mtj.tmp/
 
 # Package Files #
-*.jar
+# *.jar
 *.war
 *.ear
 *.zip
@@ -210,3 +210,6 @@ $RECYCLE.BIN/
 
 
 # End of https://www.gitignore.io/api/git,java,linux,maven,windows,eclipse,java-web,intellij+all,visualstudiocode
+
+timelines/res*
+timelines/cache*

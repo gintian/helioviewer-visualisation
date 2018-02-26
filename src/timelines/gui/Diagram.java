@@ -1,6 +1,6 @@
 package timelines.gui;
 
-import com.sun.istack.internal.NotNull;
+//import com.sun.istack.internal.NotNull;
 import timelines.api.APIImageMetadata;
 import timelines.utils.TimeUtils;
 
@@ -43,19 +43,20 @@ public class Diagram {
         this.bufferedImage = ImageIO.read(bais);
     }
 
-    @NotNull
+
+//    @NotNull
     public BufferedImage getBufferedImage(){
         return this.bufferedImage;
     }
-    @NotNull
+//    @NotNull
     public APIImageMetadata getAPIImageMetadata(){
         return this.metadata;
     }
-    @NotNull
+//    @NotNull
     public Date getStartDate(){
         return this.metadata.getDateFrom();
     }
-    @NotNull
+//    @NotNull
     public Date getEndDate(){
         return this.metadata.getDateTo();
     }

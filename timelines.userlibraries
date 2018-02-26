@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="javax.servlet-api">
+    <archive path="C:/Users/Hinrich/Source/Repos/heliovis/lib/javax.servlet-api.jar" />
+  </library>
+</eclipse-userlibraries>
+

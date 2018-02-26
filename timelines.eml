@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inheritJdk="true">
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="opencsv-2.3.jar" scope="COMPILE">
+		<srcroot url="file://C:/Users/Matthias/.m2/repository/net/sf/opencsv/opencsv/2.3/opencsv-2.3-sources.jar"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/opencsv-2.3.jar!/"/>
+	</lib>
+	<lib name="json-simple-1.1.1.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/json-simple-1.1.1.jar!/"/>
+	</lib>
+	<levels>
+		<level name="javax.servlet-api" value="project"/>
+	</levels>
+</component>
