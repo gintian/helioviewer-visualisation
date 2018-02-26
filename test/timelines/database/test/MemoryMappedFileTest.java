@@ -67,7 +67,7 @@ public class MemoryMappedFileTest {
 
     Date date = new Date();
 
-    byte[] data =  file.read(0, 16*30*60*24*365);
+    file.read(0, 16*30*60*24*365);
 
     Date timePassed = new Date(new Date().getTime() - date.getTime());
     assertTrue(5000l > timePassed.getTime());
