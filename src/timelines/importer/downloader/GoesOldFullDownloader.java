@@ -26,8 +26,8 @@ public class GoesOldFullDownloader extends AbstractGoesDownloader {
 
     static class Columns {
         public static final int TIMESTAMP = 0;
-        public static final int XS = 2;
-        public static final int XL = 1;
+        public static final int XS = 1;
+        public static final int XL = 2;
     }
 
     /**
