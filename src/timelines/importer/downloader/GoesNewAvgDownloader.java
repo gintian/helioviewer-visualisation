@@ -17,18 +17,18 @@ import timelines.utils.TimeUtils;
  */
 public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
 
-  private String urlTemplate = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_avg/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_1m_{startdate}_{enddate}.csv";
+  private String urlTemplate = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_avg/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_{resolution}_{startdate}_{enddate}.csv";
 
-  public static final Date START_DATE= new Date(839961316000L); // 1996-08-13 20:35:16
+  public static final Date START_DATE= new Date(504921600000L); // 1986-01-01 00:00:00
   public static final Date END_DATE= new Date(983401198000L); // the full downloader starts after this
 
-  public static final int DEFAULT_GOES_NR_MIN = 0;
-  public static final int DEFAULT_GOES_NR_MAX = 20;
+  public static final int DEFAULT_GOES_NR_MIN = 6;
+  public static final int DEFAULT_GOES_NR_MAX = 8;
 
   static class Columns {
     public static final int TIME_TAG = 0;
-    public static final int XS = 1;
-    public static final int XL = 2;
+    public static final int XS = 2;
+    public static final int XL = 1;
   }
 
   /**
@@ -66,6 +66,7 @@ public class GoesNewAvgDownloader extends AbstractGoesDownloader  {
     params.put("month", String.format("%02d", TimeUtils.getMonth(currentDateMidnight)));
     params.put("startdate", TimeUtils.toString(TimeUtils.firstDayOfMonth(currentDateMidnight), "yyyyMMdd")); // currentDateMidnight.dayOfMonth().withMinimumValue().toString("yyyyMMdd"));
     params.put("enddate", TimeUtils.toString(TimeUtils.lastDayOfMonth(currentDateMidnight), "yyyyMMdd")); // currentDateMidnight.dayOfMonth().withMaximumValue().toString("yyyyMMdd"));
+    params.put("resolution", "1m");
 
     final String urlString = StringUtils.format(urlTemplate, params);
     URL url = null;

@@ -17,7 +17,7 @@ import timelines.utils.TimeUtils;
  */
 public class GoesNewFullDownloader extends AbstractGoesDownloader {
 
-  private String templateUrl = "http://satdat.ngdc.noaa.gov/sem/goes/data/new_full/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_2s_{date}_{date}.csv";
+  private String templateUrl = "https://satdat.ngdc.noaa.gov/sem/goes/data/new_full/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_2s_{date}_{date}.csv";
 
   public static final Date START_DATE = new Date(1259622000000L); // TimeUtils.setMidnight(TimeUtils.fromString("2009-12-01", "yyyy-MM-dd"));
 

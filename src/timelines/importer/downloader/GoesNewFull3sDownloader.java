@@ -24,8 +24,8 @@ public class GoesNewFull3sDownloader extends AbstractGoesDownloader {
 
   static class Columns {
     public static final int TIME_TAG = 0;
-    public static final int A_FLUX = 1;
-    public static final int B_FLUX = 2;
+    public static final int XS = 1;
+    public static final int XL = 2;
   }
 
   /**
@@ -39,7 +39,7 @@ public class GoesNewFull3sDownloader extends AbstractGoesDownloader {
 
   private static CsvToGoesSxrLeafConverter createCsvToGoesSxrLeafConverter() {
     final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); // DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZoneUTC();
-    return new CsvToGoesSxrLeafConverter(Columns.TIME_TAG, Columns.A_FLUX, Columns.B_FLUX, dateTimeFormatter);
+    return new CsvToGoesSxrLeafConverter(Columns.TIME_TAG, Columns.XS, Columns.XL, dateTimeFormatter);
   }
 
   @Override

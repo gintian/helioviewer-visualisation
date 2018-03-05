@@ -142,7 +142,7 @@ public class Importer {
     getData(new GoesNewAvgDownloader(), Calendar.MONTH, Calendar.DAY_OF_MONTH, 1, GoesNewAvgDownloader.START_DATE, GoesNewAvgDownloader.END_DATE);
 
     // new 3s data
-    getData(new GoesNewFull3sDownloader(0, 20), Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFull3sDownloader.START_DATE, GoesNewFull3sDownloader.END_DATE);
+    getData(new GoesNewFull3sDownloader(8, 20), Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFull3sDownloader.START_DATE, GoesNewFull3sDownloader.END_DATE);
 
     // new data
     getData(downloader, Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFullDownloader.START_DATE, new Date());
@@ -157,7 +157,7 @@ public class Importer {
   private void getOldData() throws Exception {
     long lastTime = GoesOldFullDownloader.START_DATE.getTime();
 
-    GoesOldFullDownloader downloader = new GoesOldFullDownloader(1, 92);
+    GoesOldFullDownloader downloader = new GoesOldFullDownloader(8, 20);
 
     Date lastAddedDate = GoesOldFullDownloader.START_DATE;
     Calendar cal = Calendar.getInstance();
