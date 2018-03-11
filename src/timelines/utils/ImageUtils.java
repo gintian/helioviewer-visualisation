@@ -23,8 +23,8 @@ import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+// import org.w3c.dom.Node;
+// import org.w3c.dom.NodeList;
 
 //import com.sun.imageio.plugins.png.PNGMetadata;
 

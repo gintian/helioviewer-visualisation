@@ -51,7 +51,7 @@ public class Image extends JComponent {
     }
 
     private void setZoomLevelBoundries() throws IOException, ParseException {
-        HashMap<String, Integer> hm = ImageLoader.getApiInfo(this.serverBaseURLStr);
+        HashMap<String, Integer> hm = ImageLoader.getApiInfo(serverBaseURLStr);
         this.minZoomLevel = hm.get("zoomLevelTo");
         this.maxZoomLevel = hm.get("zoomLevelFrom");
         this.zoomLevel = this.minZoomLevel;
@@ -105,7 +105,7 @@ public class Image extends JComponent {
     }
 
     private void setImage() {
-        this.currentImageLoader = ImageLoader.loadNewSet(this, this.serverBaseURLStr, getRequestDate(), this.zoomLevel);
+        this.currentImageLoader = ImageLoader.loadNewSet(this, serverBaseURLStr, getRequestDate(), this.zoomLevel);
     }
 
     public Window getWindow() {
@@ -182,12 +182,12 @@ public class Image extends JComponent {
     private void checkBounds(int change) {
         if ((change > 0) && !(imageOffset < 0) && !this.loadingNext) {
             loadingNext = true;
-            this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage, this.serverBaseURLStr,
+            this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage, serverBaseURLStr,
                     this.dateOrigin, this.dateLast, this.zoomLevel, ImageLoader.LEFT);
         } else if ((change < 0) && this.window.getContentPane().getWidth() - imageOffset > this.bufferedImage.getWidth()
                 && !this.loadingNext) {
             loadingNext = true;
-            this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage, this.serverBaseURLStr,
+            this.currentImageLoader = ImageLoader.loadAdditional(this, this.bufferedImage, serverBaseURLStr,
                     this.dateOrigin, this.dateLast, this.zoomLevel, ImageLoader.RIGHT);
         }
     }
