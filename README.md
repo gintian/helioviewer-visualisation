@@ -7,7 +7,7 @@ This repository contains the code for the entire i4Ds05 Project.
 ### Prerequisites
 - [JDK 9](http://openjdk.java.net/projects/jdk9/) and [set JAVA_HOME](www.bing.com/search?q=set+JAVA_HOME) to its installation folder.
 - [Gradle](https://gradle.org)
-- [Apache Tomcat](http://tomcat.apache.org)
+- [Apache Tomcat 8](https://tomcat.apache.org/download-80.cgi)
 
 ### Instalation
 1. Open a Terminal, Powershell, ... and execute `git clone https://github.com/stby4/helioviewer-visualisation.git heliovis`.

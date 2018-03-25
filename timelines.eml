@@ -5,15 +5,4 @@
 	<contentEntry url="file://$MODULE_DIR$">
 		<testFolder url="file://$MODULE_DIR$/test"/>
 	</contentEntry>
-	<lib name="opencsv-2.3.jar" scope="COMPILE">
-		<srcroot url="jar://$MODULE_DIR$/lib/opencsv-2.3-sources.jar!/"/>
-		<relative-module-src project-related="jar://$PROJECT_DIR$/lib/opencsv-2.3-sources.jar!/"/>
-		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/opencsv-2.3.jar!/"/>
-	</lib>
-	<lib name="json-simple-1.1.1.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/json-simple-1.1.1.jar!/"/>
-	</lib>
-	<lib name="javax.servlet-api.jar" scope="COMPILE">
-		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/javax.servlet-api.jar!/"/>
-	</lib>
 </component>
