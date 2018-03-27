@@ -1,0 +1,6 @@
+dependencies {
+    compile project(":config")
+    compile project(":utils")
+    compile project(":database")
+    compile 'au.com.bytecode:opencsv:2.4'
+}
