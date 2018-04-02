@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import java.util.Date;
 
 import timelines.config.Config;
-import timelines.importer.downloader.GoesOldFullDownloader;
 
 /**
  * Wrapper for the timelines database
@@ -20,17 +19,12 @@ public class TimelinesDB {
   private MemoryMappedFile lowChannelDB;
   private MemoryMappedFile highChannelDB;
 
-  public static final Date DB_START_DATE = GoesOldFullDownloader.START_DATE;
-
-  private Config config;
+  public static final Date DB_START_DATE = Config.getStartDate();
 
   public TimelinesDB() {
     try {
-
-      config = new Config();
-
-      File fileLow = new File(config.getDbPath() + LOW_CHANNEL_DB_FILE);
-      File fileHigh = new File(config.getDbPath() + HIGH_CHANNEL_DB_FILE);
+      File fileLow = new File(Config.getDbPath() + LOW_CHANNEL_DB_FILE);
+      File fileHigh = new File(Config.getDbPath() + HIGH_CHANNEL_DB_FILE);
       if (!fileLow.exists()) {
         System.out.println(fileLow.getAbsolutePath());
         fileLow.createNewFile();
@@ -39,8 +33,8 @@ public class TimelinesDB {
         fileHigh.createNewFile();
       }
 
-      lowChannelDB = new MemoryMappedFile(config.getDbPath() + LOW_CHANNEL_DB_FILE);
-      highChannelDB = new MemoryMappedFile(config.getDbPath() + HIGH_CHANNEL_DB_FILE);
+      lowChannelDB = new MemoryMappedFile(Config.getDbPath() + LOW_CHANNEL_DB_FILE);
+      highChannelDB = new MemoryMappedFile(Config.getDbPath() + HIGH_CHANNEL_DB_FILE);
 
     } catch (IOException e) {
       e.printStackTrace();
@@ -84,7 +78,7 @@ public class TimelinesDB {
    * @param date the date for which to get the index
    * @return the index in the database for the given date. -1 if there's no data for the given index
    */
-  private long getIndexForDate(Date date) {
+  public long getIndexForDate(Date date) {
 
     if (date.before(DB_START_DATE) || date.after(new Date())) {
       return -1;

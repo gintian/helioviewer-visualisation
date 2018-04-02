@@ -1,8 +1,7 @@
 package timelines.config;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -10,32 +9,35 @@ import java.util.Properties;
  */
 public class Config {
 
-  private Properties properties;
-  String propertiesFile = "config/config.properties";
+    private static Properties properties;
+    private static String propertiesFile = "config/config.properties";
 
-  /**
-   * Creates a new Config object
-   * Reads the configuration from the config.properties file
-   * @throws IOException on error
-   */
-  public Config() throws IOException {
+    {
 
-    InputStream in = getClass().getClassLoader().getResourceAsStream(propertiesFile);
-    properties = new Properties();
+        InputStream in = getClass().getClassLoader().getResourceAsStream(propertiesFile);
+        properties = new Properties();
 
-    if (in != null) {
-      properties.load(in);
-    } else {
-      throw new FileNotFoundException("Could not find the config file: '" + propertiesFile);
+        if (in != null) {
+            try {
+                properties.load(in);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Could not find the config file: '" + propertiesFile);
+        }
     }
-  }
 
-  public String getDbPath() {
-    return properties.getProperty("db_path");
-  }
+    public static String getDbPath() {
+        return properties.getProperty("db_path");
+    }
 
-  public String getCachePath() {
-    return properties.getProperty("cache_path");
-  }
+    public static String getCachePath() {
+        return properties.getProperty("cache_path");
+    }
+
+    public static Date getStartDate() {
+        return new Date(Long.valueOf(properties.getProperty("start_date")));
+    }
 
 }

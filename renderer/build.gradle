@@ -1,6 +1,0 @@
-dependencies {
-    compile project(":api")
-    compile project(":config")
-    compile project(":utils")
-    compile project(":database")
-}

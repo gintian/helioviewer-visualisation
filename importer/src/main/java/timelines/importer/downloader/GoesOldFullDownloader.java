@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import timelines.config.Config;
 import timelines.importer.csv.CsvToGoesSxrLeafConverter;
 import timelines.utils.StringUtils;
 import timelines.utils.TimeUtils;
@@ -20,7 +21,7 @@ public class GoesOldFullDownloader extends AbstractGoesDownloader {
     private String templateUrl = "https://satdat.ngdc.noaa.gov/sem/goes/data/full/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_3s_{date}_{date}.csv";
 
     // public static final Date START_DATE = new Date(141865200000L); // 1974-07-01
-    public static final Date START_DATE = new Date(981020744966L); // 2001-01-01
+    public static final Date START_DATE = Config.getStartDate(); // 2001-01-01
     //   public static final Date END_DATE = new Date(839961314000L); // 1996-08-13 20:35:14
     public static final Date END_DATE = new Date();
 

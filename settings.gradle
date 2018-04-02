@@ -9,4 +9,4 @@
 
 rootProject.name = 'heliovis'
 
-include ":api", ":config", ":database", ":importer", ":renderer", ":utils"
+include ":api", ":config", ":database", ":importer", ":utils"

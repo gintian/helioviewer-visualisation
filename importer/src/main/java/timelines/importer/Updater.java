@@ -1,7 +1,5 @@
 package timelines.importer;
 
-import timelines.renderer.CacheRenderer;
-
 /**
  * Used to import new data and update the database as well as the cache
  */
@@ -23,8 +21,7 @@ public class Updater {
     boolean updated = importer.importNewData();
 
     if(updated) {
-      CacheRenderer renderer = new CacheRenderer();
-      renderer.updateCache();
+      // TODO some calculations, pre-caching
     }
   }
 

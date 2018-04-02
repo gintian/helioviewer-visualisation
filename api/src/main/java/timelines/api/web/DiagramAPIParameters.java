@@ -7,33 +7,36 @@ import java.util.Date;
  */
 public class DiagramAPIParameters {
 
-  public static final String PARAM_DATE_FROM = "dateFrom";
-  public static final String PARAM_ZOOM_LEVEL = "zoomLevel";
+    static final String PARAM_DATE_FROM = "from";
+    static final String PARAM_DATE_TO = "to";
+    static final String PARAM_DATA_POINTS = "points";
 
-  public static final String DATE_FORMAT = "yyyy-MM-dd:HH:mm:ss";
+    static final String PARAM_ZOOM_LEVEL = "zoomLevel";
 
-  private Date dateFrom;
-  private int zoomLevel;
+    static final String DATE_FORMAT = "yyyy-MM-dd:HH:mm:ss";
 
-  @Override
-  public String toString() {
-    return "Date from: " + dateFrom + " Zoom level: " + zoomLevel;
-  }
+    private Date dateFrom;
+    private int zoomLevel;
 
-  public Date getDateFrom() {
-    return dateFrom;
-  }
+    @Override
+    public String toString() {
+        return "Date from: " + dateFrom + " Zoom level: " + zoomLevel;
+    }
 
-  public void setDateFrom(Date dateFrom) {
-    this.dateFrom = dateFrom;
-  }
+    Date getDateFrom() {
+        return dateFrom;
+    }
 
-  public int getZoomLevel() {
-    return zoomLevel;
-  }
+    void setDateFrom(Date dateFrom) {
+        this.dateFrom = dateFrom;
+    }
 
-  public void setZoomLevel(int zoomLevel) {
-    this.zoomLevel = zoomLevel;
-  }
+    int getZoomLevel() {
+        return zoomLevel;
+    }
+
+    void setZoomLevel(int zoomLevel) {
+        this.zoomLevel = zoomLevel;
+    }
 
 }
