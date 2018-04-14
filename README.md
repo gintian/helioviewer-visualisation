@@ -9,10 +9,10 @@ This repository contains the code for the backend of the Helioviewer Timeline Pr
 - [Gradle](https://gradle.org)
 
 ### Instalation
-1. Open a Terminal, Powershell, ... and execute `git clone https://github.com/stby4/helioviewer-visualisation.git heliovis-back`.
+1. Open a terminal, PowerShell, ... and execute `git clone https://github.com/stby4/helioviewer-visualisation.git heliovis-back`.
 2. Install the [.editorconfig plugin](http://editorconfig.org) for your preffered editor (as long as it is [VSCode](https://code.visualstudio.com) or [IntelliJ](https://www.jetbrains.com/idea/)).
 3. Open the `heliovis-back` directory with your editor.
-4. Execute the `gradle importer:runImporter` to create your database for the first time.
+4. Execute `gradle importer:runImporter` in your terminal, PowerShell, ... to create your database for the first time.
 
 ## Projects
 TODO
