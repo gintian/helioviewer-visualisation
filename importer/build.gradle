@@ -4,3 +4,13 @@ dependencies {
     compile project(":database")
     compile 'au.com.bytecode:opencsv:2.4'
 }
+
+task(runUpdater, dependsOn: 'classes', type: JavaExec) {
+    main = "timelines.importer.Updater"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task(runImporter, dependsOn: 'classes', type: JavaExec) {
+    main = "timelines.importer.Importer"
+    classpath = sourceSets.main.runtimeClasspath
+}
