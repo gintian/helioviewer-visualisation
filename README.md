@@ -22,6 +22,7 @@ TODO
 - `gradle importer:runUpdater` updates the database.
 - `gradle api:appRun` starts an [Jetty](http://www.eclipse.org/jetty/) server for the API.
 - Alternatively, `gradle api:tomcatRun` starts a [Tomcat](http://tomcat.apache.org/) server for the API.
+- `gradle api:war` builds a *.war file for deployment on a server.
 
 ## API
 TODO
