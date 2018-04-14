@@ -1,7 +1,6 @@
 package timelines.config;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;

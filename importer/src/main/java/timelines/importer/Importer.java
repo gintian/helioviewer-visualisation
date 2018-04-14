@@ -32,7 +32,6 @@ public class Importer {
     private MemoryMappedFile lowChannelDB;
     private MemoryMappedFile highChannelDB;
     private GoesNewFullDownloader downloader;
-    private Config config;
 
     /**
      * Creates a new Importer object.
