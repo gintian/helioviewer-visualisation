@@ -1,4 +1,4 @@
-package timelines.api.web;
+package timelines.api.webapp;
 
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package timelines.api.web;
+package timelines.api.webapp;
 
 import org.json.simple.JSONObject;
 import timelines.config.Config;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 /**
  * The main data API
  */
-@WebServlet("/api")
+@WebServlet(name = "DataAPI", urlPatterns = {"/api"}, loadOnStartup =1)
 public class DataAPI extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(DataAPI.class.getName());
@@ -53,15 +53,16 @@ public class DataAPI extends HttpServlet {
 
 
         PrintWriter printWriter = response.getWriter();
+        printWriter.append('F');
 
-        try {
-            Date from = TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM), DiagramAPIParameters.DATE_FORMAT);
-            Date to = TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO), DiagramAPIParameters.DATE_FORMAT);
-            JSONObject.writeJSONString(getDataForTimespan(from, to), printWriter);
-        } catch (ParseException pe) {
-            // TODO set http error header, error message
-            JSONObject.writeJSONString(new HashMap(), printWriter);
-        }
+        // try {
+        //     Date from = TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM), DiagramAPIParameters.DATE_FORMAT);
+        //     Date to = TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO), DiagramAPIParameters.DATE_FORMAT);
+        //     JSONObject.writeJSONString(getDataForTimespan(from, to), printWriter);
+        // } catch (ParseException pe) {
+        //     // TODO set http error header, error message
+        //     JSONObject.writeJSONString(new HashMap(), printWriter);
+        // }
 
         printWriter.close();
     }
