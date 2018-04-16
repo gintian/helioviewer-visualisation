@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 public class DataAPI extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(DataAPI.class.getName());
+    
+    private static final int METHOD = 1;
 
     private TimelinesDB timelinesDB;
 
@@ -54,7 +56,9 @@ public class DataAPI extends HttpServlet {
                     DiagramAPIParameters.DATE_FORMAT);
             Date to = TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO),
                     DiagramAPIParameters.DATE_FORMAT);
-            writeDataForTimespan(from, to, printWriter);
+            int res = getResolution(from, to,
+                    Integer.parseInt(request.getParameter(DiagramAPIParameters.PARAM_DATA_POINTS)));
+            writeDataForTimespan(from, to, res, printWriter);
         } catch (ParseException pe) {
             // TODO set http error header, error message
             printWriter.write("[]");
@@ -66,24 +70,60 @@ public class DataAPI extends HttpServlet {
     /**
      * Writes data from and to the specified Dates to the Writer
      */
-    private void writeDataForTimespan(Date from, Date to, Writer writer) throws IOException {
+    private void writeDataForTimespan(Date from, Date to, int resolution, Writer writer) throws IOException {
         ByteBuffer buffer = timelinesDB.getLowChannelData(from, to);
         long index = timelinesDB.getIndexForDate(from);
 
         writer.write('[');
 
         while (buffer.hasRemaining()) {
+            // aggregation
+            float val = buffer.getFloat();
+            ++index;
+
+            switch (METHOD) {
+                case 0: 
+                // Average
+                int count =1;
+
+                for (int i = 0; i < resolution; ++i) {
+                    if (buffer.hasRemaining()) {
+                        val += buffer.getFloat();
+                        ++count;
+                    }
+                    val /= count;
+                }
+
+                break;
+            default:
+                // Max value
+                for (int i = 0; i < resolution; ++i) {
+                    if (buffer.hasRemaining()) {
+                        float next = buffer.getFloat();
+                        ++index;
+                        if (next > val) {
+                            val = next;
+                        }
+                    }
+                }
+            }
+
             writer.write('[');
             // TODO check if timestamp and data match
             Long timestamp = (index * 500) / Float.BYTES + Config.getStartDate().getTime();
             writer.write("" + timestamp);
             writer.write(',');
-            writer.write("" + buffer.getFloat());
+            writer.write("" + val);
             writer.write(']');
             writer.write(',');
-            ++index;
         }
 
         writer.write(']');
+    }
+
+    private int getResolution(Date from, Date to, int points) {
+        long spanSeconds = (to.getTime() - from.getTime()) / 1000;
+        long resolutionSeconds = spanSeconds / (2 * points);
+        return (int) resolutionSeconds;
     }
 }

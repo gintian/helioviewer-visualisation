@@ -13,7 +13,7 @@ import timelines.config.Config;
  */
 public class TimelinesDB {
 
-  public static final String LOW_CHANNEL_DB_FILE = "dbL"; // TODO move this to the config file
+  public static final String LOW_CHANNEL_DB_FILE = "dbL";
   public static final String HIGH_CHANNEL_DB_FILE = "dbH";
 
   private MemoryMappedFile lowChannelDB;
