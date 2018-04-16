@@ -74,6 +74,8 @@ public class DataAPI extends HttpServlet {
     private void writeDataForTimespan(Date from, Date to, int resolution, Writer writer) throws IOException {
         ByteBuffer buffer = timelinesDB.getLowChannelData(from, to);
         long index = timelinesDB.getIndexForDate(from);
+        long end = timelinesDB.getIndexForDate(to);
+        long ticks = index;
 
         writer.write('[');
         boolean isFirst = true;
@@ -97,8 +99,9 @@ public class DataAPI extends HttpServlet {
                         val += buffer.getFloat();
                         ++count;
                     }
-                    val /= count;
+                    ++index;
                 }
+                val /= count;
 
                 break;
             default:
@@ -106,20 +109,20 @@ public class DataAPI extends HttpServlet {
                 for (int i = 0; i < resolution; ++i) {
                     if (buffer.hasRemaining()) {
                         float next = buffer.getFloat();
-                        ++index;
                         if (next > val) {
                             val = next;
                         }
                     }
+                    ++index;
                 }
             }
 
             writer.write('[');
             // TODO check if timestamp and data match
-            Long timestamp = (index * 500) / Float.BYTES + Config.getStartDate().getTime();
-            writer.write("" + timestamp);
+            Long timestamp = from.getTime() + 2000 * (index - ticks);
+            writer.write(String.format("%d", timestamp));
             writer.write(',');
-            writer.write("" + val);
+            writer.write(String.format("%.20f", val));
             writer.write(']');
         }
 
