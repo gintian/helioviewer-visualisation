@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 public class DataAPI extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(DataAPI.class.getName());
-    
+
     private static final int METHOD = 1;
 
     private TimelinesDB timelinesDB;
@@ -48,6 +48,7 @@ public class DataAPI extends HttpServlet {
         logger.log(Level.INFO, "Data API called with parameters: {0}", new Object[] { request.toString() });
 
         response.setContentType("application/json");
+        response.addHeader("Access-Control-Allow-Origin", "*");
 
         PrintWriter printWriter = response.getWriter();
 
@@ -75,16 +76,21 @@ public class DataAPI extends HttpServlet {
         long index = timelinesDB.getIndexForDate(from);
 
         writer.write('[');
+        boolean isFirst = true;
 
         while (buffer.hasRemaining()) {
+            if (!isFirst)
+                writer.write(',');
+            isFirst = false;
+
             // aggregation
             float val = buffer.getFloat();
             ++index;
 
             switch (METHOD) {
-                case 0: 
+            case 0:
                 // Average
-                int count =1;
+                int count = 1;
 
                 for (int i = 0; i < resolution; ++i) {
                     if (buffer.hasRemaining()) {
@@ -115,7 +121,6 @@ public class DataAPI extends HttpServlet {
             writer.write(',');
             writer.write("" + val);
             writer.write(']');
-            writer.write(',');
         }
 
         writer.write(']');
