@@ -3,6 +3,7 @@ dependencies {
     compile project(":utils")
     compile project(":database")
     compile 'au.com.bytecode:opencsv:2.4'
+    compile 'gov.nasa.gsfc.heasarc:nom-tam-fits:1.15.2'
 }
 
 task(runUpdater, dependsOn: 'classes', type: JavaExec) {

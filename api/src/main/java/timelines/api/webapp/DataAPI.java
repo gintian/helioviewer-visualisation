@@ -1,6 +1,5 @@
 package timelines.api.webapp;
 
-import timelines.config.Config;
 import timelines.database.TimelinesDB;
 import timelines.utils.TimeUtils;
 
@@ -72,7 +71,7 @@ public class DataAPI extends HttpServlet {
      * Writes data from and to the specified Dates to the Writer
      */
     private void writeDataForTimespan(Date from, Date to, int resolution, Writer writer) throws IOException {
-        ByteBuffer buffer = timelinesDB.getLowChannelData(from, to);
+        ByteBuffer buffer = timelinesDB.getHighChannelData(from, to);
         long index = timelinesDB.getIndexForDate(from);
         long end = timelinesDB.getIndexForDate(to);
         long ticks = index;
