@@ -4,6 +4,7 @@ import timelines.config.Config;
 import timelines.database.MemoryMappedFile;
 import timelines.database.TimelinesDB;
 import timelines.importer.csv.GoesSxrLeaf;
+import timelines.importer.downloader.FitsDownloader;
 import timelines.importer.downloader.GoesNewFullDownloader;
 import timelines.importer.downloader.GoesOldFullDownloader;
 import timelines.importer.downloader.IDownloader;
@@ -31,7 +32,8 @@ public class Importer {
 
     private MemoryMappedFile lowChannelDB;
     private MemoryMappedFile highChannelDB;
-    private GoesNewFullDownloader downloader;
+    // private GoesNewFullDownloader downloader;
+    private FitsDownloader downloader = new FitsDownloader();
 
     /**
      * Creates a new Importer object.
@@ -57,7 +59,7 @@ public class Importer {
             e.printStackTrace();
         }
 
-        downloader = new GoesNewFullDownloader(8, 20);
+        // downloader = new GoesNewFullDownloader(8, 20);
     }
 
     /**
@@ -143,7 +145,7 @@ public class Importer {
         // getData(new GoesNewFull3sDownloader(8, 20), Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFull3sDownloader.START_DATE, GoesNewFull3sDownloader.END_DATE);
 
         // new data
-        getData(downloader, Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFullDownloader.START_DATE, new Date());
+        getData(downloader, Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, FitsDownloader.START_DATE, new Date());
 
     }
 
@@ -271,6 +273,7 @@ public class Importer {
             cal.add(calendarFieldToIncrement, 1);
             cal.set(calendarFieldToReset, resetValue);
 
+            System.out.println(lastAddedDate);
             List<GoesSxrLeaf> leafs = downloader.getGoesSxrLeafs(lastAddedDate, cal.getTime());
 
 

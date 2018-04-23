@@ -103,6 +103,30 @@ public class DataAPI extends HttpServlet {
                 val /= count;
 
                 break;
+            case 1:
+                // Median
+                boolean isOdd = 0 == resolution % 2;
+
+                float medianHelper = 0;
+                for (int i = 0; i < resolution; ++i) {
+                    if (buffer.hasRemaining()) {
+                        float v = buffer.getFloat();
+
+                        if (isOdd && i == Math.floor(resolution / 2)) {
+                            val = v;
+                        }
+
+                        if (!isOdd && i == resolution / 2 - 1) {
+                            medianHelper = v;
+                        }
+                        if (!isOdd && i == resolution / 2 + 1) {
+                            val = (medianHelper + v) / 2;
+                        }
+                    }
+                    ++index;
+                }
+
+                break;
             default:
                 // Max value
                 for (int i = 0; i < resolution; ++i) {
