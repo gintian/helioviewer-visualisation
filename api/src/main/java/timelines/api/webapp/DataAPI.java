@@ -145,7 +145,11 @@ public class DataAPI extends HttpServlet {
             Long timestamp = from.getTime() + 2000 * (index - ticks);
             writer.write(String.format("%d", timestamp));
             writer.write(',');
-            writer.write(String.format("%.20f", val));
+            if (Float.isNaN(val) || 0 > val) {
+                writer.write('0');
+            } else {
+                writer.write(String.format("%.10f", val));
+            }
             writer.write(']');
         }
 

@@ -4,19 +4,16 @@ import timelines.importer.csv.GoesSxrLeaf;
 import timelines.utils.StringUtils;
 import timelines.utils.TimeUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
-import java.time.temporal.Temporal;
+
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import nom.tam.fits.*;
-import nom.tam.util.ArrayDataInput;
 
 public class FitsDownloader implements IDownloader {
 
@@ -24,10 +21,10 @@ public class FitsDownloader implements IDownloader {
 
     private String urlTemplate = "ftp://umbra.nascom.nasa.gov/goes/fits/{yyyy}/go{goesnr}{yy}{MM}{dd}.fits";
 
-    public static final Date START_DATE = new Date(1104537600000L); // 1980-04-01 00:00:00
+    public static final Date START_DATE = new Date(1009843200000L);
     public static final Date END_DATE = new Date(); // today
 
-    private final int MIN_GOESNR = 2;
+    private final int MIN_GOESNR = 9;
     private final int MAX_GOESNR = 16;
 
     public FitsDownloader() {
@@ -115,7 +112,7 @@ public class FitsDownloader implements IDownloader {
             Calendar cal = Calendar.getInstance();
             cal.setTime(minTime);
             cal.add(Calendar.SECOND, (int) time);
-            GoesSxrLeaf leaf = new GoesSxrLeaf(cal.getTime(), vals[i][0], vals[i][1]);
+            GoesSxrLeaf leaf = new GoesSxrLeaf(cal.getTime(), vals[i][1], vals[i][0]);
 
             leafs.add(leaf);
             ++i;
