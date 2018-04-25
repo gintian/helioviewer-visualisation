@@ -24,7 +24,7 @@ public class FitsDownloader implements IDownloader {
     public static final Date START_DATE = new Date(1009843200000L);
     public static final Date END_DATE = new Date(); // today
 
-    private final int MIN_GOESNR = 9;
+    private final int MIN_GOESNR = 8;
     private final int MAX_GOESNR = 16;
 
     public FitsDownloader() {
