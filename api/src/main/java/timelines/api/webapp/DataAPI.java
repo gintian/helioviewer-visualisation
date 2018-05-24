@@ -24,7 +24,7 @@ public class DataAPI extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(DataAPI.class.getName());
 
-    private static final int METHOD = 1;
+    private static final int METHOD = 5;
 
     private TimelinesDB timelinesDB;
 
@@ -79,7 +79,7 @@ public class DataAPI extends HttpServlet {
         writer.write('[');
         boolean isFirst = true;
 
-        while (buffer.hasRemaining()) {
+        while (buffer.hasRemaining() && index < end) {
             if (!isFirst)
                 writer.write(',');
             isFirst = false;

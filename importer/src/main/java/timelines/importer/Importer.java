@@ -24,7 +24,8 @@ import java.util.logging.Logger;
 // import timelines.importer.downloader.GoesNewFull3sDownloader;
 
 /**
- * Class used to import data from the NOAA CSV Services into the timelines database
+ * Class used to import data from the NOAA CSV Services into the timelines
+ * database
  */
 public class Importer {
 
@@ -36,9 +37,8 @@ public class Importer {
     private FitsDownloader downloader = new FitsDownloader();
 
     /**
-     * Creates a new Importer object.
-     * If the database files do not exist already on the path
-     * defined in the configuration, they will be created here.
+     * Creates a new Importer object. If the database files do not exist already on
+     * the path defined in the configuration, they will be created here.
      */
     public Importer() {
 
@@ -63,15 +63,15 @@ public class Importer {
     }
 
     /**
-     * Used to update the database.
-     * Data between the last record in the database and the current date will be imported.
+     * Used to update the database. Data between the last record in the database and
+     * the current date will be imported.
      *
      * @return true if any records were imported
      * @throws Exception on error
      */
     public boolean importNewData() throws Exception {
 
-        logger.log(Level.INFO, "Updating the database", new Object[]{});
+        logger.log(Level.INFO, "Updating the database", new Object[] {});
         boolean changed = false;
 
         // get timestamp of last entry available in the database
@@ -79,7 +79,8 @@ public class Importer {
         Date lastWrittenDate = lastAvailableDate;
         long lastTime = lastWrittenDate.getTime();
         if (lowChannelDB.getFileSize() != 0) {
-            lastAvailableDate = new Date(Config.getStartDate().getTime() + lowChannelDB.getFileSize() / Float.BYTES * 2000);
+            lastAvailableDate = new Date(
+                    Config.getStartDate().getTime() + lowChannelDB.getFileSize() / Float.BYTES * 2000);
         }
 
         Calendar cal = Calendar.getInstance();
@@ -89,8 +90,12 @@ public class Importer {
         ByteBuffer lowChannelBuffer;
         ByteBuffer highChannelBuffer;
 
-        // the noaa service seems to get updated once a day, so we only have to check for data before today
-        while (!TimeUtils.isSameDay(currentDay, new Date())) {
+        // the noaa service seems to get updated once a day, so we only have to check
+        // for data before yesterday
+        Calendar calYesterday = Calendar.getInstance();
+        calYesterday.add(Calendar.DATE, -1);
+
+        while (!TimeUtils.isSameDay(currentDay, calYesterday.getTime())) {
 
             List<GoesSxrLeaf> data = downloader.getGoesSxrLeafs(lastAvailableDate, currentDay);
 
@@ -121,16 +126,16 @@ public class Importer {
             currentDay = cal.getTime();
         }
         if (changed) {
-            logger.log(Level.INFO, "Database update complete", new Object[]{});
+            logger.log(Level.INFO, "Database update complete", new Object[] {});
         } else {
-            logger.log(Level.INFO, "Database already up to date", new Object[]{});
+            logger.log(Level.INFO, "Database already up to date", new Object[] {});
         }
         return changed;
     }
 
     /**
-     * Used to initialize the database.
-     * Downloads all available data from the older as well as the new services
+     * Used to initialize the database. Downloads all available data from the older
+     * as well as the new services
      *
      * @throws Exception on error
      */
@@ -139,16 +144,26 @@ public class Importer {
         // getOldData();
 
         // new avg
-        // getData(new GoesNewAvgDownloader(), Calendar.MONTH, Calendar.DAY_OF_MONTH, 1, GoesNewAvgDownloader.START_DATE, GoesNewAvgDownloader.END_DATE);
+        // getData(new GoesNewAvgDownloader(), Calendar.MONTH, Calendar.DAY_OF_MONTH, 1,
+        // GoesNewAvgDownloader.START_DATE, GoesNewAvgDownloader.END_DATE);
 
         // new 3s data
-        // getData(new GoesNewFull3sDownloader(8, 20), Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, GoesNewFull3sDownloader.START_DATE, GoesNewFull3sDownloader.END_DATE);
+        // getData(new GoesNewFull3sDownloader(8, 20), Calendar.DAY_OF_YEAR,
+        // Calendar.SECOND, 0, GoesNewFull3sDownloader.START_DATE,
+        // GoesNewFull3sDownloader.END_DATE);
 
         // new data
-        getData(downloader, Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, FitsDownloader.START_DATE, new Date());
+        getData(downloader, Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, new Date(865123200000L),
+                new Date(1262303999000L));
+        // getData(downloader, Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, new
+        // Date(865123200000L), new Date(1514764799000L));
 
+        getData(new GoesNewFullDownloader(13, 18), Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, new Date(1262304000000L),
+                new Date(1388534399000L));
+
+        getData(downloader, Calendar.DAY_OF_YEAR, Calendar.SECOND, 0, new Date(1388534400000L),
+                new Date(1514764799000L)); // till 2017-12-31
     }
-
 
     /**
      * Used to import data from the old full service
@@ -182,7 +197,8 @@ public class Importer {
             }
 
             // we start with the expectation of perfectly valid files.
-            // Should we have to insert placeholder values, the buffers are written to the db and newly initialized as soon as they are full
+            // Should we have to insert placeholder values, the buffers are written to the
+            // db and newly initialized as soon as they are full
             ByteBuffer bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
             ByteBuffer bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
 
@@ -234,7 +250,6 @@ public class Importer {
                 }
             }
 
-
             //
             // write
             //
@@ -250,16 +265,24 @@ public class Importer {
      * Used to import data from the new average and new full services
      *
      * @param downloader               the downloader to use
-     * @param calendarFieldToIncrement the calendar field to increment after every downloaded file.<br>
-     *                                 Specifies the time frame covered by a single CSV file in the used service
-     * @param calendarFieldToReset     the calendar field to reset after downloading a CSV file.<br>
-     *                                 This specifies the start of the time frame a imported record has to match in order to be stored
-     * @param resetValue               the value the reset calendar field has to be set to
-     * @param startDate                the date starting at which data has to be imported
+     * @param calendarFieldToIncrement the calendar field to increment after every
+     *                                 downloaded file.<br>
+     *                                 Specifies the time frame covered by a single
+     *                                 CSV file in the used service
+     * @param calendarFieldToReset     the calendar field to reset after downloading
+     *                                 a CSV file.<br>
+     *                                 This specifies the start of the time frame a
+     *                                 imported record has to match in order to be
+     *                                 stored
+     * @param resetValue               the value the reset calendar field has to be
+     *                                 set to
+     * @param startDate                the date starting at which data has to be
+     *                                 imported
      * @param endDate                  the date up to which data has to be imported
      * @throws Exception on error
      */
-    private void getData(IDownloader downloader, int calendarFieldToIncrement, int calendarFieldToReset, int resetValue, Date startDate, Date endDate) throws Exception {
+    private void getData(IDownloader downloader, int calendarFieldToIncrement, int calendarFieldToReset, int resetValue,
+            Date startDate, Date endDate) throws Exception {
 
         long lastTime = startDate.getTime();
         Date lastAddedDate = startDate;
@@ -276,28 +299,29 @@ public class Importer {
             System.out.println(lastAddedDate);
             List<GoesSxrLeaf> leafs = downloader.getGoesSxrLeafs(lastAddedDate, cal.getTime());
 
-
             if (leafs == null) {
                 // no data (no matching file found)
                 continue;
             }
             if (leafs.size() == 0) {
                 // no data (found a file but no valid data is available)
-                // We try to find another file that hopefully contains valid data by resetting the goesNr
+                // We try to find another file that hopefully contains valid data by resetting
+                // the goesNr
                 downloader.resetGoesNr();
                 leafs = downloader.getGoesSxrLeafs(lastAddedDate, cal.getTime());
 
-                // if we find another / the same file again that has no valid data stored, we skip to the next date
+                // if we find another / the same file again that has no valid data stored, we
+                // skip to the next date
                 if (leafs.size() == 0) {
                     continue;
                 }
             }
 
             // we start with the expectation of perfectly valid files.
-            // Should we have to insert placeholder values, the buffers are written to the db and newly initialized as soon as they are full
+            // Should we have to insert placeholder values, the buffers are written to the
+            // db and newly initialized as soon as they are full
             ByteBuffer bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
             ByteBuffer bufferHigh = ByteBuffer.allocate(leafs.size() * Float.BYTES);
-
 
             int c = 0;
             long prevTime = 0;
@@ -365,7 +389,6 @@ public class Importer {
         long index = (date - Config.getStartDate().getTime()) / 1000 / 2 * Float.BYTES;
         db.write(buffer.array(), index);
     }
-
 
     /**
      * Use this main method to initialize the database

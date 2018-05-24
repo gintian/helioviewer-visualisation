@@ -7,7 +7,8 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 /**
- * Instances of this class allow reading and writing from/to a file in a memory mapped fashion
+ * Instances of this class allow reading and writing from/to a file in a memory
+ * mapped fashion
  */
 public class MemoryMappedFile {
 
@@ -17,10 +18,11 @@ public class MemoryMappedFile {
 
   /**
    * Creates a new MemoryMappedFile object
+   * 
    * @param file the file to be handled in a memory mapped fashion
    * @throws IOException on error
    */
-  public MemoryMappedFile (String file) throws IOException {
+  public MemoryMappedFile(String file) throws IOException {
 
     memoryMappedFile = new RandomAccessFile(file, "rw");
 
@@ -28,20 +30,22 @@ public class MemoryMappedFile {
     long length = memoryMappedFile.length();
 
     while (length >= Integer.MAX_VALUE) {
-      MappedByteBuffer out = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, (long) buffers.size() * (long) Integer.MAX_VALUE, Integer.MAX_VALUE);
+      MappedByteBuffer out = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE,
+          (long) buffers.size() * (long) Integer.MAX_VALUE, Integer.MAX_VALUE);
       buffers.add(out);
       length -= Integer.MAX_VALUE;
     }
     if (length > 0) {
-      MappedByteBuffer out = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, buffers.size() * Integer.MAX_VALUE, length);
+      MappedByteBuffer out = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE,
+          buffers.size() * Integer.MAX_VALUE, length);
       buffers.add(out);
     }
   }
 
-
   /**
    * Read length bytes from the file starting at index
-   * @param index from where to read
+   * 
+   * @param index  from where to read
    * @param length how many bytes to read
    * @return the bytes read from index to index + length
    * @throws IOException
@@ -62,9 +66,11 @@ public class MemoryMappedFile {
 
   /**
    * Reads data starting at the given index
-   * @param index the index from where to start reading
+   * 
+   * @param index  the index from where to start reading
    * @param result an array to which the result will be written
-   * @param offset the offset within the result array at which the result has to be written to
+   * @param offset the offset within the result array at which the result has to
+   *               be written to
    * @param length amount of bytes to be read and written into the result array
    * @throws IOException on error
    */
@@ -80,7 +86,7 @@ public class MemoryMappedFile {
     int originalPosition = buffer.position();
     buffer.position((int) (index % Integer.MAX_VALUE));
 
-    if(buffer.remaining() == 0) {
+    if (buffer.remaining() == 0) {
       return;
     }
 
@@ -98,37 +104,46 @@ public class MemoryMappedFile {
 
   /**
    * Writes the given byte array to the file, starting at index
+   * 
    * @param value the value to write
    * @param index the index to write from
    * @throws IOException
    */
   public void write(byte[] value, long index) throws IOException {
 
-    // case 1: empty file. Create a new buffer with math.min(value.length, int.max_val) capacity, recursive write call
+    // case 1: empty file. Create a new buffer with math.min(value.length,
+    // int.max_val) capacity, recursive write call
     if (getFileSize() == 0) {
-      MappedByteBuffer buffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, Math.min(value.length + index, Integer.MAX_VALUE));
-      buffers.add(buffer);
-      write(value, index);
+      try {
+        MappedByteBuffer buffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0,
+            Math.min(value.length + index, Integer.MAX_VALUE));
+        buffers.add(buffer);
+        write(value, index);
+      } catch (Exception e) {
+        System.out.println(value.toString());
+      }
     }
 
-    // case 2: file too small. Increase last buffers size, add new buffer if necessary. Recursive write call
+    // case 2: file too small. Increase last buffers size, add new buffer if
+    // necessary. Recursive write call
     else if (getFileSize() < (index + value.length)) {
       MappedByteBuffer buffer = buffers.get(buffers.size() - 1);
       if (buffer.capacity() < Integer.MAX_VALUE) {
         // increase last buffers size
-        long newIndex = (long)(buffers.size() - 1) * (long)Integer.MAX_VALUE;
+        long newIndex = (long) (buffers.size() - 1) * (long) Integer.MAX_VALUE;
         int newCapacity = (int) Math.min(index + value.length - newIndex, Integer.MAX_VALUE);
 
-        MappedByteBuffer newBuffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, newIndex , newCapacity);
+        MappedByteBuffer newBuffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, newIndex,
+            newCapacity);
         buffers.remove(buffers.size() - 1);
         buffers.add(newBuffer);
 
-
       } else {
         // add new buffer
-        long newIndex = (long)buffers.size() * (long)Integer.MAX_VALUE;
+        long newIndex = (long) buffers.size() * (long) Integer.MAX_VALUE;
         int newCapacity = (int) Math.min(index + value.length - newIndex, Integer.MAX_VALUE);
-        MappedByteBuffer newBuffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, newIndex, newCapacity);
+        MappedByteBuffer newBuffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, newIndex,
+            newCapacity);
         buffers.add(newBuffer);
       }
 
@@ -136,12 +151,16 @@ public class MemoryMappedFile {
       write(value, index);
     }
 
-    // default: write from index to buffers capacity, recursive call with new index and remaining data if any
+    // default: write from index to buffers capacity, recursive call with new index
+    // and remaining data if any
     else {
       MappedByteBuffer buffer = getBufferForIndex(index);
       int p0 = buffer.position();
-      buffer.position((int) (index % Integer.MAX_VALUE));
-
+      try {
+        buffer.position((int) (index % Integer.MAX_VALUE));
+      } catch (IllegalArgumentException e) {
+        buffer.position(0);
+      }
       // check whether we have to write more than there's space remaining
       // If so, write to the remaining space, then call write again recursively
       // with the remaining values and an index right after the buffers end
@@ -165,9 +184,11 @@ public class MemoryMappedFile {
 
   /**
    * Get the buffer that's needed to access the files given byte index
+   * 
    * @param index the index from where the file has to be accessed.
-   * @return the buffer needed to read from the file starting at the given index.<br>
-   *  Null if the index is outside of the files size
+   * @return the buffer needed to read from the file starting at the given
+   *         index.<br>
+   *         Null if the index is outside of the files size
    * @throws IOException
    */
   private MappedByteBuffer getBufferForIndex(long index) throws IOException {
@@ -187,8 +208,8 @@ public class MemoryMappedFile {
   }
 
   /**
-   * Closes the file.
-   * A closed file cannot be reopened.
+   * Closes the file. A closed file cannot be reopened.
+   * 
    * @see {@link RandomAccessFile#close()}
    * @throws IOException
    */

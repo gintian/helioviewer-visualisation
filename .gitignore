@@ -229,3 +229,4 @@ gradle-app.setting
 
 timelines/res*
 timelines/cache*
+timelines/fits/*

@@ -1,5 +1,6 @@
 package timelines.importer.downloader;
 
+import timelines.config.Config;
 import timelines.importer.csv.GoesSxrLeaf;
 import timelines.utils.StringUtils;
 import timelines.utils.TimeUtils;
@@ -7,6 +8,7 @@ import timelines.utils.TimeUtils;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.FileSystems;
 import java.text.DateFormat;
 
 import java.util.*;
@@ -21,14 +23,13 @@ public class FitsDownloader implements IDownloader {
 
     private String urlTemplate = "ftp://umbra.nascom.nasa.gov/goes/fits/{yyyy}/go{goesnr}{yy}{MM}{dd}.fits";
 
-    public static final Date START_DATE = new Date(1009843200000L);
-    public static final Date END_DATE = new Date(); // today
+    public static final Date START_DATE = new Date(865123200000L);
+    public static final Date END_DATE = new Date(1293839999000L); // 31.12.2010
 
-    private final int MIN_GOESNR = 8;
-    private final int MAX_GOESNR = 16;
+    private final int MIN_GOESNR = 2;
+    private final int MAX_GOESNR = 18;
 
     public FitsDownloader() {
-
     }
 
     @Override
@@ -60,6 +61,7 @@ public class FitsDownloader implements IDownloader {
 
         final String urlString = StringUtils.format(urlTemplate, params);
 
+        // return urlString;
         return new URL(urlString);
     }
 
@@ -78,6 +80,7 @@ public class FitsDownloader implements IDownloader {
         while (goesNr >= MIN_GOESNR) {
             try {
                 URL url = createUrl(csvFileDate, goesNr);
+                // String url = createUrl(csvFileDate, goesNr);
                 List<GoesSxrLeaf> leafs = downloadFitsFile(url, csvFileDate);
 
                 logger.log(Level.INFO, String.format("Downloaded fits file %s", url.toString()));
@@ -86,6 +89,7 @@ public class FitsDownloader implements IDownloader {
                 if (goesNr == MIN_GOESNR) {
                     logger.log(Level.WARNING, String.format("Could not download data for %s",
                             DateFormat.getDateInstance().format(csvFileDate)));
+                    logger.log(Level.INFO, FileSystems.getDefault().getPath(".").toAbsolutePath().toString());
                     logger.log(Level.WARNING, e.getMessage());
                 }
             } finally {
@@ -117,6 +121,8 @@ public class FitsDownloader implements IDownloader {
             leafs.add(leaf);
             ++i;
         }
+
+        f.close();
 
         return leafs;
     }

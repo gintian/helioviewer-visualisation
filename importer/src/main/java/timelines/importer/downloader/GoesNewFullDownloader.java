@@ -19,7 +19,8 @@ public class GoesNewFullDownloader extends AbstractGoesDownloader {
 
   private String templateUrl = "https://satdat.ngdc.noaa.gov/sem/goes/data/new_full/{year}/{month}/goes{goesnr}/csv/g{goesnr}_xrs_2s_{date}_{date}.csv";
 
-  public static final Date START_DATE = new Date(1259621998000L); // TimeUtils.setMidnight(TimeUtils.fromString("2009-12-01", "yyyy-MM-dd"));
+  public static final Date START_DATE = new Date(1293840000000L); // TimeUtils.setMidnight(TimeUtils.fromString("2011-01-01", "yyyy-MM-dd"));
+  public static final Date END_DATE = new Date(1514764799000L); // 31.12.2013
 
   static class Columns {
     public static final int TIME_TAG = 0;
