@@ -52,14 +52,18 @@ public class DataAPI extends HttpServlet {
         PrintWriter printWriter = response.getWriter();
 
         try {
-            Date from = TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM),
-                    DiagramAPIParameters.DATE_FORMAT);
-            Date to = TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO),
-                    DiagramAPIParameters.DATE_FORMAT);
+            // Date from =
+            // TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM),
+            // DiagramAPIParameters.DATE_FORMAT);
+            // Date to =
+            // TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO),
+            // DiagramAPIParameters.DATE_FORMAT);
+            Date from = new Date(Long.parseLong(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM)));
+            Date to = new Date(Long.parseLong(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO)));
             int res = getResolution(from, to,
                     Integer.parseInt(request.getParameter(DiagramAPIParameters.PARAM_DATA_POINTS)));
             writeDataForTimespan(from, to, res, printWriter);
-        } catch (ParseException pe) {
+        } catch (Exception pe) {
             // TODO set http error header, error message
             printWriter.write("[]");
         }
@@ -161,6 +165,10 @@ public class DataAPI extends HttpServlet {
     private int getResolution(Date from, Date to, int points) {
         long spanSeconds = (to.getTime() - from.getTime()) / 1000;
         long resolutionSeconds = spanSeconds / (2 * points);
+
+        if (1 > resolutionSeconds)
+            resolutionSeconds = 1;
+
         return (int) resolutionSeconds;
     }
 }

@@ -13,7 +13,7 @@ public class DiagramAPIParameters {
 
     static final String PARAM_ZOOM_LEVEL = "zoomLevel";
 
-    static final String DATE_FORMAT = "yyyy-MM-dd:HH:mm:ss";
+    static final String DATE_FORMAT = "yyyy-M-d:H:m:s";
 
     private Date dateFrom;
     private int zoomLevel;
