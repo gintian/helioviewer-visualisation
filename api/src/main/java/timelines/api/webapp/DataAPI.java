@@ -86,6 +86,7 @@ public class DataAPI extends HttpServlet {
 
             // aggregation
             float val = buffer.getFloat();
+            long timeIndex = index;
             ++index;
 
             switch (METHOD) {
@@ -134,6 +135,7 @@ public class DataAPI extends HttpServlet {
                         float next = buffer.getFloat();
                         if (next > val) {
                             val = next;
+                            timeIndex = index;
                         }
                     }
                     ++index;
