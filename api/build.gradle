@@ -13,3 +13,7 @@ gretty {
     httpPort = 8080
     contextPath = '/'
 }
+
+war {
+    webXml = file('src/main/java/timelines/api/webapp/web.xml')
+}
