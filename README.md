@@ -22,7 +22,7 @@ TODO
 - `gradle runUpdater` updates the database.
 - `gradle appRunDebug` starts an [Jetty](http://www.eclipse.org/jetty/) server for the API.
 - Alternatively, `gradle tomcatRunDebug` starts a [Tomcat](http://tomcat.apache.org/) server for the API.
-- `gradle api:war` builds a *.war file for deployment on a server.
+- `gradle api:war` builds _/api/build/libs/api.war_ for deployment on a server.
 
 ## Debugging with gretty
 After starting a server with `gradle appRunDebug`, you can listen on communicate with the server on port 5005. Use the VS Code debugger and the `Debug (Attach)` launch configuration to start debugging.
