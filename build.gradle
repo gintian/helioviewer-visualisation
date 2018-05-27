@@ -10,6 +10,6 @@ subprojects {
     }
 
     tasks.withType(JavaExec) {
-        jvmArgs = ['-Xms4096m', '-Xmx4096m']
+        jvmArgs = ['-Xms1024M', '-Xmx6144M']
     }
 }
