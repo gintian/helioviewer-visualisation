@@ -28,7 +28,7 @@ public class ImporterTest {
     // first available entry in the data
     Date date = TimeUtils.fromString("1974-07-01 00:01:16", "yyyy-MM-dd hh:mm:ss");
     Date date2 = new Date(date.getTime() + 2000);
-    ByteBuffer buffer = db.getLowChannelData(date, date2);
+    ByteBuffer buffer = db.getHighChannelData(date, date2);
 
     float f = buffer.getFloat();
     Assert.assertEquals("expected 1.000e-09, found " + f, 1.000e-09, f, 0.2e-9);
@@ -41,7 +41,7 @@ public class ImporterTest {
 
     Date date = TimeUtils.fromString("1996-07-31 23:59:54", "yyyy-MM-dd hh:mm:ss");
     Date date2 = new Date(date.getTime() + 2000);
-    ByteBuffer buffer = db.getLowChannelData(date, date2);
+    ByteBuffer buffer = db.getHighChannelData(date, date2);
 
     float f = buffer.getFloat();
     Assert.assertEquals("expected 5.000e-10, found " + f, 5.000e-10, f, 0.2e-9);
@@ -57,7 +57,7 @@ public class ImporterTest {
 
     Date date = TimeUtils.fromString("1996-09-01 00:00:00.000", "yyyy-MM-dd hh:mm:ss");
     Date date2 = new Date(date.getTime() + 2000 * 30);
-    ByteBuffer buffer = db.getLowChannelData(date, date2);
+    ByteBuffer buffer = db.getHighChannelData(date, date2);
 
     float f = buffer.getFloat();
     while(buffer.hasRemaining()) {
@@ -77,7 +77,7 @@ public class ImporterTest {
 
     Date date = TimeUtils.fromString("2015-11-24 00:00:02", "yyyy-MM-dd hh:mm:ss");
     Date date2 = new Date(date.getTime() + 2000 * 30);
-    ByteBuffer buffer = db.getLowChannelData(date, date2);
+    ByteBuffer buffer = db.getHighChannelData(date, date2);
 
     float f = buffer.getFloat();
     while(buffer.hasRemaining()) {
@@ -101,7 +101,7 @@ public class ImporterTest {
 
     Date date = TimeUtils.fromString("2007-09-01 00:00:00", "yyyy-MM-dd hh:mm:ss");
     Date date2 = new Date(date.getTime() + 2000 * 30);
-    ByteBuffer buffer = db.getLowChannelData(date, date2);
+    ByteBuffer buffer = db.getHighChannelData(date, date2);
 
     float f = buffer.getFloat();
     while(buffer.hasRemaining()) {

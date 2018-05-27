@@ -13,43 +13,25 @@ import timelines.config.Config;
  */
 public class TimelinesDB {
 
-  public static final String LOW_CHANNEL_DB_FILE = "dbL";
   public static final String HIGH_CHANNEL_DB_FILE = "dbH";
 
-  private MemoryMappedFile lowChannelDB;
   private MemoryMappedFile highChannelDB;
 
   public static final Date DB_START_DATE = Config.getStartDate();
 
   public TimelinesDB() {
     try {
-      File fileLow = new File(Config.getDbPath() + LOW_CHANNEL_DB_FILE);
       File fileHigh = new File(Config.getDbPath() + HIGH_CHANNEL_DB_FILE);
-      if (!fileLow.exists()) {
-        System.out.println(fileLow.getAbsolutePath());
-        fileLow.createNewFile();
-      }
+      
       if (!fileHigh.exists()) {
         fileHigh.createNewFile();
       }
 
-      lowChannelDB = new MemoryMappedFile(Config.getDbPath() + LOW_CHANNEL_DB_FILE);
       highChannelDB = new MemoryMappedFile(Config.getDbPath() + HIGH_CHANNEL_DB_FILE);
 
     } catch (IOException e) {
       e.printStackTrace();
     }
-  }
-
-  /**
-   * Reads data from the low channel database from the given start to end date
-   * @param start the date starting from which data has to be retrieved
-   * @param end the end date to which data has to be retrieved
-   * @return a ByteBuffer containing the data
-   * @throws IOException
-   */
-  public ByteBuffer getLowChannelData(Date start, Date end) throws IOException {
-    return getData(start, end, lowChannelDB);
   }
 
   /**
@@ -99,7 +81,6 @@ public class TimelinesDB {
    * @throws IOException
    */
   public void close() throws IOException {
-     lowChannelDB.close();
      highChannelDB.close();
   }
 

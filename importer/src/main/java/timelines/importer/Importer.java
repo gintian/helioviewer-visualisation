@@ -31,7 +31,6 @@ public class Importer {
 
     private static final Logger logger = Logger.getLogger(Importer.class.getName());
 
-    private MemoryMappedFile lowChannelDB;
     private MemoryMappedFile highChannelDB;
     // private GoesNewFullDownloader downloader;
     private FitsDownloader downloader = new FitsDownloader();
@@ -43,16 +42,11 @@ public class Importer {
     public Importer() {
 
         try {
-            File fileLow = new File(Config.getDbPath() + TimelinesDB.LOW_CHANNEL_DB_FILE);
             File fileHigh = new File(Config.getDbPath() + TimelinesDB.HIGH_CHANNEL_DB_FILE);
-            if (!fileLow.exists()) {
-                fileLow.createNewFile();
-            }
             if (!fileHigh.exists()) {
                 fileHigh.createNewFile();
             }
 
-            lowChannelDB = new MemoryMappedFile(Config.getDbPath() + TimelinesDB.LOW_CHANNEL_DB_FILE);
             highChannelDB = new MemoryMappedFile(Config.getDbPath() + TimelinesDB.HIGH_CHANNEL_DB_FILE);
 
         } catch (IOException e) {
@@ -78,16 +72,15 @@ public class Importer {
         Date lastAvailableDate = downloader.getStartDateMidnight();
         Date lastWrittenDate = lastAvailableDate;
         long lastTime = lastWrittenDate.getTime();
-        if (lowChannelDB.getFileSize() != 0) {
+        if (highChannelDB.getFileSize() != 0) {
             lastAvailableDate = new Date(
-                    Config.getStartDate().getTime() + lowChannelDB.getFileSize() / Float.BYTES * 2000);
+                    Config.getStartDate().getTime() + highChannelDB.getFileSize() / Float.BYTES * 2000);
         }
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(lastAvailableDate);
         Date currentDay = cal.getTime();
 
-        ByteBuffer lowChannelBuffer;
         ByteBuffer highChannelBuffer;
 
         // the noaa service seems to get updated once a day, so we only have to check
@@ -103,21 +96,17 @@ public class Importer {
                 continue;
             }
 
-            lowChannelBuffer = ByteBuffer.allocate(data.size() * Float.BYTES);
             highChannelBuffer = ByteBuffer.allocate(data.size() * Float.BYTES);
 
             for (GoesSxrLeaf leaf : data) {
-                lowChannelBuffer.putFloat(leaf.getLowChannel()).array();
                 highChannelBuffer.putFloat(leaf.getHighChannel()).array();
                 lastTime = leaf.getTimestamp().getTime();
             }
 
             // write to the end of the mem. mapped file
-            appendBufferToDb(lowChannelBuffer, lowChannelDB, lastWrittenDate.getTime());
             appendBufferToDb(highChannelBuffer, highChannelDB, lastWrittenDate.getTime());
             lastWrittenDate = new Date(lastTime);
 
-            lowChannelDB.write(lowChannelBuffer.array(), lowChannelDB.getFileSize());
             highChannelDB.write(highChannelBuffer.array(), highChannelDB.getFileSize());
 
             changed = true;
@@ -222,7 +211,6 @@ public class Importer {
                         c++;
 
                         if (!bufferHigh.hasRemaining()) {
-                            appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
                             appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
                             lastWrittenDate = lastTime;
                             bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
@@ -238,7 +226,6 @@ public class Importer {
 
                     // TODO refactor this so we don't have the block twice
                     if (!bufferHigh.hasRemaining()) {
-                        appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
                         appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
                         lastWrittenDate = lastTime;
                         bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
@@ -253,7 +240,6 @@ public class Importer {
             //
             // write
             //
-            appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
             appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
             lastWrittenDate = lastTime;
             bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
@@ -346,7 +332,6 @@ public class Importer {
                         c++;
 
                         if (!bufferHigh.hasRemaining()) {
-                            appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
                             appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
                             lastWrittenDate = lastTime;
                             bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
@@ -362,7 +347,6 @@ public class Importer {
 
                     // TODO refactor this so we don't have the block twice
                     if (!bufferHigh.hasRemaining()) {
-                        appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
                         appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
                         lastWrittenDate = lastTime;
                         bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
@@ -377,7 +361,6 @@ public class Importer {
             //
             // write
             //
-            appendBufferToDb(bufferLow, lowChannelDB, lastWrittenDate);
             appendBufferToDb(bufferHigh, highChannelDB, lastWrittenDate);
             lastWrittenDate = lastTime;
             bufferLow = ByteBuffer.allocate(leafs.size() * Float.BYTES);
