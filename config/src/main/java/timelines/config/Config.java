@@ -8,8 +8,8 @@ import java.util.Date;
 public class Config {
 
     public static String getDbPath() {
-        // return "/mnt/ext-storage/res_";
-        return "..\\timelines\\res_";
+        return "/mnt/ext-storage/res_";
+        // return "..\\timelines\\res_";
     }
 
     public static Date getStartDate() {
