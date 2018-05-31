@@ -1,7 +1,6 @@
 package timelines.api.webapp;
 
 import timelines.database.TimelinesDB;
-import timelines.utils.TimeUtils;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,7 +17,7 @@ import java.util.logging.Logger;
 /**
  * The main data API
  */
-@WebServlet(name = "DataAPI", urlPatterns = { "/api" }, loadOnStartup = 1)
+@WebServlet(name = "DataAPI", urlPatterns = { "/" }, loadOnStartup = 1)
 public class DataAPI extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(DataAPI.class.getName());
