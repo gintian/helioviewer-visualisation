@@ -43,8 +43,7 @@ public class DataAPI extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         logger.log(Level.INFO, "Data API called with parameters: {0}", new Object[] { request.toString() });
-
-        response.addHeader("Access-Control-Allow-Origin", "*");
+        
         response.setContentType("application/json");
 
         PrintWriter printWriter = response.getWriter();
