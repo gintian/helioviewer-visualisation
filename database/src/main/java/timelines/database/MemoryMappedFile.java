@@ -114,14 +114,10 @@ public class MemoryMappedFile {
     // case 1: empty file. Create a new buffer with math.min(value.length,
     // int.max_val) capacity, recursive write call
     if (getFileSize() == 0) {
-      try {
         MappedByteBuffer buffer = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0,
             Math.min(value.length + index, Integer.MAX_VALUE));
         buffers.add(buffer);
         write(value, index);
-      } catch (Exception e) {
-        System.out.println(value.toString());
-      }
     }
 
     // case 2: file too small. Increase last buffers size, add new buffer if

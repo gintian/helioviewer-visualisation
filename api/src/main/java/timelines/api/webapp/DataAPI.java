@@ -44,8 +44,8 @@ public class DataAPI extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         logger.log(Level.INFO, "Data API called with parameters: {0}", new Object[] { request.toString() });
 
-        response.setContentType("application/json");
         response.addHeader("Access-Control-Allow-Origin", "*");
+        response.setContentType("application/json");
 
         PrintWriter printWriter = response.getWriter();
 
@@ -88,6 +88,8 @@ public class DataAPI extends HttpServlet {
 
             // aggregation
             float val = buffer.getFloat();
+            if (Float.isNaN(val) || val < 0)
+                val = 0;
             long timeIndex = index;
             ++index;
 
@@ -98,12 +100,16 @@ public class DataAPI extends HttpServlet {
 
                 for (int i = 0; i < resolution; ++i) {
                     if (buffer.hasRemaining()) {
-                        val += buffer.getFloat();
-                        ++count;
+                        float v = buffer.getFloat();
+                        if (!Float.isNaN(v) && v > 0) {
+                            val += v;
+                            ++count;
+                        }
                     }
                     ++index;
                 }
                 val /= count;
+                timeIndex = index;
 
                 break;
             case 1:
@@ -115,19 +121,22 @@ public class DataAPI extends HttpServlet {
                     if (buffer.hasRemaining()) {
                         float v = buffer.getFloat();
 
-                        if (isOdd && i == Math.floor(resolution / 2)) {
-                            val = v;
-                        }
+                        if (!Float.isNaN(v) && v > 0) {
+                            if (isOdd && i == Math.floor(resolution / 2)) {
+                                val = v;
+                            }
 
-                        if (!isOdd && i == resolution / 2 - 1) {
-                            medianHelper = v;
-                        }
-                        if (!isOdd && i == resolution / 2 + 1) {
-                            val = (medianHelper + v) / 2;
+                            if (!isOdd && i == resolution / 2 - 1) {
+                                medianHelper = v;
+                            }
+                            if (!isOdd && i == resolution / 2 + 1) {
+                                val = (medianHelper + v) / 2;
+                            }
                         }
                     }
                     ++index;
                 }
+                timeIndex = index;
 
                 break;
             default:
@@ -146,7 +155,7 @@ public class DataAPI extends HttpServlet {
 
             writer.write('[');
             // TODO check if timestamp and data match
-            Long timestamp = from.getTime() + 2000 * (index - ticks);
+            Long timestamp = from.getTime() + 2000 * (timeIndex - ticks);
             writer.write(String.format("%d", timestamp));
             writer.write(',');
             if (Float.isNaN(val) || 0 > val) {

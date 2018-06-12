@@ -8,8 +8,8 @@ import java.util.Date;
 import timelines.config.Config;
 
 /**
- * Wrapper for the timelines database
- * Use this class to retrieve data from the timelines database
+ * Wrapper for the timelines database Use this class to retrieve data from the
+ * timelines database
  */
 public class TimelinesDB {
 
@@ -22,7 +22,7 @@ public class TimelinesDB {
   public TimelinesDB() {
     try {
       File fileHigh = new File(Config.getDbPath() + HIGH_CHANNEL_DB_FILE);
-      
+
       if (!fileHigh.exists()) {
         fileHigh.createNewFile();
       }
@@ -36,8 +36,9 @@ public class TimelinesDB {
 
   /**
    * Reads data from the high channel database from the given start to end date
+   * 
    * @param start the date starting from which data has to be retrieved
-   * @param end the end date to which data has to be retrieved
+   * @param end   the end date to which data has to be retrieved
    * @return a ByteBuffer containing the data
    * @throws IOException
    */
@@ -57,8 +58,10 @@ public class TimelinesDB {
 
   /**
    * Gets the index in the database for a given date
+   * 
    * @param date the date for which to get the index
-   * @return the index in the database for the given date. -1 if there's no data for the given index
+   * @return the index in the database for the given date. -1 if there's no data
+   *         for the given index
    */
   public long getIndexForDate(Date date) {
 
@@ -66,7 +69,8 @@ public class TimelinesDB {
       return -1;
     }
 
-    // count of passed 2sec intervals between start date and date * single DB entry length
+    // count of passed 2sec intervals between start date and date * single DB entry
+    // length
     return Math.max(0, (date.getTime() - Config.getStartDate().getTime()) / 1000 / 2 * Float.BYTES - Float.BYTES);
   }
 
@@ -74,14 +78,13 @@ public class TimelinesDB {
     return (to.getTime() - from.getTime()) / 1000 / 2 * Float.BYTES;
   }
 
-
   /**
-   * Closes the database files.
-   * Once closed they cannot be reopened
+   * Closes the database files. Once closed they cannot be reopened
+   * 
    * @throws IOException
    */
   public void close() throws IOException {
-     highChannelDB.close();
+    highChannelDB.close();
   }
 
 }
