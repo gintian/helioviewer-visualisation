@@ -62,7 +62,7 @@ public class DataAPI extends HttpServlet {
                     Integer.parseInt(request.getParameter(DiagramAPIParameters.PARAM_DATA_POINTS)));
             writeDataForTimespan(from, to, res, printWriter);
         } catch (Exception pe) {
-            // TODO set http error header, error message
+            logger.log(Level.WARNING, pe.getMessage());
             printWriter.write("[]");
         }
 
