@@ -15,7 +15,36 @@ This repository contains the code for the backend of the Helioviewer Timeline Pr
 4. Execute `gradle runImporter` in your terminal, PowerShell, ... to create your database for the first time.
 
 ## Projects
-TODO
+<table>
+<thead>
+<tr>
+<th>Project folder</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>api</th>
+<td>Web servlet for a data API to the database.</td>
+</tr>
+<tr>
+<th>config</th>
+<td>Stores global settings, e.g. path to database.</td>
+</tr>
+<tr>
+<th>database</th>
+<td>Handles access to the memory mapped files, offers read / write access.</td>
+</tr>
+<tr>
+<th>importer</th>
+<td>Downloads files with X-ray flux data from various sources, updates database.</td>
+</tr>
+<tr>
+<th>api</th>
+<td>Web servlet for a data API to the database.</td>
+</tr>
+</tbody>
+</table>
 
 ## Gradle commands
 - `gradle runImporter` starts the download of all required data from the NOAA servers. This might take several hours. Only needs to be executed once.
@@ -28,4 +57,47 @@ TODO
 After starting a server with `gradle appRunDebug`, you can listen on communicate with the server on port 5005. Use the VS Code debugger and the `Debug (Attach)` launch configuration to start debugging.
 
 ## API
-TODO
+### Request
+Example request: http://localhost:8080/api/?from=1009843200000&to=1528927023999&points=2926
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Valid values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>from</th>
+<td>Sets the start date for the time series.</td>
+<td>UNIX timestamp in milliseconds, any time</td>
+</tr>
+<tr>
+<th>to</th>
+<td>Sets the end date for the time series.</td>
+<td>UNIX timestamp in milliseconds, any time larger than "from".</td>
+</tr>
+<tr>
+<th>
+points
+</th>
+<td>
+Sets the amount of returned data points. This is only a maximum number, the amount of actually returned data points can be lower.
+</td>
+<td>
+Any integer value larger than 0.
+</td>
+</tr>
+</tbody>
+</table>
+
+### Response
+The response is json formatted:
+``` json
+[
+    ["timestamp in milliseconds", "flux value in Watts/m^2"],
+    ...
+]
+```

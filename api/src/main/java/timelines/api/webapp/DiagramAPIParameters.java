@@ -11,10 +11,6 @@ public class DiagramAPIParameters {
     static final String PARAM_DATE_TO = "to";
     static final String PARAM_DATA_POINTS = "points";
 
-    static final String PARAM_ZOOM_LEVEL = "zoomLevel";
-
-    static final String DATE_FORMAT = "yyyy-M-d:H:m:s";
-
     private Date dateFrom;
     private int zoomLevel;
 

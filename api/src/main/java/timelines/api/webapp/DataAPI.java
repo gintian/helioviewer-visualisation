@@ -45,16 +45,11 @@ public class DataAPI extends HttpServlet {
         logger.log(Level.INFO, "Data API called with parameters: {0}", new Object[] { request.toString() });
         
         response.setContentType("application/json");
+        response.setHeader("Access-Control-Allow-Origin", "*");
 
         PrintWriter printWriter = response.getWriter();
 
         try {
-            // Date from =
-            // TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM),
-            // DiagramAPIParameters.DATE_FORMAT);
-            // Date to =
-            // TimeUtils.fromString(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO),
-            // DiagramAPIParameters.DATE_FORMAT);
             Date from = new Date(Long.parseLong(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM)));
             Date to = new Date(Long.parseLong(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO)));
             int res = getResolution(from, to,
