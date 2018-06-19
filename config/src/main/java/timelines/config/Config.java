@@ -3,7 +3,7 @@ package timelines.config;
 import java.util.Date;
 
 /**
- * Used to access configuration values specified in the config.properties file
+ * Used to access configuration values
  */
 public class Config {
 

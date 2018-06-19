@@ -42,8 +42,9 @@ public class DataAPI extends HttpServlet {
      * @throws IOException
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        logger.log(Level.INFO, "Data API called with parameters: {0}", new Object[] { request.toString() });
-        
+        logger.log(Level.INFO, "Data API called with parameters: {0}",
+                new Object[] { request.getParameterMap().toString() });
+
         response.setContentType("application/json");
         response.setHeader("Access-Control-Allow-Origin", "*");
 
@@ -67,6 +68,8 @@ public class DataAPI extends HttpServlet {
      * Writes data from and to the specified Dates to the Writer
      */
     private void writeDataForTimespan(Date from, Date to, int resolution, Writer writer) throws IOException {
+        long timeBefore = System.currentTimeMillis();
+
         ByteBuffer buffer = timelinesDB.getHighChannelData(from, to);
         long index = timelinesDB.getIndexForDate(from);
         long end = timelinesDB.getIndexForDate(to);
@@ -148,7 +151,6 @@ public class DataAPI extends HttpServlet {
             }
 
             writer.write('[');
-            // TODO check if timestamp and data match
             Long timestamp = from.getTime() + 2000 * (timeIndex - ticks);
             writer.write(String.format("%d", timestamp));
             writer.write(',');
@@ -161,6 +163,11 @@ public class DataAPI extends HttpServlet {
         }
 
         writer.write(']');
+
+        long timeAfter = System.currentTimeMillis();
+        long elapsed = timeAfter - timeBefore;
+        logger.log(Level.INFO, "elapsed: " + elapsed + " ms");
+
     }
 
     private int getResolution(Date from, Date to, int points) {

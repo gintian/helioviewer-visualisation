@@ -6,79 +6,24 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Debug (Launch)-TimeLinesViewer<timelines>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopOnEntry": false,
-            "mainClass": "timelines.gui.TimeLinesViewer",
-            "projectName": "timelines",
-            "args": ""
-        },
-        {
-            "type": "java",
-            "name": "Debug (Launch)-Importer<timelines>",
+            "name": "Debug (Launch)-Importer<importer>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopOnEntry": false,
             "mainClass": "timelines.importer.Importer",
-            "projectName": "timelines",
+            "projectName": "importer",
             "args": ""
         },
         {
             "type": "java",
-            "name": "Debug (Launch)-Updater<timelines>",
+            "name": "Debug (Launch)-Updater<importer>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopOnEntry": false,
             "mainClass": "timelines.importer.Updater",
-            "projectName": "timelines",
-            "args": ""
-        },
-        {
-            "type": "java",
-            "name": "Debug (Launch)-CacheRenderer<timelines>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopOnEntry": false,
-            "mainClass": "timelines.renderer.CacheRenderer",
-            "projectName": "timelines",
-            "args": ""
-        },
-        {
-            "type": "java",
-            "name": "Debug (Launch)-DownloadTest<timelines>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopOnEntry": false,
-            "mainClass": "timelines.performanceTest.DownloadTest",
-            "projectName": "timelines",
-            "args": ""
-        },
-        {
-            "type": "java",
-            "name": "Debug (Launch)-RenderTest<timelines>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopOnEntry": false,
-            "mainClass": "timelines.performanceTest.RenderTest",
-            "projectName": "timelines",
-            "args": ""
-        },
-        {
-            "type": "java",
-            "name": "Debug (Launch)-TimelinesDBTest<timelines>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopOnEntry": false,
-            "mainClass": "timelines.performanceTest.TimelinesDBTest",
-            "projectName": "timelines",
+            "projectName": "importer",
             "args": ""
         },
         {
@@ -86,7 +31,7 @@
             "name": "Debug (Attach)",
             "request": "attach",
             "hostName": "localhost",
-            "port": 5005
+            "port": 0
         }
     ]
 }
