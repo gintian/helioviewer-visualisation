@@ -8,8 +8,4 @@ subprojects {
     dependencies {
         testCompile 'junit:junit:4.12'
     }
-
-    tasks.withType(JavaExec) {
-        jvmArgs = ['-Xms1024M', '-Xmx6144M']
-    }
 }

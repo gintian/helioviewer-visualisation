@@ -22,8 +22,6 @@ public class DataAPI extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(DataAPI.class.getName());
 
-    private static final int METHOD = 5;
-
     private TimelinesDB timelinesDB;
 
     /**
@@ -90,68 +88,20 @@ public class DataAPI extends HttpServlet {
             long timeIndex = index;
             ++index;
 
-            switch (METHOD) {
-            case 0:
-                // Average
-                int count = 1;
-
-                for (int i = 0; i < resolution; ++i) {
-                    if (buffer.hasRemaining()) {
-                        float v = buffer.getFloat();
-                        if (!Float.isNaN(v) && v > 0) {
-                            val += v;
-                            ++count;
-                        }
+            // Max value
+            for (int i = 0; i < resolution; ++i) {
+                if (buffer.hasRemaining()) {
+                    float next = buffer.getFloat();
+                    if (next > val) {
+                        val = next;
+                        timeIndex = index;
                     }
-                    ++index;
                 }
-                val /= count;
-                timeIndex = index;
-
-                break;
-            case 1:
-                // Median
-                boolean isOdd = 0 == resolution % 2;
-
-                float medianHelper = 0;
-                for (int i = 0; i < resolution; ++i) {
-                    if (buffer.hasRemaining()) {
-                        float v = buffer.getFloat();
-
-                        if (!Float.isNaN(v) && v > 0) {
-                            if (isOdd && i == Math.floor(resolution / 2)) {
-                                val = v;
-                            }
-
-                            if (!isOdd && i == resolution / 2 - 1) {
-                                medianHelper = v;
-                            }
-                            if (!isOdd && i == resolution / 2 + 1) {
-                                val = (medianHelper + v) / 2;
-                            }
-                        }
-                    }
-                    ++index;
-                }
-                timeIndex = index;
-
-                break;
-            default:
-                // Max value
-                for (int i = 0; i < resolution; ++i) {
-                    if (buffer.hasRemaining()) {
-                        float next = buffer.getFloat();
-                        if (next > val) {
-                            val = next;
-                            timeIndex = index;
-                        }
-                    }
-                    ++index;
-                }
+                ++index;
             }
 
             writer.write('[');
-            Long timestamp = from.getTime() + 2000 * (timeIndex - ticks);
+            Long timestamp = 2000 * (timeIndex - ticks);
             writer.write(String.format("%d", timestamp));
             writer.write(',');
             if (Float.isNaN(val) || 0 > val) {
