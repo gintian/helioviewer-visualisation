@@ -101,7 +101,7 @@ public class DataAPI extends HttpServlet {
             }
 
             writer.write('[');
-            Long timestamp = 2000 * (timeIndex - ticks);
+            Long timestamp = from.getTime() + 2000 * (timeIndex - ticks);
             writer.write(String.format("%d", timestamp));
             writer.write(',');
             if (Float.isNaN(val) || 0 > val) {
