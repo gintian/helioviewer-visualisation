@@ -1,5 +1,6 @@
 package timelines.api.webapp;
 
+// import timelines.config.Config;
 import timelines.database.TimelinesDB;
 
 import javax.servlet.annotation.WebServlet;
@@ -49,10 +50,17 @@ public class DataAPI extends HttpServlet {
         PrintWriter printWriter = response.getWriter();
 
         try {
-            Date from = new Date(Long.parseLong(request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM)));
-            Date to = new Date(Long.parseLong(request.getParameter(DiagramAPIParameters.PARAM_DATE_TO)));
+            String paramFrom = request.getParameter(DiagramAPIParameters.PARAM_DATE_FROM);
+            paramFrom = paramFrom.substring(0, paramFrom.length() - 3);
+            Date from = new Date(Long.parseLong(paramFrom + "000"));
+
+            String paramTo = request.getParameter(DiagramAPIParameters.PARAM_DATE_TO);
+            paramTo = paramTo.substring(0, paramTo.length() - 3);
+            Date to = new Date(Long.parseLong(paramTo + "000"));
+
             int res = getResolution(from, to,
                     Integer.parseInt(request.getParameter(DiagramAPIParameters.PARAM_DATA_POINTS)));
+
             writeDataForTimespan(from, to, res, printWriter);
         } catch (Exception pe) {
             logger.log(Level.WARNING, pe.getMessage());
@@ -94,14 +102,15 @@ public class DataAPI extends HttpServlet {
                     float next = buffer.getFloat();
                     if (next > val) {
                         val = next;
-                        timeIndex = index;
+                        timeIndex = index + 1;
                     }
                 }
                 ++index;
             }
 
             writer.write('[');
-            Long timestamp = from.getTime() + 2000 * (timeIndex - ticks);
+            Long timestamp = from.getTime() + (timeIndex - ticks) * 2000;
+            // timestamp = Config.getStartDate().getTime() + 2000 * timeIndex;
             writer.write(String.format("%d", timestamp));
             writer.write(',');
             if (Float.isNaN(val) || 0 > val) {
